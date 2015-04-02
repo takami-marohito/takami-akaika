@@ -19,7 +19,7 @@ function Calc_SecondInvariant(time, depth) {
                 v: data_v,
                 w: data_w
             };
-            SecondInvariant = Calc_SecondInvariant_exec(m_object);
+            Calc_SecondInvariant_exec(m_object);
             return m_object;
         });
 }
@@ -35,24 +35,41 @@ function Calc_SecondInvariant_exec(object) {
         console.log("x_length " + x_length);
     }
 
-    return object;
-}
-/*
+    for(var i=0;i<y_length;i++){
+        SecondInvariant[i] = new Array(x_length);
+    }
 
-        SecondInvariant.time = time;
-        SecondInvariant.depth = depth;
-        SecondInvariant.data = new Array(672);
-
-        console.log(MOVE_U);
-
-
-        for (var i = 0; i < 441; i++) {
-            SecondInvariant.data[i] = new Array(441);
-        }
-        for (y = 0; y < 441; y++) {
-            for (x = 0; x < 672; x++) {
-                SecondInvariant.data[y][x] = MOVE_U.data[y][x];
+    for(var x=0;x<x_length;x++){
+        for(var y=0;y<y_length;y++){
+            if(x==0||x==x_length-1||y==0||y==y_length-1){
+                SecondInvariant[y][x] = -50;             //this process pretermits edge calculation.
+            }else{
+                var Tensor = Calc_Tensor(x,y,object);
+                SecondInvariant[y][x] = Tensor[0][1]*Tensor[1][0] - Tensor[0][0]*Tensor[1][1];
             }
         }
     }
-        */
+    if(DEBUG==1) {
+        console.log(SecondInvariant);
+    }
+
+    return object;
+}
+
+
+function Calc_Tensor(x,y,object)
+{
+    var Tensor = [
+        [0,0],
+        [0,0]
+    ];
+    Tensor[0][0] = (object.u.data[y][x+1] - object.u.data[y][x-1]) / 2.0;
+    Tensor[0][1] = (object.u.data[y+1][x] - object.u.data[y-1][x]) / 2.0;
+    Tensor[1][0] = (object.v.data[y][x+1] - object.v.data[y][x-1]) / 2.0;
+    Tensor[1][1] = (object.v.data[y+1][x] - object.v.data[y-1][x]) / 2.0;
+    return Tensor;
+}
+
+//In matrix iXj, tensor = dVi/dVj
+
+//if second invariant is over 0, this area has vortex.
