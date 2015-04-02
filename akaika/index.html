@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head lang="ja">
+    <meta charset="UTF-8">
+    <title>takami</title>
+
+    <script src="js/Constant.js"></script>
+
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/jqdap.js"></script>
+    <script src="js/load_data.js"></script>
+    <script src="js/Calc_SecondInvariant.js"></script>
+    <script src="js/draw_land.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+
+
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#tab1" data-toggle="tab">tab1</a></li>
+    <li><a href="#tab2" data-toggle="tab">tab2</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="tab1">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-1">
+
+                    <script>
+                        //loadMOVEdata(2,2,0,441,0,672,"U");
+                    </script>
+
+                    <div id="mapArea"></div>
+                    <script src="js/draw_map.js"></script>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <script src="js/OnClickFunction.js"></script>
+                    <button data-toggle="button"  value="OFF" class="btn btn-success btn-lg" data-loading-text="loading" autocomplete="off" onclick="OnClickFunction();">Exec</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="output2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="tab2">
+        <p>test</p>
+    </div>
+</div>
+
+<!--
+<div class="container">
+    <div class="row">
+        <div class="col-xs-1">
+
+            <script>
+                loadMOVEdata(2,2,0,441,0,672);
+            </script>
+
+            <div id="mapArea"></div>
+            <script src="js/draw_map.js"></script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <button data-toggle="button"  value="OFF" class="btn btn-success btn-lg" data-loading-text="loading" autocomplete="off" onclick="draw_land();">Exec</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="output2"></div>
+        </div>
+    </div>
+</div>
+-->
+
+<!--
+<input type="button" value="Exec" onclick="draw_land();"/><br />
+-->
+
+
+
+</body>
+</html>
