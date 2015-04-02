@@ -9,10 +9,6 @@ var SecondInvariant = {};
 
 
 function Calc_SecondInvariant(time, depth) {
-    var data_u = {};
-    var data_v = {};
-    var data_w = {};
-
     return jQuery.when(
         loadMOVEdata(time, depth, 0, 441, 0, 672, "U"),
         loadMOVEdata(time, depth, 0, 441, 0, 672, "V"),
@@ -31,9 +27,15 @@ function Calc_SecondInvariant(time, depth) {
 //m_object has three object u,v,w
 //m_object.u.time, m_object.u.depth, m_object.u.type, m_object.u.data[y][x]
 
-function Calc_SecondInvariant_exec(object)
-{
+function Calc_SecondInvariant_exec(object) {
+    var y_length = object.u.data.length;
+    var x_length = object.u.data[0].length;
+    if (DEBUG == 1) {
+        console.log("y_length " + y_length);
+        console.log("x_length " + x_length);
+    }
 
+    return object;
 }
 /*
 

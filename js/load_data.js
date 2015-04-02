@@ -21,7 +21,6 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
     return jqdap.loadData(dap_line,{withCredentials:true})
         .then(function(tmp_T)
         {
-
             //loadしたデータは扱いづらいので並び替える
             //MOVEdata.dataの初期化
             if(DEBUG==1) {
