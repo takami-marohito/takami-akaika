@@ -10,7 +10,7 @@ function OnClickFunction()
 
     Calc_SecondInvariant(2, 0)
         .then(function(m_secondinvariant) {
-            console.log(m_secondinvariant);
+            draw_map();
             draw_land(m_secondinvariant);
         });
 }

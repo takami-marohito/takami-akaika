@@ -34,7 +34,7 @@ function Calc_SecondInvariant_exec(object) {
         console.log("y_length " + y_length);
         console.log("x_length " + x_length);
     }
-
+    SecondInvariant = new Array(y_length);
     for(var i=0;i<y_length;i++){
         SecondInvariant[i] = new Array(x_length);
     }
@@ -49,10 +49,12 @@ function Calc_SecondInvariant_exec(object) {
             }
         }
     }
+
+    SecondInvariant.time = object.u.time;
+
     if(DEBUG==1) {
         console.log(SecondInvariant);
     }
-
     return SecondInvariant;
 }
 
