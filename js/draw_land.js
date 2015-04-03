@@ -7,7 +7,7 @@
 function draw_land(input)
 {
     target = document.getElementById("output2");
-    target.innerHTML = input[3][3];
+    target.innerHTML = input.data[3][3];
     check_minmax_2Dmatrix(input);
 }
 

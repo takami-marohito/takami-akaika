@@ -67,7 +67,7 @@ var map_renderer = new THREE.WebGLRenderer();
 }
 )();
 
-function draw_map()
+function draw_map(SecondInvariant)
 {
     var width = 500;
     var height = 500;
@@ -81,7 +81,7 @@ function draw_map()
 
     geometry = new THREE.Geometry();
 
-    geometry = CreateGeometry();
+    geometry = CreateGeometry(SecondInvariant);
 
     var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
         vertexColors: THREE.VertexColors,
@@ -109,27 +109,27 @@ function draw_map()
     var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
     camera.position.set(0, 0, 1);
     camera.lookAt({x: 0, y: 0, z: 0});
-    camera.position.set(SecondInvariant[0].length/2, SecondInvariant.length/2, 500);
+    camera.position.set(SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, 500);
 
 
     map_renderer.render(scene, camera);
 }
 
-function CreateGeometry()
+function CreateGeometry(SecondInvariant)
 {
     var geometry = new THREE.Geometry();
 
-    for(var y=0;y<SecondInvariant.length-1;y++){
-        for(var x=0;x<SecondInvariant[0].length-1;x++){
+    for(var y=0;y<SecondInvariant.data.length-1;y++){
+        for(var x=0;x<SecondInvariant.data[0].length-1;x++){
             geometry.vertices.push(new THREE.Vector3(x, y, 0));
             geometry.vertices.push(new THREE.Vector3(x+1, y, 0));
             geometry.vertices.push(new THREE.Vector3(x+1, y+1, 0));
             geometry.vertices.push(new THREE.Vector3(x, y+1, 0));
 
-            var tmp_color0 = SecondInvariantToRGB(SecondInvariant[y][x]);
-            var tmp_color1 = SecondInvariantToRGB(SecondInvariant[y][x+1]);
-            var tmp_color2 = SecondInvariantToRGB(SecondInvariant[y+1][x+1]);
-            var tmp_color3 = SecondInvariantToRGB(SecondInvariant[y+1][x]);
+            var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
+            var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
+            var tmp_color2 = SecondInvariantToRGB(SecondInvariant.data[y+1][x+1]);
+            var tmp_color3 = SecondInvariantToRGB(SecondInvariant.data[y+1][x]);
 
             var color0 = new THREE.Color();
             var color1 = new THREE.Color();
@@ -141,10 +141,10 @@ function CreateGeometry()
             color2.setRGB(tmp_color2.red,tmp_color2.green,tmp_color2.blue);
             color3.setRGB(tmp_color3.red,tmp_color3.green,tmp_color3.blue);
 /*
-            console.log(SecondInvariant[0].length);
+            console.log(SecondInvariant.data[0].length);
             console.log(geometry.vertices.length);
             */
-            var coord_index = y*(SecondInvariant[0].length-1)*4 + x*4;
+            var coord_index = y*(SecondInvariant.data[0].length-1)*4 + x*4;
             var face1 = new THREE.Face3(coord_index, coord_index + 1, coord_index + 3);
             face1.vertexColors[0] = color0;
             face1.vertexColors[1] = color1;
