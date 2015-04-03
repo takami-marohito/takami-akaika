@@ -20,7 +20,7 @@ function Calc_SecondInvariant(time, depth) {
                 w: data_w
             };
             Calc_SecondInvariant_exec(m_object);
-            return m_object;
+            return SecondInvariant;
         });
 }
 
@@ -53,7 +53,7 @@ function Calc_SecondInvariant_exec(object) {
         console.log(SecondInvariant);
     }
 
-    return object;
+    return SecondInvariant;
 }
 
 
