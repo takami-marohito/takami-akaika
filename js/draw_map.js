@@ -7,8 +7,8 @@ var map_renderer = new THREE.WebGLRenderer();
 //tmp map before loading geometry data
 ( function()
 {
-    var width = 500;
-    var height = 500;
+    var width = 672;
+    var height = 441;
 
     (function()
     {
@@ -59,7 +59,7 @@ var map_renderer = new THREE.WebGLRenderer();
     map_renderer.shadowMapEnabled = true;
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
 
-    var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 100);
+    var camera = new THREE.OrthographicCamera(-500, 500, 500, -500, 0.01, 100);
     camera.position.set(0, 0, 50);
     camera.lookAt({x: 0, y: 0, z: 0});
 
@@ -69,8 +69,8 @@ var map_renderer = new THREE.WebGLRenderer();
 
 function draw_map(SecondInvariant)
 {
-    var width = 500;
-    var height = 500;
+    var width = 672;
+    var height = 441;
 
     (function()
     {
@@ -106,10 +106,11 @@ function draw_map(SecondInvariant)
     map_renderer.shadowMapEnabled = true;
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
 
-    var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    var camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
     camera.position.set(0, 0, 1);
     camera.lookAt({x: 0, y: 0, z: 0});
-    camera.position.set(SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, 500);
+    camera.position.set(SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, 30);
 
 
     map_renderer.render(scene, camera);
@@ -118,8 +119,8 @@ function draw_map(SecondInvariant)
 function CreateGeometry(SecondInvariant)
 {
     var geometry = new THREE.Geometry();
-
     for(var y=0;y<SecondInvariant.data.length-1;y++){
+        console.log(y);
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
             geometry.vertices.push(new THREE.Vector3(x, y, 0));
             geometry.vertices.push(new THREE.Vector3(x+1, y, 0));
@@ -163,51 +164,27 @@ function CreateGeometry(SecondInvariant)
     return geometry;
 }
 
+var min = 0.1;
+var max = 5;
+var rgb = d3.scale.linear().domain([min,(min+max)/2.0,max]).range(["blue","green","red"]).clamp(true);
+
 function SecondInvariantToRGB(value)
 {
-    var rgb;
-    var min = 0;
-    var max = 20;
-    var range = max - min;
-    var step = range/511.0;
-    if(value < min){
-        rgb = {
-            red:0,
-            green:0,
-            blue:255
-        };
-        return rgb;
-    }
-    if(value > max){
-        rgb = {
-            red:0,
-            green:0,
-            blue:255
-        };
-        return rgb;
-    }
-    if(Math.round((value-min)/step) < 256){
-        rgb = {
-            red:0,
-            green:Math.round((value-min)/step),
-            blue:255-Math.round((value-min)/step)
-        };
-        return rgb;
-    }
-    if(Math.round((value-min)/step) >= 256 && Math.round((value-min)/step) < 512){
-        rgb = {
-            red:Math.round((value-min)/step),
-            green:255-Math.round((value-min)/step),
-            blue:0
-        };
-        return rgb;
-    }
-    rgb = {
-        red:0,
-        green:0,
-        blue:0
+    value_rgb_string = rgb(value);
+
+    value_hex = {
+        red:value_rgb_string.slice(1,3),
+        green:value_rgb_string.slice(3,5),
+        blue:value_rgb_string.slice(5,7)
     };
-    return rgb;
+    //console.log(value_hex);
+    var color = {
+        red:parseInt(value_hex.red,16),
+        green:parseInt(value_hex.green,16),
+        blue:parseInt(value_hex.blue,16)
+    };
+    //console.log(color);
+    return(color);
 }
 
 
