@@ -4,56 +4,15 @@
 
 var map_renderer = new THREE.WebGLRenderer();
 
+var map_scale = 1.0;
+
 //tmp map before loading geometry data
 ( function()
 {
-    var width = 672;
-    var height = 441;
-
-    (function()
-    {
-        d3.select("body").append("svg")
-            .attr("width", width / 2)
-            .attr("height", height / 2);
-    })();
-
-    var geometry = new THREE.Geometry();
-
-    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
-    geometry.vertices.push(new THREE.Vector3(1, 0, 0));
-    geometry.vertices.push(new THREE.Vector3(0, 1, 0));
-
-    var color = new THREE.Color(0xff0000);
-    var color3 = new THREE.Color(0x0000ff);
-    var color2 = new THREE.Color(0xff0000);
-    color2.setRGB(0, 255, 0);
-
-    var coord_index = 0;
-
-    var face = new THREE.Face3(coord_index, coord_index + 1, coord_index + 2);
-    face.vertexColors[0] = color;
-    face.vertexColors[1] = color2;
-    face.vertexColors[2] = color3;
-
-    geometry.faces.push(face);
-
-    var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
-        vertexColors: THREE.VertexColors,
-        side: THREE.DoubleSide,
-        opacity: 0.5,
-        transparent: true
-    });
-
-    var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
+    var width = 672*map_scale;
+    var height = 441*map_scale;
 
     var scene = new THREE.Scene();
-    scene.add(mesh_triangle);
-
-    mesh_triangle.position.set(0, 0, 0);
-
-    geometry.dispose();
-    material_triangle.dispose();
-
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
     map_renderer.shadowMapEnabled = true;
@@ -69,30 +28,34 @@ var map_renderer = new THREE.WebGLRenderer();
 
 function draw_map(SecondInvariant)
 {
-    var width = 672;
-    var height = 441;
-
+    var width = 672*map_scale;
+    var height = 441*map_scale;
+/*
     (function()
     {
         land_map = d3.select("svg")
             .attr("width", width / 2)
             .attr("height", height / 2);
     })();
-
+*/
     geometry = new THREE.Geometry();
 
     geometry = CreateGeometry(SecondInvariant);
 
     var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
         vertexColors: THREE.VertexColors,
-        side: THREE.DoubleSide,
+        side: THREE.FrontSide,
         opacity: 0,
         transparent: false
     });
-    var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
+    //var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
+    var mesh_triangle = new THREE.Mesh(geometry, material_triangle);
 
+    var light = new THREE.DirectionalLight("#AAAAAA");
+    light.position.set(0,0,100);
     var scene = new THREE.Scene();
     scene.add(mesh_triangle);
+    scene.add(light);
 
     mesh_triangle.position.set(0, 0, 0);
 
@@ -103,8 +66,10 @@ function draw_map(SecondInvariant)
 
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
-    map_renderer.shadowMapEnabled = true;
+    map_renderer.shadowMapEnabled = false;
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
+    document.getElementById("mapArea").setAttribute("width",width);
+    document.getElementById("mapArea").setAttribute("height",height);
 
     //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
     var camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
@@ -112,20 +77,31 @@ function draw_map(SecondInvariant)
     camera.lookAt({x: 0, y: 0, z: 0});
     camera.position.set(SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, 30);
 
-
     map_renderer.render(scene, camera);
+
+    document.addEventListener('click',function(e){
+        var rect = document.getElementById("mapArea").getBoundingClientRect();
+        var mouseX = Math.round((e.clientX - rect.left)/map_scale);
+        var mouseY = Math.round((e.clientY - rect.top)/map_scale);
+        if(0<mouseX && mouseX<document.getElementById("mapArea").getAttribute("width") && 0<mouseY && mouseY<document.getElementById("mapArea").getAttribute("height")) {
+            target = document.getElementById("output2");
+            target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY;
+        }
+    },false);
+
 }
+
+
 
 function CreateGeometry(SecondInvariant)
 {
     var geometry = new THREE.Geometry();
     for(var y=0;y<SecondInvariant.data.length-1;y++){
-        console.log(y);
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
             geometry.vertices.push(new THREE.Vector3(x, y, 0));
-            geometry.vertices.push(new THREE.Vector3(x+1, y, 0));
-            geometry.vertices.push(new THREE.Vector3(x+1, y+1, 0));
-            geometry.vertices.push(new THREE.Vector3(x, y+1, 0));
+            geometry.vertices.push(new THREE.Vector3(x+map_scale, y, 0));
+            geometry.vertices.push(new THREE.Vector3(x+map_scale, y+map_scale, 0));
+            geometry.vertices.push(new THREE.Vector3(x, y+map_scale, 0));
 
             var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
             var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
@@ -164,12 +140,22 @@ function CreateGeometry(SecondInvariant)
     return geometry;
 }
 
-var min = 0.1;
-var max = 5;
+var min = -60;
+var max = 60;
 var rgb = d3.scale.linear().domain([min,(min+max)/2.0,max]).range(["blue","green","red"]).clamp(true);
 
 function SecondInvariantToRGB(value)
 {
+    //陸地の処理
+    if(value < -5000){
+        var color_land = {
+            red:0.1,
+            green:0.1,
+            blue:0.1
+        };
+        return(color_land);
+    }
+
     value_rgb_string = rgb(value);
 
     value_hex = {
@@ -179,45 +165,10 @@ function SecondInvariantToRGB(value)
     };
     //console.log(value_hex);
     var color = {
-        red:parseInt(value_hex.red,16),
-        green:parseInt(value_hex.green,16),
-        blue:parseInt(value_hex.blue,16)
+        red:parseInt(value_hex.red,16)/256.0,
+        green:parseInt(value_hex.green,16)/256.0,
+        blue:parseInt(value_hex.blue,16)/256.0
     };
-    //console.log(color);
     return(color);
 }
 
-
-//draw japan from local geometry data
-/*
-d3.json("./japan_geometry/japan.json", function(json){
-    var japan = topojson.object(json, json.objects.japan).geometries;
-    console.log(japan);
-    var projection = d3.geo.mercator()
-        .center([137,36.9])
-        .scale(1000)
-        .translate([width/4,height/4]);
-    var path = d3.geo.path()
-        .projection(projection);
-
-
-    land_map.selectAll("path")
-        .data(japan)
-        .enter()
-        .append("path")
-        .attr("d", path);
-
-
-    land_map.append("rect")
-        .attr("x",100)
-        .attr("y",100)
-        .attr("width",100)
-        .attr("height",100)
-        .attr("fill","green");
-
-
-});
-
-
-map = land_map;
-    */

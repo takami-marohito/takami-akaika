@@ -4,6 +4,7 @@
 
 //#include "load_data.js"
 
+var vortex_size = 1;
 
 function SecondInvariant(Time, Depth)
 {
@@ -30,7 +31,7 @@ function SecondInvariant(Time, Depth)
             }
             for(var x=0;x<this.width;x++){
                 for(var y=0;y<this.height;y++){
-                    if(x==0||x==this.width-1||y==0||y==this.height-1){
+                    if(x<=vortex_size-1||x>=this.width-vortex_size||y<=vortex_size-1||y>=this.height-vortex_size){
                         this.data[y][x] = -50;             //this process pretermits edge calculation.
                     }else{
                         var Tensor = Calc_Tensor(x,y,this);
@@ -47,16 +48,19 @@ function SecondInvariant(Time, Depth)
 //m_object has three object u,v,w
 //m_object.u.time, m_object.u.depth, m_object.u.type, m_object.u.data[y][x]
 
-function Calc_Tensor(x,y,object)
-{
+function Calc_Tensor(x,y,object) {
     var Tensor = [
-        [0,0],
-        [0,0]
+        [0, 0],
+        [0, 0]
     ];
-    Tensor[0][0] = (object.u.data[y][x+1] - object.u.data[y][x-1]) / 2.0;
-    Tensor[0][1] = (object.u.data[y+1][x] - object.u.data[y-1][x]) / 2.0;
-    Tensor[1][0] = (object.v.data[y][x+1] - object.v.data[y][x-1]) / 2.0;
-    Tensor[1][1] = (object.v.data[y+1][x] - object.v.data[y-1][x]) / 2.0;
+    if (object.u.data[y][x + vortex_size] < -100 || object.u.data[y][x - vortex_size] < -100 || object.u.data[y + vortex_size][x] < -100 || object.u.data[y - vortex_size][x] < -100) {
+        Tensor = [[1000, 0], [0, 1000]];
+    } else {
+        Tensor[0][0] = (object.u.data[y][x + vortex_size] - object.u.data[y][x - vortex_size]) / (2.0 * vortex_size);
+        Tensor[0][1] = (object.u.data[y + vortex_size][x] - object.u.data[y - vortex_size][x]) / (2.0 * vortex_size);
+        Tensor[1][0] = (object.v.data[y][x + vortex_size] - object.v.data[y][x - vortex_size]) / (2.0 * vortex_size);
+        Tensor[1][1] = (object.v.data[y + vortex_size][x] - object.v.data[y - vortex_size][x]) / (2.0 * vortex_size);
+    }
     return Tensor;
 }
 
