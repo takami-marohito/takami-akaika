@@ -15,7 +15,7 @@ var map_scale = 1.0;
     var scene = new THREE.Scene();
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
-    map_renderer.shadowMapEnabled = true;
+    map_renderer.shadowMapEnabled = false;
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
 
     var camera = new THREE.OrthographicCamera(-500, 500, 500, -500, 0.01, 100);
@@ -30,14 +30,7 @@ function draw_map(SecondInvariant)
 {
     var width = 672*map_scale;
     var height = 441*map_scale;
-/*
-    (function()
-    {
-        land_map = d3.select("svg")
-            .attr("width", width / 2)
-            .attr("height", height / 2);
-    })();
-*/
+
     geometry = new THREE.Geometry();
 
     geometry = CreateGeometry(SecondInvariant);
@@ -103,24 +96,29 @@ function CreateGeometry(SecondInvariant)
             geometry.vertices.push(new THREE.Vector3(x+map_scale, y+map_scale, 0));
             geometry.vertices.push(new THREE.Vector3(x, y+map_scale, 0));
 
-            var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
-            var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
-            var tmp_color2 = SecondInvariantToRGB(SecondInvariant.data[y+1][x+1]);
-            var tmp_color3 = SecondInvariantToRGB(SecondInvariant.data[y+1][x]);
-
             var color0 = new THREE.Color();
             var color1 = new THREE.Color();
             var color2 = new THREE.Color();
             var color3 = new THREE.Color();
-
+            /*
+            var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
+            var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
+            var tmp_color2 = SecondInvariantToRGB(SecondInvariant.data[y+1][x+1]);
+            var tmp_color3 = SecondInvariantToRGB(SecondInvariant.data[y+1][x]);
             color0.setRGB(tmp_color0.red,tmp_color0.green,tmp_color0.blue);
             color1.setRGB(tmp_color1.red,tmp_color1.green,tmp_color1.blue);
             color2.setRGB(tmp_color2.red,tmp_color2.green,tmp_color2.blue);
             color3.setRGB(tmp_color3.red,tmp_color3.green,tmp_color3.blue);
-/*
-            console.log(SecondInvariant.data[0].length);
-            console.log(geometry.vertices.length);
             */
+            var tmp_color0 = SecondInvariantToHSL_white(SecondInvariant.data[y][x]);
+            var tmp_color1 = SecondInvariantToHSL_white(SecondInvariant.data[y][x+1]);
+            var tmp_color2 = SecondInvariantToHSL_white(SecondInvariant.data[y+1][x+1]);
+            var tmp_color3 = SecondInvariantToHSL_white(SecondInvariant.data[y+1][x]);
+            color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
+            color1.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
+            color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
+            color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
+
             var coord_index = y*(SecondInvariant.data[0].length-1)*4 + x*4;
             var face1 = new THREE.Face3(coord_index, coord_index + 1, coord_index + 3);
             face1.vertexColors[0] = color0;
@@ -136,14 +134,214 @@ function CreateGeometry(SecondInvariant)
             geometry.faces.push(face2);
         }
     }
-    console.log(geometry);
     return geometry;
 }
 
-var min = -60;
-var max = 60;
-var rgb = d3.scale.linear().domain([min,(min+max)/2.0,max]).range(["blue","green","red"]).clamp(true);
+var colorlegend_min = -60;
+var colorlegend_max = 60;
 
+
+
+function addColorLegend_Vertical()
+{
+    var width = 30;
+    var height = 400;
+    var legend_geometry = new THREE.Geometry();
+
+    if(height < 3){
+        console.log("color legend's height wrong");
+    }
+
+    for(var i=0;i<height-1;i++){
+        legend_geometry.vertices.push(new THREE.Vector3(0, i, 0));
+        legend_geometry.vertices.push(new THREE.Vector3(0+width, i, 0));
+        legend_geometry.vertices.push(new THREE.Vector3(0+width, i+1, 0));
+        legend_geometry.vertices.push(new THREE.Vector3(0, i+1, 0));
+
+        //var legend_step = 1.0 / (height-1.0) * (colorlegend_max-colorlegend_min);
+        var legend_step = (colorlegend_max-colorlegend_min) / (height-1.0) ;
+
+        var tmp_color0 = SecondInvariantToHSL_white(i*legend_step+colorlegend_min);
+        var tmp_color1 = SecondInvariantToHSL_white(i*legend_step+colorlegend_min);
+        var tmp_color2 = SecondInvariantToHSL_white((i+1.0)*legend_step+colorlegend_min);
+        var tmp_color3 = SecondInvariantToHSL_white((i+1.0)*legend_step+colorlegend_min);
+
+        var color0 = new THREE.Color();
+        var color1 = new THREE.Color();
+        var color2 = new THREE.Color();
+        var color3 = new THREE.Color();
+
+        color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
+        color1.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
+        color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
+        color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
+
+        var coord_index = i*4;
+        var face1 = new THREE.Face3(coord_index, coord_index + 1, coord_index + 3);
+        face1.vertexColors[0] = color0;
+        face1.vertexColors[1] = color1;
+        face1.vertexColors[2] = color3;
+
+        var face2 = new THREE.Face3(coord_index+1, coord_index + 2, coord_index + 3);
+        face2.vertexColors[0] = color1;
+        face2.vertexColors[1] = color2;
+        face2.vertexColors[2] = color3;
+
+        legend_geometry.faces.push(face1);
+        legend_geometry.faces.push(face2);
+    }
+
+    var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
+        vertexColors: THREE.VertexColors,
+        side: THREE.FrontSide,
+        opacity: 0,
+        transparent: false
+    });
+
+    var mesh_triangle = new THREE.Mesh(legend_geometry, material_triangle);
+
+    var light = new THREE.DirectionalLight("#AAAAAA");
+    light.position.set(0,0,100);
+    var scene = new THREE.Scene();
+    scene.add(mesh_triangle);
+    scene.add(light);
+/*
+    var legend_text_geometry = new THREE.TextGeometry(colorlegend_min,
+        {
+            size: 10,
+            height: 30
+        }) ;
+    var text_material = new THREE.MeshBasicMaterial({color:0x000000});
+    var text_mesh = new THREE.Mesh(legend_text_geometry, text_material);
+
+    scene.add(text);
+*/
+    mesh_triangle.position.set(0, 0, 0);
+
+    legend_geometry.dispose();
+    material_triangle.dispose();
+    var legend_renderer = new THREE.WebGLRenderer();
+    legend_renderer.setSize(width+100, height);
+    legend_renderer.setClearColor(0xffffff, 1);
+    legend_renderer.shadowMapEnabled = false;
+    document.getElementById("ColorLegend").appendChild(legend_renderer.domElement);
+    document.getElementById("ColorLegend").setAttribute("width",width);
+    document.getElementById("ColorLegend").setAttribute("height",height);
+
+    //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    var camera = new THREE.OrthographicCamera(-width/2-50, width/2+50, height/2, -height/2, 0.01, 1000);
+    camera.position.set(0, 0, 1);
+    camera.lookAt({x: 0, y: 0, z: 0});
+    camera.position.set(width/2+50, height/2, 30);
+    legend_renderer.render(scene, camera);
+}
+
+function addColorLegend_Horizontal()
+{
+    var width = 400;
+    var height = 30;
+    var legend_geometry = new THREE.Geometry();
+
+    if(height < 3){
+        console.log("color legend's height wrong");
+    }
+
+    for(var i=0;i<width-1;i++){
+        legend_geometry.vertices.push(new THREE.Vector3(i, 0, 0));
+        legend_geometry.vertices.push(new THREE.Vector3(i+1, 0, 0));
+        legend_geometry.vertices.push(new THREE.Vector3(i+1, 0+height, 0));
+        legend_geometry.vertices.push(new THREE.Vector3(i, 0+height, 0));
+
+        //var legend_step = 1.0 / (height-1.0) * (colorlegend_max-colorlegend_min);
+        var legend_step = (colorlegend_max-colorlegend_min) / (width-1.0) ;
+
+        var tmp_color0 = SecondInvariantToHSL_white(i*legend_step+colorlegend_min);
+        var tmp_color3 = SecondInvariantToHSL_white(i*legend_step+colorlegend_min);
+        var tmp_color1 = SecondInvariantToHSL_white((i+1.0)*legend_step+colorlegend_min);
+        var tmp_color2 = SecondInvariantToHSL_white((i+1.0)*legend_step+colorlegend_min);
+
+        var color0 = new THREE.Color();
+        var color1 = new THREE.Color();
+        var color2 = new THREE.Color();
+        var color3 = new THREE.Color();
+
+        color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
+        color3.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
+        color1.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
+        color2.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
+
+        var coord_index = i*4;
+        var face1 = new THREE.Face3(coord_index, coord_index + 1, coord_index + 3);
+        face1.vertexColors[0] = color0;
+        face1.vertexColors[1] = color1;
+        face1.vertexColors[2] = color3;
+
+        var face2 = new THREE.Face3(coord_index+1, coord_index + 2, coord_index + 3);
+        face2.vertexColors[0] = color1;
+        face2.vertexColors[1] = color2;
+        face2.vertexColors[2] = color3;
+
+        legend_geometry.faces.push(face1);
+        legend_geometry.faces.push(face2);
+    }
+
+    var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
+        vertexColors: THREE.VertexColors,
+        side: THREE.FrontSide,
+        opacity: 0,
+        transparent: false
+    });
+
+    var mesh_triangle = new THREE.Mesh(legend_geometry, material_triangle);
+
+    var light = new THREE.DirectionalLight("#AAAAAA");
+    light.position.set(0,0,100);
+    var scene = new THREE.Scene();
+    scene.add(mesh_triangle);
+    scene.add(light);
+
+    var textGeoMin = new THREE.TextGeometry(colorlegend_min,{
+        size: 13,
+        height: 20
+    }) ;
+    var textMaterialMin = new THREE.MeshBasicMaterial({color:0x000000});
+    var textMin = new THREE.Mesh(textGeoMin, textMaterialMin);
+    textMin.position.set(0,-15,100);
+    textMin.doubleSided=true;
+    scene.add( textMin );
+
+    var textGeoMax = new THREE.TextGeometry(colorlegend_max,{
+        size: 13,
+        height: 20
+    }) ;
+    var textMaterialMax = new THREE.MeshBasicMaterial({color:0x000000});
+    var textMax = new THREE.Mesh(textGeoMax, textMaterialMax);
+    textMax.position.set(370,-15,100);
+    textMax.doubleSided=true;
+    scene.add( textMax );
+
+    mesh_triangle.position.set(0, 0, 0);
+
+    legend_geometry.dispose();
+    material_triangle.dispose();
+    var legend_renderer = new THREE.WebGLRenderer();
+    legend_renderer.setSize(width, height+40);
+    legend_renderer.setClearColor(0xffffff, 1);
+    legend_renderer.shadowMapEnabled = false;
+    document.getElementById("ColorLegend").appendChild(legend_renderer.domElement);
+    document.getElementById("ColorLegend").setAttribute("width",width);
+    document.getElementById("ColorLegend").setAttribute("height",height);
+
+    //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    var camera = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2-40, 0.01, 1000);
+    camera.position.set(0, 0, 1);
+    camera.lookAt({x: 0, y: 0, z: 0});
+    camera.position.set(width/2, height/2, 300);
+    legend_renderer.render(scene, camera);
+}
+
+var interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);
+//関数内で定義したら時間がかかった->何度もこれを実行するから
 function SecondInvariantToRGB(value)
 {
     //陸地の処理
@@ -156,7 +354,7 @@ function SecondInvariantToRGB(value)
         return(color_land);
     }
 
-    value_rgb_string = rgb(value);
+    value_rgb_string = interpolate_rgb(value);
 
     value_hex = {
         red:value_rgb_string.slice(1,3),
@@ -172,3 +370,58 @@ function SecondInvariantToRGB(value)
     return(color);
 }
 
+var interpolate_hsl = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0.66,0.33,0]).clamp(true);  //hslでは0.66が青で0が赤
+function SecondInvariantToHSL(value)
+{
+    //陸地の処理
+    if(value < -5000){
+        var color_land = {
+            h:0.1,
+            s:0,
+            l:0
+        };
+        return(color_land);
+    }
+
+    var hofhsl = interpolate_hsl(value);
+    //console.log(value_hex);
+    var color = {
+        h:hofhsl,
+        s:1.0,
+        l:0.5
+    };
+    return(color);
+}
+
+var interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0,0.5,1]).clamp(true);  //hslでは0.66が青で0が赤
+function SecondInvariantToHSL_white(value)
+{
+    //陸地の処理
+    if(value < -5000){
+        var color_land = {
+            h:0.1,
+            s:0,
+            l:0
+        };
+        return(color_land);
+    }
+
+    var location = interpolate_white(value);
+    //console.log(value_hex);
+    if(location >= 0.5){
+        var color = {
+            h:0,
+            s:1.0,
+            l:1.5 - location
+        };
+        return color;
+    }else{
+        var color = {
+            h:0.66,
+            s:1.0,
+            l:location+0.5
+        };
+        return color;
+    }
+    return(color);
+}

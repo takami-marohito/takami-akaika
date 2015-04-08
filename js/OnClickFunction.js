@@ -11,6 +11,7 @@ function OnClickFunction() {
     ).then(function (m_secondinvariant) {
             draw_map(m_secondinvariant);
             draw_land(m_secondinvariant);
+            addColorLegend_Horizontal();
             return m_secondinvariant;
         });
 }
