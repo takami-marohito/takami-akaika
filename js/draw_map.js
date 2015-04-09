@@ -29,6 +29,8 @@ var map_scale = 1.0;
 
 function draw_map(SecondInvariant)
 {
+    updateSecondInvariantMinMax();
+
     var width = 672*map_scale;
     var height = 441*map_scale;
 
@@ -452,4 +454,13 @@ function VortexTypeToHSL_white(value)
         l:0
     };
     return(color);
+}
+
+function updateSecondInvariantMinMax()
+{
+    colorlegend_min = eval(document.forms.SecondInvariant.SecondInvariantMin.value);
+    colorlegend_max = eval(document.forms.SecondInvariant.SecondInvariantMax.value);
+    interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0,0.5,1]).clamp(true);
+    interpolate_hsl = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0.66,0.33,0]).clamp(true);
+    interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);
 }
