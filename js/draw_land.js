@@ -4,8 +4,8 @@
 
 
 
-function draw_land(input)
+function draw_land()
 {
     target = document.getElementById("output2");
-    target.innerHTML = input.data[3][3];
+    target.innerHTML = "";
 }

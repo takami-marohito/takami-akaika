@@ -3,6 +3,7 @@
  */
 
 var map_renderer = new THREE.WebGLRenderer();
+//new webglrenderer()するとコンソールログが出る
 
 var map_scale = 1.0;
 
@@ -78,7 +79,7 @@ function draw_map(SecondInvariant)
         var mouseY = Math.round((e.clientY - rect.top)/map_scale);
         if(0<mouseX && mouseX<document.getElementById("mapArea").getAttribute("width") && 0<mouseY && mouseY<document.getElementById("mapArea").getAttribute("height")) {
             target = document.getElementById("output2");
-            target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY;
+            target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY + "  this point's vortex is " + SecondInvariant.vortex_type[441-mouseY][mouseX];
         }
     },false);
 
@@ -110,6 +111,7 @@ function CreateGeometry(SecondInvariant)
             color2.setRGB(tmp_color2.red,tmp_color2.green,tmp_color2.blue);
             color3.setRGB(tmp_color3.red,tmp_color3.green,tmp_color3.blue);
             */
+
             var tmp_color0 = SecondInvariantToHSL_white(SecondInvariant.data[y][x]);
             var tmp_color1 = SecondInvariantToHSL_white(SecondInvariant.data[y][x+1]);
             var tmp_color2 = SecondInvariantToHSL_white(SecondInvariant.data[y+1][x+1]);
@@ -119,6 +121,16 @@ function CreateGeometry(SecondInvariant)
             color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
             color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
 
+            /*
+            var tmp_color0 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y][x]);
+            var tmp_color1 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y][x+1]);
+            var tmp_color2 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y+1][x+1]);
+            var tmp_color3 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y+1][x]);
+            color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
+            color1.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
+            color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
+            color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
+            */
             var coord_index = y*(SecondInvariant.data[0].length-1)*4 + x*4;
             var face1 = new THREE.Face3(coord_index, coord_index + 1, coord_index + 3);
             face1.vertexColors[0] = color0;
@@ -139,8 +151,7 @@ function CreateGeometry(SecondInvariant)
 
 var colorlegend_min = -60;
 var colorlegend_max = 60;
-
-
+var legend_renderer = new THREE.WebGLRenderer();
 
 function addColorLegend_Vertical()
 {
@@ -205,22 +216,13 @@ function addColorLegend_Vertical()
     var scene = new THREE.Scene();
     scene.add(mesh_triangle);
     scene.add(light);
-/*
-    var legend_text_geometry = new THREE.TextGeometry(colorlegend_min,
-        {
-            size: 10,
-            height: 30
-        }) ;
-    var text_material = new THREE.MeshBasicMaterial({color:0x000000});
-    var text_mesh = new THREE.Mesh(legend_text_geometry, text_material);
 
-    scene.add(text);
-*/
     mesh_triangle.position.set(0, 0, 0);
 
     legend_geometry.dispose();
     material_triangle.dispose();
-    var legend_renderer = new THREE.WebGLRenderer();
+
+    legend_renderer = new THREE.WebGLRenderer();
     legend_renderer.setSize(width+100, height);
     legend_renderer.setClearColor(0xffffff, 1);
     legend_renderer.shadowMapEnabled = false;
@@ -324,7 +326,7 @@ function addColorLegend_Horizontal()
 
     legend_geometry.dispose();
     material_triangle.dispose();
-    var legend_renderer = new THREE.WebGLRenderer();
+
     legend_renderer.setSize(width, height+40);
     legend_renderer.setClearColor(0xffffff, 1);
     legend_renderer.shadowMapEnabled = false;
@@ -423,5 +425,31 @@ function SecondInvariantToHSL_white(value)
         };
         return color;
     }
+    return(color);
+}
+
+function VortexTypeToHSL_white(value)
+{
+    if(value == "stable"){
+        var color = {
+            h:0,
+            s:1.0,
+            l:0.6
+        };
+        return color;
+    }
+    if(value == "unstable"){
+        var color = {
+            h:0.66,
+            s:1.0,
+            l:0.6
+        };
+        return color;
+    }
+    var color = {
+        h:0,
+        s:0,
+        l:0
+    };
     return(color);
 }
