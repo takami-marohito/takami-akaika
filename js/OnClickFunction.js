@@ -24,7 +24,7 @@ function OnClickFunction() {
 function button_loading_text()
 {
     var target = document.getElementById("button_exec");
-    target.innerHTML = "loading";
+    target.innerHTML = "loading&Calculating";
     return 0;
 }
 
