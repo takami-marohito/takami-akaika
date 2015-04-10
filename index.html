@@ -31,6 +31,37 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
+                    <form id="LongitudeRange" class="form-inline" role="form">
+                        <label for="Longitude_range">Longitude Range（経度の範囲）</label>
+                        <input type="number" name="name1" id="LongitudeMinInt" class="form-control"  value="116">
+                        度
+                        <input type="number" name="name1" id="LongitudeMinDec" class="form-control"  value="50">
+                        分~
+                        <input type="number" name="name2" id="LongitudeMaxInt" class="form-control"  value="200">
+                        度
+                        <input type="number" name="name2" id="LongitudeMaxDec" class="form-control"  value="15">
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <form id="LatitudeRange" class="form-inline" role="form">
+                        <label for="Latitude_range">Latitude Range（緯度の範囲）</label>
+                        <input type="number" name="name1" id="LatitudeMinInt" class="form-control"  value="14">
+                        度
+                        <input type="number" name="name1" id="LatitudeMinDec" class="form-control"  value="50">
+                        分~
+                        <input type="number" name="name2" id="LatitudeMaxInt" class="form-control"  value="65">
+                        度
+                        <input type="number" name="name2" id="LatitudeMaxDec" class="form-control"  value="5">
+                    </form>
+                </div>
+            </div>
+
+            <div class="row"><div class="col-lg-12 col-lg-offset-12">&nbsp;</div> </div>  <!--空白行-->
+
+            <div class="row">
+                <div class="col-lg-12">
                     <script type="text/javascript">    SelectVariable();       </script>
                     <div class="form-group">
                         <label class="col-lg-5 control-label">Variable</label>
@@ -42,7 +73,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col col-md-12">
+                <div class="col col-lg-12">
                     <form id="SecondInvariant" class="form-inline" role="form">
                         <label for="SecondInvariant_range">SecondInvariant Range</label>
                         <input type="text" name="name1" id="SecondInvariantMin" class="form-control"  value="-60">
@@ -52,25 +83,31 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-lg-6">
                     <script src="js/OnClickFunction.js"></script>
                     <button id=button_exec data-toggle="button"  value="OFF" class="btn btn-success btn-lg" data-loading-text="loading" onclick="OnClickFunction();">Exec</button>
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-12">
+                <div class="col-lg-12">
                     <div id="mapArea"></div>
                     <script src="js/draw_map.js"></script>
                 </div>
             </div>
             <div class="row">
-                <div class="col col-md-12">
+                <div class="col col-lg-12">
                     <div id="ColorLegend"></div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-lg-12">
                     <div id="output2"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <script src="js/DownloadButton.js"></script>
+                    <button id=button_download data-toggle="button"  value="OFF" class="btn btn-lg" onclick="DownloadButtonOnClickFunction();">Download Image</button>
                 </div>
             </div>
         </div>

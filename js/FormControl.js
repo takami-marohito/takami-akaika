@@ -4,9 +4,8 @@
 
 function SelectVariable()
 {
-
     jQuery(function() {
-        jQuery('.form-control').on('change', function(){
+        jQuery('#VariableMode').on('change', function(){
             var target2 = document.getElementById("VariableMode");
             console.log(target2.value + " selected");
             if(target2.value == "SecondInvariant"){

@@ -39,6 +39,15 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
                     MOVEdata.data[y][x] = tmp_T[0][0][0][0][y][x];
                 }
             }
+
+            MOVEdata.lat = new Array(arg_y_end-arg_y_start);
+            MOVEdata.lon = new Array(arg_x_end-arg_x_start);
+            for(var i=0;i<arg_y_end-arg_y_start;i++){
+                MOVEdata.lat[i] = tmp_T[0][3][i];
+            }
+            for(var i=0;i<arg_x_end-arg_x_start;i++){
+                MOVEdata.lon[i] = tmp_T[0][4][i];
+            }
             return(MOVEdata);
         }
     );

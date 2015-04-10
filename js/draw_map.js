@@ -2,7 +2,9 @@
  * Created by vizlab on 15/03/26.
  */
 
-var map_renderer = new THREE.WebGLRenderer();
+var map_renderer = new THREE.WebGLRenderer({
+    preserveDrawingBuffer:true
+});
 //new webglrenderer()するとコンソールログが出る
 
 var map_scale = 1.0;

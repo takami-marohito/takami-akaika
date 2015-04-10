@@ -5,49 +5,53 @@
 //#include "load_data.js"
 
 var vortex_size = 1;
+var Latitude = {min:0,max:0};
+var Longitude = {min:0,max:0};
 
 function SecondInvariant(Time, Depth)
 {
-    this.data = {};
-    this.u = {};
-    this.v = {};
-    this.w = {};
-    this.vortex_type = {};
+    var SecondInvariant = {};
+    SecondInvariant.data = {};
+    SecondInvariant.u = {};
+    SecondInvariant.v = {};
+    SecondInvariant.w = {};
+    SecondInvariant.vortex_type = {};
 
     return jQuery.when(
         loadMOVEdata(Time, Depth, 0, 441, 0, 672, "U"),
         loadMOVEdata(Time, Depth, 0, 441, 0, 672, "V"),
         loadMOVEdata(Time, Depth, 0, 441, 0, 672, "W")
     ).then(function (data_u, data_v, data_w) {
-            this.u = data_u;
-            this.v = data_v;
-            this.w = data_w;
-            this.time = Time;
-            this.depth = Depth;
-            this.width = data_u.data[0].length;
-            this.height = data_u.data.length;
-            this.data = new Array(this.height);
-            this.vortex_type = new Array(this.height);
+            button_loading_finish();
+            SecondInvariant.u = data_u;
+            SecondInvariant.v = data_v;
+            SecondInvariant.w = data_w;
+            SecondInvariant.time = Time;
+            SecondInvariant.depth = Depth;
+            SecondInvariant.width = data_u.data[0].length;
+            SecondInvariant.height = data_u.data.length;
+            SecondInvariant.data = new Array(SecondInvariant.height);
+            SecondInvariant.vortex_type = new Array(SecondInvariant.height);
 
             var Tensor = {};
-            for(var i=0;i<this.height;i++){
-                this.data[i] = new Array(this.width);
-                this.vortex_type[i] = new Array(this.width);
+            for(var i=0;i<SecondInvariant.height;i++){
+                SecondInvariant.data[i] = new Array(SecondInvariant.width);
+                SecondInvariant.vortex_type[i] = new Array(SecondInvariant.width);
             }
-            for(var x=0;x<this.width;x++){
-                for(var y=0;y<this.height;y++){
-                    if(x<=vortex_size-1||x>=this.width-vortex_size||y<=vortex_size-1||y>=this.height-vortex_size){
+            for(var x=0;x<SecondInvariant.width;x++){
+                for(var y=0;y<SecondInvariant.height;y++){
+                    if(x<=vortex_size-1||x>=SecondInvariant.width-vortex_size||y<=vortex_size-1||y>=SecondInvariant.height-vortex_size){
                         Tensor = [[undefined,undefined],[undefined,undefined]];
-                        this.data[y][x] = -50;             //this process pretermits edge calculation.
+                        SecondInvariant.data[y][x] = -50;             //this process pretermits edge calculation.
                     }else{
-                        Tensor = Calc_Tensor(x,y,this);
-                        this.data[y][x] = Tensor[0][1]*Tensor[1][0] - Tensor[0][0]*Tensor[1][1];
+                        Tensor = Calc_Tensor(x,y,SecondInvariant);
+                        SecondInvariant.data[y][x] = Tensor[0][1]*Tensor[1][0] - Tensor[0][0]*Tensor[1][1];
                         //this.vortex[y][x] = vortex_type(Tensor);
                     }
-                    this.vortex_type[y][x] = vortex_type(Tensor);
+                    SecondInvariant.vortex_type[y][x] = vortex_type(Tensor);
                 }
             }
-            return this;
+            return SecondInvariant;
         });
 }
 
