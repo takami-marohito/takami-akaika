@@ -12,21 +12,18 @@
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
-        loadLatandLonData()
-    ).then(function(retvalue1,retvalue2) {
-            jQuery.when(
-                button_loading_text(),
-                new SecondInvariant(300, 0)
-            ).then(function (retvalue2, m_secondinvariant) {
-                    if (DEBUG == 1) {
-                        console.log(m_secondinvariant);
-                    }
-                    draw_map(m_secondinvariant);
-                    draw_land();
-                    addColorLegend_Horizontal();
-                    button_calculating_finish();
-                    return m_secondinvariant;
-                });
+        loadLatandLonData(),
+        button_loading_text(),
+        new SecondInvariant(300, 0)
+    ).then(function (retvalue0,retvalue2,retvalue2, m_secondinvariant) {
+            if (DEBUG == 1) {
+                console.log(m_secondinvariant);
+            }
+            draw_map(m_secondinvariant);
+            draw_land();
+            addColorLegend_Horizontal();
+            button_calculating_finish();
+            return m_secondinvariant;
         });
 }
 
