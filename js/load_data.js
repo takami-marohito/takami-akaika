@@ -1,6 +1,14 @@
 /**
  * Created by vizlab on 15/03/25.
  */
+
+//ユーザの入力は緯度、経度だけどopendapへのアクセスは0,1,2...で行う
+//この変換を行う関数を作る
+function loadLatandLonData()
+{
+
+}
+
 //opendapURLに0,441と指定すると0から441まで合計442の数取ってくる
 //だからデータを入れるときはarg_x_end-arg_x_start+1にしないといけない
 
@@ -39,15 +47,6 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
                 for(x=0;x<arg_x_end-arg_x_start+1;x++){
                     MOVEdata.data[y][x] = tmp_T[0][0][0][0][y][x];
                 }
-            }
-
-            MOVEdata.lat = new Array(arg_y_end-arg_y_start+1);
-            MOVEdata.lon = new Array(arg_x_end-arg_x_start+1);
-            for(var i=0;i<arg_y_end-arg_y_start+1;i++){
-                MOVEdata.lat[i] = tmp_T[0][3][i];
-            }
-            for(var i=0;i<arg_x_end-arg_x_start+1;i++){
-                MOVEdata.lon[i] = tmp_T[0][4][i];
             }
             return(MOVEdata);
         }

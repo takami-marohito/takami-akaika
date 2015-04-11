@@ -5,8 +5,6 @@
 //#include "SecondInvariant.js"
 //#include "draw_land.js"
 
-var DataCalculating;
-
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
@@ -20,7 +18,6 @@ function OnClickFunction() {
             draw_land();
             addColorLegend_Horizontal();
             button_calculating_finish();
-            DataCalculating = m_secondinvariant;
             return m_secondinvariant;
         });
 }
@@ -28,14 +25,7 @@ function OnClickFunction() {
 function button_loading_text()
 {
     var target = document.getElementById("button_exec");
-    target.innerHTML = "loading";
-    return 0;
-}
-
-function button_loading_finish()
-{
-    var target = document.getElementById("button_exec");
-    target.innerHTML = "Calculating";
+    target.innerHTML = "loading&Calculating";
     return 0;
 }
 
