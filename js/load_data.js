@@ -1,7 +1,8 @@
 /**
  * Created by vizlab on 15/03/25.
  */
-
+//opendapURLに0,441と指定すると0から441まで合計442の数取ってくる
+//だからデータを入れるときはarg_x_end-arg_x_start+1にしないといけない
 
 function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, arg_x_end, arg_string)
 {
@@ -29,23 +30,23 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
             MOVEdata.time = arg_time;
             MOVEdata.depth = arg_depth;
             MOVEdata.type = arg_string;
-            MOVEdata.data = new Array(arg_y_end-arg_y_start);
-            for(var i=0;i<arg_y_end-arg_y_start;i++){
-                MOVEdata.data[i] = new Array(arg_x_end-arg_x_start);
+            MOVEdata.data = new Array(arg_y_end-arg_y_start+1);
+            for(var i=0;i<arg_y_end-arg_y_start+1;i++){
+                MOVEdata.data[i] = new Array(arg_x_end-arg_x_start+1);
             }
 
-            for(y=0;y<arg_y_end-arg_y_start;y++){
-                for(x=0;x<arg_x_end-arg_x_start;x++){
+            for(y=0;y<arg_y_end-arg_y_start+1;y++){
+                for(x=0;x<arg_x_end-arg_x_start+1;x++){
                     MOVEdata.data[y][x] = tmp_T[0][0][0][0][y][x];
                 }
             }
 
-            MOVEdata.lat = new Array(arg_y_end-arg_y_start);
-            MOVEdata.lon = new Array(arg_x_end-arg_x_start);
-            for(var i=0;i<arg_y_end-arg_y_start;i++){
+            MOVEdata.lat = new Array(arg_y_end-arg_y_start+1);
+            MOVEdata.lon = new Array(arg_x_end-arg_x_start+1);
+            for(var i=0;i<arg_y_end-arg_y_start+1;i++){
                 MOVEdata.lat[i] = tmp_T[0][3][i];
             }
-            for(var i=0;i<arg_x_end-arg_x_start;i++){
+            for(var i=0;i<arg_x_end-arg_x_start+1;i++){
                 MOVEdata.lon[i] = tmp_T[0][4][i];
             }
             return(MOVEdata);

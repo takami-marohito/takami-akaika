@@ -4,6 +4,7 @@
 
 //#include "load_data.js"
 
+
 var vortex_size = 1;
 var Latitude = {min:0,max:0};
 var Longitude = {min:0,max:0};
@@ -11,11 +12,11 @@ var Longitude = {min:0,max:0};
 function SecondInvariant(Time, Depth)
 {
     var SecondInvariant = {};
-    SecondInvariant.data = {};
+    SecondInvariant.data = new Array();
     SecondInvariant.u = {};
     SecondInvariant.v = {};
     SecondInvariant.w = {};
-    SecondInvariant.vortex_type = {};
+    SecondInvariant.vortex_type = new Array();
 
     return jQuery.when(
         loadMOVEdata(Time, Depth, 0, 441, 0, 672, "U"),
@@ -32,7 +33,15 @@ function SecondInvariant(Time, Depth)
             SecondInvariant.height = data_u.data.length;
             SecondInvariant.data = new Array(SecondInvariant.height);
             SecondInvariant.vortex_type = new Array(SecondInvariant.height);
-
+            //tmp variable
+            SecondInvariant.latitude = new Array();
+            SecondInvariant.longitude = new Array();
+            for(var x=0;x<SecondInvariant.width;x++){
+                SecondInvariant.longitude[x] = data_u.lon[x];
+            }
+            for(var y=0;y<SecondInvariant.height;y++) {
+                SecondInvariant.latitude[y] = data_u.lat[y];
+            }
             var Tensor = {};
             for(var i=0;i<SecondInvariant.height;i++){
                 SecondInvariant.data[i] = new Array(SecondInvariant.width);
