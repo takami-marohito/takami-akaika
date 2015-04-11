@@ -18,6 +18,7 @@ function SecondInvariant(Time, Depth)
     SecondInvariant.w = {};
     SecondInvariant.vortex_type = new Array();
 
+
     return jQuery.when(
         loadMOVEdata(Time, Depth, 0, 441, 0, 672, "U"),
         loadMOVEdata(Time, Depth, 0, 441, 0, 672, "V"),

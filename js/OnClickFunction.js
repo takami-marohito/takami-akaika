@@ -5,20 +5,28 @@
 //#include "SecondInvariant.js"
 //#include "draw_land.js"
 
+//クリックすると
+//1.ユーザの設定した緯度経度を配列番号にする関数をつくる
+//2.データをロード、計算
+//3.描画
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
-        button_loading_text(),
-        new SecondInvariant(300, 0)
-    ).then(function (retvalue1,retvalue2,m_secondinvariant) {
-            if(DEBUG==1){
-                console.log(m_secondinvariant);
-            }
-            draw_map(m_secondinvariant);
-            draw_land();
-            addColorLegend_Horizontal();
-            button_calculating_finish();
-            return m_secondinvariant;
+        loadLatandLonData()
+    ).then(function(retvalue1,retvalue2) {
+            jQuery.when(
+                button_loading_text(),
+                new SecondInvariant(300, 0)
+            ).then(function (retvalue2, m_secondinvariant) {
+                    if (DEBUG == 1) {
+                        console.log(m_secondinvariant);
+                    }
+                    draw_map(m_secondinvariant);
+                    draw_land();
+                    addColorLegend_Horizontal();
+                    button_calculating_finish();
+                    return m_secondinvariant;
+                });
         });
 }
 
@@ -48,6 +56,12 @@ function setVariable()
     Longitude.max = eval(document.getElementById("LongitudeMaxInt").value);
     Longitude.max += eval(document.getElementById("LongitudeMaxDec").value/60.0);
 
+    if(Latitude.min > Latitude.max){
+        console.log("Latitude min max error");
+    }
+    if(Longitude.min > Longitude.max){
+        console.log("Longitude min max error");
+    }
     return 0;
 }
 
