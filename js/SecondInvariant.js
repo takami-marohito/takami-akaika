@@ -11,7 +11,8 @@ var Longitude = {min:0,max:0};
 
 function SecondInvariant(Time, Depth)
 {
-    console.log(MinMaxLatLonToArrayNum);
+    console.log(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
+    console.log(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
     var SecondInvariant = {};
     SecondInvariant.data = new Array();
     SecondInvariant.u = {};

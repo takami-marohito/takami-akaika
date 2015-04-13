@@ -2,6 +2,9 @@
  * Created by vizlab on 15/03/26.
  */
 
+
+//地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
+
 var map_renderer = new THREE.WebGLRenderer({
     preserveDrawingBuffer:true
 });
@@ -9,12 +12,13 @@ var map_renderer = new THREE.WebGLRenderer({
 
 var map_scale = 1.0;
 
+var MapGrid = {width:834, height:502};
+
 //tmp map before loading geometry data
 ( function()
 {
-    var width = 672*map_scale;
-    var height = 441*map_scale;
-
+    var width = MapGrid.width;
+    var height = MapGrid.height;
     var scene = new THREE.Scene();
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
@@ -33,9 +37,8 @@ function draw_map(SecondInvariant)
 {
     updateSecondInvariantMinMax();
 
-    var width = 672*map_scale;
-    var height = 441*map_scale;
-
+    var width = MapGrid.width;
+    var height = MapGrid.height;
     geometry = new THREE.Geometry();
 
     geometry = CreateGeometry(SecondInvariant);
@@ -70,10 +73,13 @@ function draw_map(SecondInvariant)
     document.getElementById("mapArea").setAttribute("height",height);
 
     //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
-    var camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
+    var lon = MapGrid.width * (Longitude.max - Longitude.min)/(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
+    var lat = MapGrid.height * (Latitude.max - Latitude.min)/(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
+    //var camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
+    var camera = new THREE.OrthographicCamera(-lon/2, lon/2, lat/2, -lat/2, 0.01, 1000);
     camera.position.set(0, 0, 1);
     camera.lookAt({x: 0, y: 0, z: 0});
-    camera.position.set(SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, 30);
+    camera.position.set(lon/2, lat/2, 30);
 
     map_renderer.render(scene, camera);
 
@@ -93,13 +99,19 @@ function draw_map(SecondInvariant)
 
 function CreateGeometry(SecondInvariant)
 {
+    var x_grid = 0;
+    var y_grid = 0;
     var geometry = new THREE.Geometry();
     for(var y=0;y<SecondInvariant.data.length-1;y++){
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
-            geometry.vertices.push(new THREE.Vector3(x, y, 0));
-            geometry.vertices.push(new THREE.Vector3(x+map_scale, y, 0));
-            geometry.vertices.push(new THREE.Vector3(x+map_scale, y+map_scale, 0));
-            geometry.vertices.push(new THREE.Vector3(x, y+map_scale, 0));
+            var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(Longitude.max - Longitude.min);
+            var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
+
+            geometry.vertices.push(new THREE.Vector3(x_grid, y_grid, 0));
+            geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid, 0));
+            geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid+y_grid_step, 0));
+            geometry.vertices.push(new THREE.Vector3(x_grid, y_grid+y_grid_step, 0));
+            x_grid += x_grid_step;
 
             var color0 = new THREE.Color();
             var color1 = new THREE.Color();
@@ -149,6 +161,9 @@ function CreateGeometry(SecondInvariant)
             geometry.faces.push(face1);
             geometry.faces.push(face2);
         }
+        var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
+        x_grid = 0;
+        y_grid += y_grid_step;
     }
     return geometry;
 }

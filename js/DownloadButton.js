@@ -25,5 +25,3 @@ function DownloadButtonOnClickFunction() {
     link.click();
     */
 }
-
-

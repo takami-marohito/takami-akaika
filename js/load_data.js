@@ -5,7 +5,7 @@
 //ユーザの入力は緯度、経度だけどopendapへのアクセスは0,1,2...で行う
 //この変換を行う関数を作る
 
-var MinMaxLatLonToArrayNum = new setMinMaxLatLonToArrayNum_func();
+var LatLon = new setLatLon_func();
 
 function loadLatandLonData()
 {
@@ -17,7 +17,7 @@ function loadLatandLonData()
             for(var i=0;i<StringDataLat[0].length;i++){
                 dataLat[i] = Number(StringDataLat[0][i]);
             }
-            MinMaxLatLonToArrayNum.setLatitude(dataLat);
+            LatLon.setLatitude(dataLat);
             console.log("a1");
             d3.text("./js/LatLon/Longitude_ascii",function(error,text) {
                 var StringDataLon = d3.csv.parseRows(text);
@@ -25,13 +25,13 @@ function loadLatandLonData()
                 for(var i=0;i<StringDataLon[0].length;i++){
                     dataLon[i] = Number(StringDataLon[0][i]);
                 }
-                MinMaxLatLonToArrayNum.setLongitude(dataLon);
+                LatLon.setLongitude(dataLon);
                 console.log("a2");
                 return 0;
             });
         })
     ).then(function(lat){
-            MinMaxLatLonToArrayNum.exec();
+            LatLon.exec();
             console.log("a3");
             return 3;
         })
@@ -53,7 +53,7 @@ function loadLatandLonData()
     for(var i=0;i<csvData[0].length;i++){
         dataLat[i] = Number(csvData[0][i]);
     }
-    MinMaxLatLonToArrayNum.setLatitude(dataLat);
+    LatLon.setLatitude(dataLat);
 
     var csvData2 = new Array();
     var data2 = new XMLHttpRequest();
@@ -70,11 +70,11 @@ function loadLatandLonData()
     for(var i=0;i<csvData2[0].length;i++){
         dataLon[i] = Number(csvData2[0][i]);
     }
-    MinMaxLatLonToArrayNum.setLongitude(dataLon);
-    MinMaxLatLonToArrayNum.exec();
+    LatLon.setLongitude(dataLon);
+    LatLon.exec();
 }
 
-function setMinMaxLatLonToArrayNum_func(Lat,Lon)
+function setLatLon_func(Lat,Lon)
 {
     this.Latitude = {};
     this.Latitude.data = new Array();
