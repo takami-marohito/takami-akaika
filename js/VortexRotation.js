@@ -31,7 +31,7 @@ function VortexRotation(Time, Depth)
     return jQuery.when.apply(
         $,dfds
     ).then(function () {
-            for(var i=0;i<Time_backward*3;i++) {
+            for(var i=0;i<Time_backward;i++) {
                 VortexRotation[i].u = arguments[i*3+0];
                 VortexRotation[i].v = arguments[i*3+1];
                 VortexRotation[i].w = arguments[i*3+2];
@@ -41,23 +41,16 @@ function VortexRotation(Time, Depth)
                 VortexRotation[i].height = arguments[i*3+0].data.length;
                 VortexRotation[i].data = new Array(VortexRotation.height);
             }
-            var Tensor = {};
-            for(var i=0;i<VortexRotation.height;i++){
-                VortexRotation.data[i] = new Array(VortexRotation.width);
-                VortexRotation.vortex_type[i] = new Array(VortexRotation.width);
+            var returnObject = {};
+            returnObject.data = new Array(VortexRotation[0].u.data.length);
+            for(var i=0;i<returnObject.data.length;i++){
+                returnObject.data[i] = new Array(VortexRotation[0].u.data[0].length);
             }
-            for(var x=0;x<VortexRotation.width;x++){
-                for(var y=0;y<VortexRotation.height;y++){
-                    if(x<=vortex_size-1||x>=VortexRotation.width-vortex_size||y<=vortex_size-1||y>=VortexRotation.height-vortex_size){
-                        Tensor = [[undefined,undefined],[undefined,undefined]];
-                        VortexRotation.data[y][x] = -50;             //this process pretermits edge calculation.
-                    }else{
-                        Tensor = Calc_Tensor(x,y,VortexRotation);
-                        VortexRotation.data[y][x] = Tensor[0][1]*Tensor[1][0] - Tensor[0][0]*Tensor[1][1];
-                        //this.vortex[y][x] = vortex_type(Tensor);
-                    }
+            for(var j=0;j<returnObject.data.length;j++){
+                for(var i=0;i<returnObject.data[0].length;i++){
+                    returnObject.data[j][i] = VortexRotation[0].u.data[j][i];
                 }
             }
-            return VortexRotation;
+            return returnObject;
         });
 }
