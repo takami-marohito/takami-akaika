@@ -100,8 +100,6 @@ function setLatLon_func(Lat,Lon)
         if(Latitude.min <= this.Latitude.data[0]){
             this.Latitude.range.min = 0;
         }
-        console.log(this.Longitude.data[this.Longitude.data.length-1]);
-        console.log(Longitude.max);
         if(Latitude.max >= this.Latitude.data[this.Latitude.data.length-1]){
             this.Latitude.range.max = this.Latitude.data.length-1;
         }

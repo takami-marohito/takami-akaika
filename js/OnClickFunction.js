@@ -14,8 +14,8 @@ function OnClickFunction() {
         setVariable(),
         loadLatandLonData(),
         button_loading_text(),
-        new SecondInvariant(300, 0)
-    ).then(function (retvalue0,retvalue2,retvalue2, m_secondinvariant) {
+        CalcVariable()
+    ).then(function (retvalue0,retvalue1,retvalue2, m_secondinvariant) {
             if (DEBUG == 1) {
                 console.log(m_secondinvariant);
             }
@@ -62,3 +62,20 @@ function setVariable()
     return 0;
 }
 
+function CalcVariable()
+{
+    var target = document.getElementById("VariableMode");
+    var exec_function = [];
+    if(target.value == "SecondInvariant") {
+        exec_function.push(SecondInvariant(300, 0));
+    }
+    if(target.value == "VortexRotation"){
+        exec_function.push(VortexRotation(300,0));
+    }
+    console.log(exec_function);
+    return jQuery.when.apply(
+        $,exec_function
+    ).then(function(){
+            return arguments[0];
+        });
+}

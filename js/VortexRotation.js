@@ -4,31 +4,43 @@
 
 function VortexRotation(Time, Depth)
 {
-    console.log(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
-    console.log(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
-    var VortexRotation = {};
-    VortexRotation.data = new Array();
-    VortexRotation.u = {};
-    VortexRotation.v = {};
-    VortexRotation.w = {};
-    VortexRotation.vortex_type = new Array();
+    var Time_backward=5;
 
+    var VortexRotation = new Array();
 
-    return jQuery.when(
-        loadMOVEdata(Time, Depth, 0, 441, 0, 672, "U"),
-        loadMOVEdata(Time, Depth, 0, 441, 0, 672, "V"),
-        loadMOVEdata(Time, Depth, 0, 441, 0, 672, "W")
-    ).then(function (data_u, data_v, data_w) {
-            VortexRotation.u = data_u;
-            VortexRotation.v = data_v;
-            VortexRotation.w = data_w;
-            VortexRotation.time = Time;
-            VortexRotation.depth = Depth;
-            VortexRotation.width = data_u.data[0].length;
-            VortexRotation.height = data_u.data.length;
-            VortexRotation.data = new Array(VortexRotation.height);
-            VortexRotation.vortex_type = new Array(VortexRotation.height);
+    for(var i=0;i<Time_backward;i++){
+        VortexRotation[i] = {};
+        VortexRotation[i].data = new Array();
+        VortexRotation[i].u = {};
+        VortexRotation[i].v = {};
+        VortexRotation[i].w = {};
+        VortexRotation[i].vortex_type = new Array();
+    }
 
+    var dfds = [];
+
+    for(var i=0;i<Time_backward;i++){
+        if(Time-i==0){
+            break;
+        }
+        dfds.push(loadMOVEdata(Time-i, Depth, 0, 441, 0, 672, "U"));
+        dfds.push(loadMOVEdata(Time-i, Depth, 0, 441, 0, 672, "V"));
+        dfds.push(loadMOVEdata(Time-i, Depth, 0, 441, 0, 672, "W"));
+    }
+
+    return jQuery.when.apply(
+        $,dfds
+    ).then(function () {
+            for(var i=0;i<Time_backward*3;i++) {
+                VortexRotation[i].u = arguments[i*3+0];
+                VortexRotation[i].v = arguments[i*3+1];
+                VortexRotation[i].w = arguments[i*3+2];
+                VortexRotation[i].time = Time-i;
+                VortexRotation[i].depth = Depth;
+                VortexRotation[i].width = arguments[i*3+0].data[0].length;
+                VortexRotation[i].height = arguments[i*3+0].data.length;
+                VortexRotation[i].data = new Array(VortexRotation.height);
+            }
             var Tensor = {};
             for(var i=0;i<VortexRotation.height;i++){
                 VortexRotation.data[i] = new Array(VortexRotation.width);
@@ -44,7 +56,6 @@ function VortexRotation(Time, Depth)
                         VortexRotation.data[y][x] = Tensor[0][1]*Tensor[1][0] - Tensor[0][0]*Tensor[1][1];
                         //this.vortex[y][x] = vortex_type(Tensor);
                     }
-                    VortexRotation.vortex_type[y][x] = vortex_type(Tensor);
                 }
             }
             return VortexRotation;

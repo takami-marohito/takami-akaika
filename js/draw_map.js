@@ -80,7 +80,7 @@ function draw_map(SecondInvariant)
     camera.position.set(0, 0, 1);
     camera.lookAt({x: 0, y: 0, z: 0});
     camera.position.set(lon/2, lat/2, 30);
-
+    //map_renderer.setSize(lon,lat);
     map_renderer.render(scene, camera);
 
     document.addEventListener('click',function(e){
@@ -104,8 +104,10 @@ function CreateGeometry(SecondInvariant)
     var geometry = new THREE.Geometry();
     for(var y=0;y<SecondInvariant.data.length-1;y++){
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
-            var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(Longitude.max - Longitude.min);
-            var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
+            //var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(Longitude.max - Longitude.min);
+            //var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
+            var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(LatLon.Longitude.data[LatLon.Longitude.data.length-1]-LatLon.Longitude.data[0]);
+            var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])/(LatLon.Latitude.data[LatLon.Latitude.data.length-1]-LatLon.Latitude.data[0]);
 
             geometry.vertices.push(new THREE.Vector3(x_grid, y_grid, 0));
             geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid, 0));
@@ -161,7 +163,8 @@ function CreateGeometry(SecondInvariant)
             geometry.faces.push(face1);
             geometry.faces.push(face2);
         }
-        var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
+        var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])/(LatLon.Latitude.data[LatLon.Latitude.data.length-1]-LatLon.Latitude.data[0]);
+        //var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
         x_grid = 0;
         y_grid += y_grid_step;
     }

@@ -11,7 +11,7 @@ function SelectVariable()
             if(target2.value == "SecondInvariant"){
                 document.getElementById("SecondInvariant").style.display="inline";
             }
-            if(target2.value == "VortexCore"){
+            if(target2.value == "VortexRotation"){
                 document.getElementById("SecondInvariant").style.display="none";
             }
         });
