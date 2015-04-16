@@ -39,7 +39,7 @@ function loadLatandLonData()
     */
     var csvData = new Array();
     var data = new XMLHttpRequest();
-    data.open("GET","./js/LatLon/Latitude_ascii", false);  //true:非同期, false:同期
+    data.open("GET","./js/data/Latitude_ascii", false);  //true:非同期, false:同期
     data.send(null);
     var LF = String.fromCharCode(10); //改行ｺｰﾄﾞ
     var lines = data.responseText.split(LF);
@@ -57,7 +57,7 @@ function loadLatandLonData()
 
     var csvData2 = new Array();
     var data2 = new XMLHttpRequest();
-    data2.open("GET","./js/LatLon/Longitude_ascii", false);  //true:非同期, false:同期
+    data2.open("GET","./js/data/Longitude_ascii", false);  //true:非同期, false:同期
     data2.send(null);
     var lines2 = data2.responseText.split(LF);
     for(var i=0;i<lines2.length;i++){
@@ -152,6 +152,7 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
                 console.log(tmp_T);
             }
             MOVEdata.time = arg_time;
+            MOVEdata.time_string = tmp_T[0][1];
             MOVEdata.depth = arg_depth;
             MOVEdata.type = arg_string;
             MOVEdata.data = new Array(arg_y_end-arg_y_start+1);

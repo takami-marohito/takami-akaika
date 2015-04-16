@@ -18,8 +18,14 @@
     <script src="js/lib/three.min.js"></script>
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/topojson.v0.min.js"></script>
+    <script src="js/lib/moment.js"></script>
     <script src="js/font/helvetiker_regular.typeface.js"></script>
     <script src="js/FormControl.js"></script>
+
+    <link type="text/css" href="css/bootstrap-datepicker3.min.css" rel="stylesheet"/>
+
+    <script type="text/javascript" src="js/lib/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="js/font/bootstrap-datepicker.ja.min.js"></script>
 
 </head>
 <body>
@@ -34,13 +40,13 @@
                 <div class="col-lg-12">
                     <form id="LongitudeRange" class="form-inline" role="form">
                         <label for="Longitude_range">Longitude Range（経度の範囲）</label>
-                        <input type="number" name="name1" id="LongitudeMinInt" class="form-control"  value="116">
+                        <input type="number" name="name1" id="LongitudeMinInt" class="form-control"  value="116" />
                         度
-                        <input type="number" name="name1" id="LongitudeMinDec" class="form-control"  value="50">
+                        <input type="number" name="name1" id="LongitudeMinDec" class="form-control"  value="50" />
                         分~
-                        <input type="number" name="name2" id="LongitudeMaxInt" class="form-control"  value="200">
+                        <input type="number" name="name2" id="LongitudeMaxInt" class="form-control"  value="200" />
                         度
-                        <input type="number" name="name2" id="LongitudeMaxDec" class="form-control"  value="15">
+                        <input type="number" name="name2" id="LongitudeMaxDec" class="form-control"  value="15" />
                     </form>
                 </div>
             </div>
@@ -48,14 +54,47 @@
                 <div class="col col-lg-12">
                     <form id="LatitudeRange" class="form-inline" role="form">
                         <label for="Latitude_range">Latitude Range（緯度の範囲）</label>
-                        <input type="number" name="name1" id="LatitudeMinInt" class="form-control"  value="14">
+                        <input type="number" name="name1" id="LatitudeMinInt" class="form-control"  value="14" />
                         度
-                        <input type="number" name="name1" id="LatitudeMinDec" class="form-control"  value="50">
+                        <input type="number" name="name1" id="LatitudeMinDec" class="form-control"  value="50" />
                         分~
-                        <input type="number" name="name2" id="LatitudeMaxInt" class="form-control"  value="65">
+                        <input type="number" name="name2" id="LatitudeMaxInt" class="form-control"  value="65" />
                         度
-                        <input type="number" name="name2" id="LatitudeMaxDec" class="form-control"  value="5">
+                        <input type="number" name="name2" id="LatitudeMaxDec" class="form-control"  value="5" />
                     </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <form id="Date" class="form-inline" role="form">
+                        <label for="Date_range">日付</label>
+                        From
+                        <input type="text" name="name1" id="dp1" class="form-control"  value="2006/02/01" />
+                        To
+                        <input type="text" name="name2" id="dp2" class="form-control"  value="2006/01/01" />
+                    </form>
+
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#dp1').datepicker({
+                                format: 'yyyy/mm/dd',
+                                language: 'ja',
+                                autoclose: true,
+                                clearBtn: true
+                            });
+                        });
+                    </script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#dp2').datepicker({
+                                format: 'yyyy/mm/dd',
+                                language: 'ja',
+                                autoclose: true,
+                                clearBtn: true
+                            });
+                        });
+                    </script>
                 </div>
             </div>
 
@@ -77,9 +116,9 @@
                 <div class="col col-lg-12">
                     <form id="SecondInvariant" class="form-inline" role="form">
                         <label for="SecondInvariant_range">SecondInvariant Range</label>
-                        <input type="text" name="name1" id="SecondInvariantMin" class="form-control"  value="-60">
+                        <input type="text" name="name1" id="SecondInvariantMin" class="form-control"  value="-60" />
                         ~
-                        <input type="text" name="name2" id="SecondInvariantMax" class="form-control"  value="60">
+                        <input type="text" name="name2" id="SecondInvariantMax" class="form-control"  value="60" />
                     </form>
                 </div>
             </div>

@@ -67,10 +67,10 @@ function CalcVariable()
     var target = document.getElementById("VariableMode");
     var exec_function = [];
     if(target.value == "SecondInvariant") {
-        exec_function.push(SecondInvariant(300, 0));
+        exec_function.push(SecondInvariant(1213, 0));
     }
     if(target.value == "VortexRotation"){
-        exec_function.push(VortexRotation(300,0));
+        exec_function.push(VortexRotation(1213,0));
     }
     console.log(exec_function);
     return jQuery.when.apply(
