@@ -102,14 +102,28 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <script type="text/javascript">    SelectVariable();       </script>
                     <div class="form-group">
                         <label class="col-lg-5 control-label">Variable</label>
                         <select class="form-control" id="VariableMode">
                             <option>SecondInvariant</option>
                             <option>VortexRotation</option>
+                            <option>LoadingCalculatedVariable</option>
                         </select>
                     </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col col-lg-12">
+                    <input type="file" id="Filename" name="file" />
+                    <script>
+                        function handleFileSelect(evt) {
+                            var files = evt.target.files;
+                            var output = [];
+                            document.getElementById('Filename').innerHTML = '<ul>' + output.join('') + '</ul>';
+                        }
+                        document.getElementById('Filename').addEventListener('change', handleFileSelect, false);
+                    </script>
                 </div>
             </div>
             <div class="row">
@@ -122,6 +136,14 @@
                     </form>
                 </div>
             </div>
+
+            <!--  初期設定-->
+            <script type="text/javascript">    SelectVariableEvent();
+            document.getElementById("Filename").style.display="none";
+            </script>
+            <!--  ここまで-->
+
+
             <div class="row">
                 <div class="col-lg-6">
                     <script src="js/OnClickFunction.js"></script>
