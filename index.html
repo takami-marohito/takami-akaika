@@ -115,15 +115,7 @@
 
             <div class="row">
                 <div class="col col-lg-12">
-                    <input type="file" id="Filename" name="file" />
-                    <script>
-                        function handleFileSelect(evt) {
-                            var files = evt.target.files;
-                            var output = [];
-                            document.getElementById('Filename').innerHTML = '<ul>' + output.join('') + '</ul>';
-                        }
-                        document.getElementById('Filename').addEventListener('change', handleFileSelect, false);
-                    </script>
+                    <input type="file" id="Filename"/>
                 </div>
             </div>
             <div class="row">
