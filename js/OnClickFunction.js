@@ -72,6 +72,9 @@ function CalcVariable()
     if(target.value == "VortexRotation"){
         exec_function.push(VortexRotation(1213,0));
     }
+    if(target.value == "LoadingCalculatedVariable"){
+        exec_function.push(LoadingFile());
+    }
     console.log(exec_function);
     return jQuery.when.apply(
         $,exec_function

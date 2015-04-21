@@ -14,6 +14,7 @@
     <script src="js/load_data.js"></script>
     <script src="js/SecondInvariant.js"></script>
     <script src="js/VortexRotation.js"></script>
+    <script src="js/LoadingFile.js"></script>
     <script src="js/draw_land.js"></script>
     <script src="js/lib/three.min.js"></script>
     <script src="js/lib/d3.js" charset="utf-8"></script>
@@ -39,7 +40,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <form id="LongitudeRange" class="form-inline" role="form">
-                        <label for="Longitude_range">Longitude Range（経度の範囲）</label>
+                        <label>Longitude Range（経度の範囲）</label>
                         <input type="number" name="name1" id="LongitudeMinInt" class="form-control"  value="116" />
                         度
                         <input type="number" name="name1" id="LongitudeMinDec" class="form-control"  value="50" />
@@ -53,7 +54,7 @@
             <div class="row">
                 <div class="col col-lg-12">
                     <form id="LatitudeRange" class="form-inline" role="form">
-                        <label for="Latitude_range">Latitude Range（緯度の範囲）</label>
+                        <label>Latitude Range（緯度の範囲）</label>
                         <input type="number" name="name1" id="LatitudeMinInt" class="form-control"  value="14" />
                         度
                         <input type="number" name="name1" id="LatitudeMinDec" class="form-control"  value="50" />
@@ -68,7 +69,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <form id="Date" class="form-inline" role="form">
-                        <label for="Date_range">日付</label>
+                        <label>日付</label>
                         From
                         <input type="text" name="name1" id="dp1" class="form-control"  value="2006/02/01" />
                         To
@@ -121,7 +122,7 @@
             <div class="row">
                 <div class="col col-lg-12">
                     <form id="SecondInvariant" class="form-inline" role="form">
-                        <label for="SecondInvariant_range">SecondInvariant Range</label>
+                        <label>SecondInvariant Range</label>
                         <input type="text" name="name1" id="SecondInvariantMin" class="form-control"  value="-60" />
                         ~
                         <input type="text" name="name2" id="SecondInvariantMax" class="form-control"  value="60" />
