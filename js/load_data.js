@@ -7,6 +7,13 @@
 
 var LatLon = new setLatLon_func();
 
+var TimeArray = new Array();
+
+function loadTimeArray()
+{
+
+}
+
 function loadLatandLonData()
 {
     /*

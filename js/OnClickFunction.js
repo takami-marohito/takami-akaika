@@ -67,6 +67,7 @@ function CalcVariable()
     var target = document.getElementById("VariableMode");
     var exec_function = [];
     if(target.value == "SecondInvariant") {
+        console.log(document.getElementById("SecondInvariantDate_input").value);
         exec_function.push(SecondInvariant(1213, 0));
     }
     if(target.value == "VortexRotation"){
