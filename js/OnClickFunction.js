@@ -17,7 +17,7 @@ function OnClickFunction() {
         CalcVariable()
     ).then(function (retvalue0,retvalue1,retvalue2, m_secondinvariant) {
             if (DEBUG == 1) {
-                console.log(m_secondinvariant);
+                //console.log(m_secondinvariant);
             }
             draw_map(m_secondinvariant);
             draw_land();
@@ -75,10 +75,11 @@ function CalcVariable()
     if(target.value == "LoadingCalculatedVariable"){
         exec_function.push(LoadingFile());
     }
-    console.log(exec_function);
+    //console.log(exec_function);
     return jQuery.when.apply(
         $,exec_function
     ).then(function(){
+            //console.log(arguments[0]);
             return arguments[0];
         });
 }
