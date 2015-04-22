@@ -70,7 +70,7 @@ function CalcVariable()
         exec_function.push(SecondInvariant(1213, 0));
     }
     if(target.value == "VortexRotation"){
-        exec_function.push(VortexRotation(1213,0));
+        exec_function.push(VortexRotation(1300,0));
     }
     if(target.value == "LoadingCalculatedVariable"){
         exec_function.push(LoadingFile());

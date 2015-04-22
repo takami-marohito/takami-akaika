@@ -129,6 +129,25 @@
                     </form>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <form id="SecondInvariantDate" class="form-inline" role="form">
+                        <label>日付</label>
+                        <input type="text" name="name1" id="SecondInvariantDate_input" class="form-control"  value="2006/02/01" />
+                    </form>
+
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#SecondInvariantDate_input').datepicker({
+                                format: 'yyyy/mm/dd',
+                                language: 'ja',
+                                autoclose: true,
+                                clearBtn: true
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
 
             <!--  初期設定-->
             <script type="text/javascript">    SelectVariableEvent();

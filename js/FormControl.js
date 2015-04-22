@@ -12,14 +12,17 @@ function SelectVariableEvent()
             if(target2.value == "SecondInvariant"){
                 document.getElementById("SecondInvariant").style.display="";
                 document.getElementById("Filename").style.display="none";
+                document.getElementById("SecondInvariantDate").style.display="";
             }
             if(target2.value == "VortexRotation"){
                 document.getElementById("SecondInvariant").style.display="none";
                 document.getElementById("Filename").style.display="none";
+                document.getElementById("SecondInvariantDate").style.display="none";
             }
             if(target2.value == "LoadingCalculatedVariable"){
                 document.getElementById("SecondInvariant").style.display="none";
                 document.getElementById("Filename").style.display="";
+                document.getElementById("SecondInvariantDate").style.display="none";
             }
         });
     });

@@ -6,28 +6,18 @@ var VortexRotation_matrix = new Array();
 
 function VortexRotation(Time, Depth)
 {
-    var Time_backward=30;
+    var Time_backward=Time+1;
 
     //var VortexRotation_matrix = new Array();
 
     for(var i=0;i<Time_backward;i++){
-        VortexRotation_matrix[i] = {};
-        VortexRotation_matrix[i].data = new Array();
-        VortexRotation_matrix[i].u = {};
-        VortexRotation_matrix[i].v = {};
-        VortexRotation_matrix[i].w = {};
-        VortexRotation_matrix[i].vortex_type = new Array();
+        VortexRotation_matrix[i]={};
     }
 
     var dfds = [];
 
     for(var i=0;i<Time_backward;i++){
-        if(Time-i==0){
-            break;
-        }
-        dfds.push(loadMOVEdata(Time-i, Depth, 0, 441, 0, 672, "U"));
-        dfds.push(loadMOVEdata(Time-i, Depth, 0, 441, 0, 672, "V"));
-        dfds.push(loadMOVEdata(Time-i, Depth, 0, 441, 0, 672, "W"));
+        dfds.push(loadMOVEdata(i, Depth, 0, 5, 0, 5, "U"));
     }
 
     return jQuery.when.apply(
@@ -37,18 +27,13 @@ function VortexRotation(Time, Depth)
             var m=moment('2000/02/28', "YYYY/MM/DD");
             m.add( 2,'days').format();
             console.log(m);*/
-
             for(var i=0;i<Time_backward;i++) {
-                VortexRotation_matrix[i].u = arguments[i*3+0];
-                VortexRotation_matrix[i].v = arguments[i*3+1];
-                VortexRotation_matrix[i].w = arguments[i*3+2];
-                VortexRotation_matrix[i].time = Time-i;
-                VortexRotation_matrix[i].depth = Depth;
-                VortexRotation_matrix[i].width = arguments[i*3+0].data[0].length;
-                VortexRotation_matrix[i].height = arguments[i*3+0].data.length;
-                VortexRotation_matrix[i].data = new Array(VortexRotation_matrix.height);
+                VortexRotation_matrix[i].time = arguments[i].time;
+                VortexRotation_matrix[i].time_string = arguments[i].time_string;
             }
             var returnObject = {};
+            console.log(VortexRotation_matrix[3]);
+            /*
             returnObject.data = new Array(VortexRotation_matrix[0].u.data.length);
             for(var i=0;i<returnObject.data.length;i++){
                 returnObject.data[i] = new Array(VortexRotation_matrix[0].u.data[0].length);
@@ -58,6 +43,18 @@ function VortexRotation(Time, Depth)
                     returnObject.data[j][i] = VortexRotation_matrix[0].v.data[j][i];
                 }
             }
+            */
+            var OutputString = new Array();
+            for(var i=0;i<Time_backward;i++) {
+                OutputString += VortexRotation_matrix[i].time_string;
+                OutputString += ",";
+            }
+            var blob = new Blob([OutputString],{type:'text/plain'});
+            var link = document.createElement("a");
+            var filenameString = "time";
+            link.download = filenameString;
+            link.href = URL.createObjectURL(blob);
+            link.click();
             //return VortexRotation_matrix;
             return returnObject;
         });
