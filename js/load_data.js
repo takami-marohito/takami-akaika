@@ -11,39 +11,19 @@ var TimeArray = new Array();
 
 function loadTimeArray()
 {
-
+    var data = new XMLHttpRequest();
+    data.open("GET","./js/data/time_ascii", false);  //true:非同期, false:同期
+    data.send(null);
+    var LF = String.fromCharCode(10); //改行ｺｰﾄﾞ
+    var lines = data.responseText.split(LF);
+    for(var i=0;i<lines.length;i++){
+        TimeArray.push(lines[i]);
+    }
+    return 0;
 }
 
 function loadLatandLonData()
 {
-    /*
-    return (jQuery.when(
-        d3.text("./js/LatLon/Latitude_ascii",function(error,text) {
-            var StringDataLat = d3.csv.parseRows(text);
-            var dataLat = new Array(StringDataLat[0].length);
-            for(var i=0;i<StringDataLat[0].length;i++){
-                dataLat[i] = Number(StringDataLat[0][i]);
-            }
-            LatLon.setLatitude(dataLat);
-            console.log("a1");
-            d3.text("./js/LatLon/Longitude_ascii",function(error,text) {
-                var StringDataLon = d3.csv.parseRows(text);
-                var dataLon = new Array(StringDataLon[0].length);
-                for(var i=0;i<StringDataLon[0].length;i++){
-                    dataLon[i] = Number(StringDataLon[0][i]);
-                }
-                LatLon.setLongitude(dataLon);
-                console.log("a2");
-                return 0;
-            });
-        })
-    ).then(function(lat){
-            LatLon.exec();
-            console.log("a3");
-            return 3;
-        })
-    );
-    */
     var csvData = new Array();
     var data = new XMLHttpRequest();
     data.open("GET","./js/data/Latitude_ascii", false);  //true:非同期, false:同期

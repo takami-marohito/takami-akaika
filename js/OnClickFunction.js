@@ -4,6 +4,7 @@
 
 //#include "SecondInvariant.js"
 //#include "draw_land.js"
+//#include "load_data.js"
 
 //クリックすると
 //1.ユーザの設定した緯度経度を配列番号にする関数をつくる
@@ -13,9 +14,10 @@ function OnClickFunction() {
     jQuery.when(
         setVariable(),
         loadLatandLonData(),
+        loadTimeArray(),
         button_loading_text(),
         CalcVariable()
-    ).then(function (retvalue0,retvalue1,retvalue2, m_secondinvariant) {
+    ).then(function (retvalue0,retvalue1,retvalue2,retvalue3, m_secondinvariant) {
             if (DEBUG == 1) {
                 //console.log(m_secondinvariant);
             }
@@ -67,8 +69,15 @@ function CalcVariable()
     var target = document.getElementById("VariableMode");
     var exec_function = [];
     if(target.value == "SecondInvariant") {
-        console.log(document.getElementById("SecondInvariantDate_input").value);
-        exec_function.push(SecondInvariant(1213, 0));
+        var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
+        if(dateNum == -1){
+            console.log("cannot find date");
+            return(function(){
+               var date = {miss:true};
+                return date;
+            });
+        }
+        exec_function.push(SecondInvariant(dateNum, 0));
     }
     if(target.value == "VortexRotation"){
         exec_function.push(VortexRotation(1300,0));
@@ -83,4 +92,15 @@ function CalcVariable()
             //console.log(arguments[0]);
             return arguments[0];
         });
+}
+
+function DateToArrayNum(date)
+{
+    for(var i=0;i<TimeArray.length;i++){
+        if(TimeArray[i] == date){
+            console.log("find date " + TimeArray[i] );
+            return i;
+        }
+    }
+    return -1;
 }
