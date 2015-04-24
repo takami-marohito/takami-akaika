@@ -123,7 +123,7 @@
             <div class="row">
                 <div class="col col-lg-12">
                     <form id="SecondInvariant" class="form-inline" role="form">
-                        <label>SecondInvariant Range</label>
+                        <label>SecondInvariant Color Range</label>
                         <input type="text" name="name1" id="SecondInvariantMin" class="form-control"  value="-60" />
                         ~
                         <input type="text" name="name2" id="SecondInvariantMax" class="form-control"  value="60" />
@@ -150,9 +150,30 @@
                 </div>
             </div>
 
-            <!--  初期設定-->
-            <script type="text/javascript">    SelectVariableEvent();
-            document.getElementById("Filename").style.display="none";
+            <div class="row">
+                <div class="col col-lg-12">
+                    <form id="DrawLine" class="form-inline" role="form">
+                        <label>DrawLine</label>
+                        <input type="checkbox" name="line" id="LineOnOff" value=""/>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col col-lg-12">
+                    <form id="DownloadDateRange" class="form-inline" role="form">
+                        <label>Load Range</label>
+                        <input type="number" name="name1" id="DownloadDateRangeInput" class="form-control"  value="3" />
+                        日
+                    </form>
+                </div>
+            </div>
+
+            <!--  可視化変数の初期化-->
+            <script type="text/javascript">
+                SelectVariableEvent();
+                jQuery('#VariableMode').val('VortexRotation').trigger('change');
+                jQuery('#LineOnOff').prop('checked',true);
             </script>
             <!--  ここまで-->
 

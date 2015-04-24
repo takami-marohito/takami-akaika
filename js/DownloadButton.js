@@ -11,7 +11,7 @@ function DownloadButtonOnClickFunction() {
     link.href = imgData;
     link.click();
 
-/*
+
     for(var i=0;i<30;i++) {
         var OutputString = new Array();
         OutputString += VortexRotation_matrix[i].u.time_string;
@@ -79,7 +79,7 @@ function DownloadButtonOnClickFunction() {
         link.href = URL.createObjectURL(blob);
         link.click();
     }
-*/
+
 
     /*
     var OutputString = new Array();

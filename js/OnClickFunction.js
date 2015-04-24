@@ -80,7 +80,16 @@ function CalcVariable()
         exec_function.push(SecondInvariant(dateNum, 0));
     }
     if(target.value == "VortexRotation"){
-        exec_function.push(VortexRotation(1300,0));
+        var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
+        if(dateNum == -1){
+            console.log("cannot find date");
+            return(function(){
+                var date = {miss:true};
+                return date;
+            });
+        }
+        var range = Number(document.getElementById("DownloadDateRangeInput").value);
+        exec_function.push(VortexRotation(dateNum,0,range));
     }
     if(target.value == "LoadingCalculatedVariable"){
         exec_function.push(LoadingFile());

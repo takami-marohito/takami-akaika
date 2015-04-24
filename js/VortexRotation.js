@@ -4,9 +4,9 @@
 
 var VortexRotation_matrix = new Array();
 
-function VortexRotation(Time, Depth)
+function VortexRotation(Time, Depth, Range)
 {
-    var Time_backward=30;
+    var Time_backward=Range;
 
     //var VortexRotation_matrix = new Array();
 
@@ -58,7 +58,22 @@ function VortexRotation(Time, Depth)
                     returnObject.data[j][i] = VortexRotation_matrix[0].v.data[j][i];
                 }
             }
-            //return VortexRotation_matrix;
+
+            //lineの配列を用意  配列の要素数は引きたい線の数（折れ線も一本で書ける）
+            var lineNum = 5;
+            returnObject.line = new Array(lineNum);
+            for(var i=0;i<lineNum;i++) {
+                returnObject.line[i] = new THREE.Geometry();
+            }
+
+            //lineの座標を設定
+            for(var i=0;i<lineNum;i++){
+                returnObject.line[i].vertices.push(new THREE.Vector3(10,i*50+10, 50));
+                returnObject.line[i].vertices.push(new THREE.Vector3(300,i*50+60, 50));
+                returnObject.line[i].vertices.push(new THREE.Vector3(500,400-i*30, 50));
+                returnObject.line[i].vertices.push(new THREE.Vector3(700,400-i*60, 50));
+            }
+
             return returnObject;
         });
 }

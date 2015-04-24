@@ -8,6 +8,9 @@
 var map_renderer = new THREE.WebGLRenderer({
     preserveDrawingBuffer:true
 });
+
+var map_camera;
+var map_scene;
 //new webglrenderer()するとコンソールログが出る
 
 var map_scale = 1.0;
@@ -19,21 +22,59 @@ var MapGrid = {width:834, height:502};
 {
     var width = MapGrid.width;
     var height = MapGrid.height;
-    var scene = new THREE.Scene();
+    map_scene = new THREE.Scene();
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
     map_renderer.shadowMapEnabled = false;
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
 
-    var camera = new THREE.OrthographicCamera(-500, 500, 500, -500, 0.01, 100);
-    camera.position.set(0, 0, 50);
-    camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera = new THREE.OrthographicCamera(-500, 500, 500, -500, 0.01, 100);
+    map_camera.position.set(0, 0, 50);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
 
-    map_renderer.render(scene, camera);
+    map_renderer.render(map_scene, map_camera);
 }
 )();
 
-function draw_map(SecondInvariant)
+function draw_map(Data)
+{
+    draw_polygon(Data);
+    if(document.getElementById("LineOnOff").checked){
+        draw_line(Data);
+    }
+}
+
+function draw_line(Data)
+{
+    /*
+    var geo = new THREE.Geometry();
+    geo.vertices.push(new THREE.Vector3(30,30, 50));
+    geo.vertices.push(new THREE.Vector3(500,400,50));
+    geo.vertices.push(new THREE.Vector3(600,200,50));
+
+    var line = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x000000,linewidth:3}));
+    map_scene.add(line);
+    map_renderer.render(map_scene,map_camera);
+    */
+    if(Data.line == undefined){
+        console.log("there is no line data");
+        return 0;
+    }
+    var line = new Array(Data.line.length);
+    var geo = new Array(Data.line.length);
+
+    for(var i=0;i<Data.line.length;i++){
+        geo[i] = new THREE.Geometry();
+        for(var j=0;j<Data.line[i].vertices.length;j++) {
+            geo[i].vertices.push(Data.line[i].vertices[j]);
+        }
+        line[i] = new THREE.Line(geo[i], new THREE.LineBasicMaterial({color:0x000000,linewidth:5}));
+        map_scene.add(line[i]);
+    }
+    map_renderer.render(map_scene,map_camera);
+}
+
+function draw_polygon(SecondInvariant)
 {
     updateSecondInvariantMinMax();
 
@@ -52,11 +93,11 @@ function draw_map(SecondInvariant)
     //var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
     var mesh_triangle = new THREE.Mesh(geometry, material_triangle);
 
-    var light = new THREE.DirectionalLight("#AAAAAA");
-    light.position.set(0,0,100);
-    var scene = new THREE.Scene();
-    scene.add(mesh_triangle);
-    scene.add(light);
+    //var light = new THREE.DirectionalLight("#AAAAAA");
+    //light.position.set(0,0,100);
+    map_scene = new THREE.Scene();
+    map_scene.add(mesh_triangle);
+    //map_scene.add(light);
 
     mesh_triangle.position.set(0, 0, 0);
 
@@ -72,27 +113,29 @@ function draw_map(SecondInvariant)
     document.getElementById("mapArea").setAttribute("width",width);
     document.getElementById("mapArea").setAttribute("height",height);
 
-    //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    //map_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
     var lon = MapGrid.width * (Longitude.max - Longitude.min)/(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
     var lat = MapGrid.height * (Latitude.max - Latitude.min)/(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
-    //var camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
-    var camera = new THREE.OrthographicCamera(-lon/2, lon/2, lat/2, -lat/2, 0.01, 1000);
-    camera.position.set(0, 0, 1);
-    camera.lookAt({x: 0, y: 0, z: 0});
-    camera.position.set(lon/2, lat/2, 30);
+    //map_camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
+    map_camera = new THREE.OrthographicCamera(-lon/2, lon/2, lat/2, -lat/2, 0.01, 1000);
+    map_camera.position.set(0, 0, 1);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera.position.set(lon/2, lat/2, 100);
     //map_renderer.setSize(lon,lat);
-    map_renderer.render(scene, camera);
+    map_renderer.render(map_scene, map_camera);
 
+    /*
+   //マウスクリックでその点の情報が出る機能
     document.addEventListener('click',function(e){
         var rect = document.getElementById("mapArea").getBoundingClientRect();
         var mouseX = Math.round((e.clientX - rect.left)/map_scale);
         var mouseY = Math.round((e.clientY - rect.top)/map_scale);
         if(0<mouseX && mouseX<document.getElementById("mapArea").getAttribute("width") && 0<mouseY && mouseY<document.getElementById("mapArea").getAttribute("height")) {
             target = document.getElementById("output2");
-            target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY + "  this point's vortex is " + SecondInvariant.vortex_type[441-mouseY][mouseX];
+            target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY;// + "  this point's vortex is " + SecondInvariant.vortex_type[441-mouseY][mouseX];
         }
     },false);
-
+*/
 }
 
 
@@ -233,11 +276,11 @@ function addColorLegend_Vertical()
 
     var mesh_triangle = new THREE.Mesh(legend_geometry, material_triangle);
 
-    var light = new THREE.DirectionalLight("#AAAAAA");
-    light.position.set(0,0,100);
-    var scene = new THREE.Scene();
-    scene.add(mesh_triangle);
-    scene.add(light);
+    //var light = new THREE.DirectionalLight("#AAAAAA");
+    //light.position.set(0,0,100);
+    map_scene = new THREE.Scene();
+    map_scene.add(mesh_triangle);
+    //map_scene.add(light);
 
     mesh_triangle.position.set(0, 0, 0);
 
@@ -252,12 +295,12 @@ function addColorLegend_Vertical()
     document.getElementById("ColorLegend").setAttribute("width",width);
     document.getElementById("ColorLegend").setAttribute("height",height);
 
-    //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
-    var camera = new THREE.OrthographicCamera(-width/2-50, width/2+50, height/2, -height/2, 0.01, 1000);
-    camera.position.set(0, 0, 1);
-    camera.lookAt({x: 0, y: 0, z: 0});
-    camera.position.set(width/2+50, height/2, 30);
-    legend_renderer.render(scene, camera);
+    //map_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    map_camera = new THREE.OrthographicCamera(-width/2-50, width/2+50, height/2, -height/2, 0.01, 1000);
+    map_camera.position.set(0, 0, 1);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera.position.set(width/2+50, height/2, 30);
+    legend_renderer.render(map_scene, map_camera);
 }
 
 function addColorLegend_Horizontal()
@@ -318,11 +361,11 @@ function addColorLegend_Horizontal()
 
     var mesh_triangle = new THREE.Mesh(legend_geometry, material_triangle);
 
-    var light = new THREE.DirectionalLight("#AAAAAA");
-    light.position.set(0,0,100);
-    var scene = new THREE.Scene();
-    scene.add(mesh_triangle);
-    scene.add(light);
+    //var light = new THREE.DirectionalLight("#AAAAAA");
+    //light.position.set(0,0,100);
+    map_scene = new THREE.Scene();
+    map_scene.add(mesh_triangle);
+    //map_scene.add(light);
 
     var textGeoMin = new THREE.TextGeometry(colorlegend_min,{
         size: 13,
@@ -332,7 +375,7 @@ function addColorLegend_Horizontal()
     var textMin = new THREE.Mesh(textGeoMin, textMaterialMin);
     textMin.position.set(0,-15,100);
     textMin.doubleSided=true;
-    scene.add( textMin );
+    map_scene.add( textMin );
 
     var textGeoMax = new THREE.TextGeometry(colorlegend_max,{
         size: 13,
@@ -342,7 +385,7 @@ function addColorLegend_Horizontal()
     var textMax = new THREE.Mesh(textGeoMax, textMaterialMax);
     textMax.position.set(370,-15,100);
     textMax.doubleSided=true;
-    scene.add( textMax );
+    map_scene.add( textMax );
 
     mesh_triangle.position.set(0, 0, 0);
 
@@ -356,12 +399,12 @@ function addColorLegend_Horizontal()
     document.getElementById("ColorLegend").setAttribute("width",width);
     document.getElementById("ColorLegend").setAttribute("height",height);
 
-    //var camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
-    var camera = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2-40, 0.01, 1000);
-    camera.position.set(0, 0, 1);
-    camera.lookAt({x: 0, y: 0, z: 0});
-    camera.position.set(width/2, height/2, 300);
-    legend_renderer.render(scene, camera);
+    //map_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    map_camera = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2-40, 0.01, 1000);
+    map_camera.position.set(0, 0, 1);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera.position.set(width/2, height/2, 300);
+    legend_renderer.render(map_scene, map_camera);
 }
 
 var interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);
