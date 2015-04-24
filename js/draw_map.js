@@ -68,7 +68,7 @@ function draw_line(Data)
         for(var j=0;j<Data.line[i].vertices.length;j++) {
             geo[i].vertices.push(Data.line[i].vertices[j]);
         }
-        line[i] = new THREE.Line(geo[i], new THREE.LineBasicMaterial({color:0x000000,linewidth:5}));
+        line[i] = new THREE.Line(geo[i], new THREE.LineBasicMaterial({color:0xff00ff,linewidth:5}));
         map_scene.add(line[i]);
     }
     map_renderer.render(map_scene,map_camera);

@@ -60,7 +60,7 @@ function VortexRotation(Time, Depth, Range)
             }
 
             //lineの配列を用意  配列の要素数は引きたい線の数（折れ線も一本で書ける）
-            var lineNum = 5;
+            var lineNum = 1;
             returnObject.line = new Array(lineNum);
             for(var i=0;i<lineNum;i++) {
                 returnObject.line[i] = new THREE.Geometry();
@@ -70,15 +70,31 @@ function VortexRotation(Time, Depth, Range)
             for(var i=0;i<lineNum;i++){
                 returnObject.line[i].vertices.push(new THREE.Vector3(10,i*50+10, 50));
                 returnObject.line[i].vertices.push(new THREE.Vector3(300,i*50+60, 50));
-                returnObject.line[i].vertices.push(new THREE.Vector3(500,400-i*30, 50));
+                returnObject.line[i].vertices.push(new THREE.Vector3(400,400-i*30, 50));
                 returnObject.line[i].vertices.push(new THREE.Vector3(700,400-i*60, 50));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 139.8, 35.7 ));
             }
 
             return returnObject;
         });
 }
 
-function VortexRotation_matrix_exec(VortexRotation_matrix)
+//latは緯度で南北方向、lonは経度で東西方向
+function LatLonToMapGrid_Vector3(lon,lat)
 {
-
+    var vector = new THREE.Vector3();
+    if(LatLon.Latitude.data[LatLon.Latitude.data.length-1] < lat || LatLon.Latitude.data[0] > lat){
+        console.log("line vertex has latitude that is out of range.");
+        return vector;
+    }
+    if(LatLon.Longitude.data[LatLon.Longitude.data.length-1] < lon || LatLon.Longitude.data[0] > lon){
+        console.log("line vertex has Longitude that is out of range.");
+        return vector;
+    }
+    var tmp_x = (lon-LatLon.Longitude.data[0])*10.0;
+    var tmp_y = (lat-LatLon.Latitude.data[0])*10.0;
+    vector = new THREE.Vector3(tmp_x,tmp_y, 50);
+    console.log(LatLon.Latitude.data[LatLon.Latitude.data.length-1]);
+    console.log(LatLon.Longitude.data[LatLon.Longitude.data.length-1]);
+    return vector;
 }
