@@ -68,11 +68,11 @@ function VortexRotation(Time, Depth, Range)
 
             //lineの座標を設定
             for(var i=0;i<lineNum;i++){
-                returnObject.line[i].vertices.push(new THREE.Vector3(10,i*50+10, 50));
-                returnObject.line[i].vertices.push(new THREE.Vector3(300,i*50+60, 50));
-                returnObject.line[i].vertices.push(new THREE.Vector3(400,400-i*30, 50));
-                returnObject.line[i].vertices.push(new THREE.Vector3(700,400-i*60, 50));
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 139.8, 35.7 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 154.0, 24 + 16.0/60.0 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 148 + 45.0/60.0, 45 + 33.0/60.0 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 122 + 56.0/60.0, 24 + 26.0/60.0 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 136 + 4.0/60.0, 20 + 25.0/60.0 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 139.7, 35.7 ));
             }
 
             return returnObject;
@@ -91,10 +91,6 @@ function LatLonToMapGrid_Vector3(lon,lat)
         console.log("line vertex has Longitude that is out of range.");
         return vector;
     }
-    var tmp_x = (lon-LatLon.Longitude.data[0])*10.0;
-    var tmp_y = (lat-LatLon.Latitude.data[0])*10.0;
-    vector = new THREE.Vector3(tmp_x,tmp_y, 50);
-    console.log(LatLon.Latitude.data[LatLon.Latitude.data.length-1]);
-    console.log(LatLon.Longitude.data[LatLon.Longitude.data.length-1]);
+    vector = new THREE.Vector3(lon*10.0,lat*10.0, 50);
     return vector;
 }
