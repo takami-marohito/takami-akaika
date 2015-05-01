@@ -6,17 +6,16 @@
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
 
-var map_renderer = new THREE.WebGLRenderer({
-    preserveDrawingBuffer:true
-});
+var map_renderer = new THREE.WebGLRenderer();
 
-var map_camera;
-var map_scene;
+var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
+var map_scene = new THREE.Scene();
 //new webglrenderer()するとコンソールログが出る
 
 var map_scale = 1.0;
 
 var MapGrid = {width:834, height:502};
+
 
 //tmp map before loading geometry data
 ( function()
@@ -43,11 +42,7 @@ var MapGrid = {width:834, height:502};
 
 function render()
 {
-    map_renderer.clear();
-
-    map_renderer.setSize(MapGrid.width, MapGrid.height);
-    map_renderer.setClearColor(0xaaaaaa, 1);
-    map_renderer.shadowMapEnabled = false;
+    requestAnimationFrame(render);
     map_renderer.render(map_scene, map_camera);
 }
 
@@ -69,34 +64,38 @@ function draw_map(Data)
         if(!mousedown) return;
         moveDistance = {x: mouselocation.x - e.pageX, y: mouselocation.y - e.pageY};
         camera_position.x += moveDistance.x;
-        camera_position.y += moveDistance.y;
+        camera_position.y -= moveDistance.y;
         map_camera.position.set(camera_position.x,camera_position.y,100);
         //map_camera.lookAt(camera_position.x,camera_position.y,0);
         console.log(camera_position);
         mouselocation = {x: e.pageX, y: e.pageY};
-
     }, false);
 
     map_renderer.domElement.addEventListener('mouseup', function(e){
         mousedown = false;
-        render();
+        //render();
         //map_renderer.render(map_scene, map_camera);
     }, false);
 
+
+    //縮尺変更中はマウスホイールのスクロールを無効にしている
+
+    map_renderer.domElement.addEventListener('mousewheel', function(e){
+        mousedown = false;
+        var wheel_delta = e.detail ? e.detail / -3 : e.wheelDelta / 120;
+        //map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,Latitude.max*10.0,Latitude.min*10.0, 0.01, 3000);
+        if(e.preventDefault()){
+            e.preventDefault();
+        }
+        e.returnValue = false;
+        console.log(wheel_delta);
+    }, false);
+
+    //render();
 }
 
 function draw_line(Data)
 {
-    /*
-    var geo = new THREE.Geometry();
-    geo.vertices.push(new THREE.Vector3(30,30, 50));
-    geo.vertices.push(new THREE.Vector3(500,400,50));
-    geo.vertices.push(new THREE.Vector3(600,200,50));
-
-    var line = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x000000,linewidth:3}));
-    map_scene.add(line);
-    map_renderer.render(map_scene,map_camera);
-    */
     if(Data.line == undefined){
         console.log("there is no line data");
         return 0;
@@ -112,9 +111,6 @@ function draw_line(Data)
         line[i] = new THREE.Line(geo[i], new THREE.LineBasicMaterial({color:0xff00ff,linewidth:5}));
         map_scene.add(line[i]);
     }
-    map_camera.position.set(50,50,100);
-    //map_camera.lookAt(50,50,0);
-    render();
 }
 
 function draw_polygon(SecondInvariant)
@@ -169,19 +165,19 @@ function draw_polygon(SecondInvariant)
     //map_camera.lookAt({x: 500, y: 300, z: 0});
     //map_renderer.setSize(lon,lat);
     //map_renderer.render(map_scene, map_camera);
-    render();
+    //render();
     /*
-   //マウスクリックでその点の情報が出る機能
-    document.addEventListener('click',function(e){
-        var rect = document.getElementById("mapArea").getBoundingClientRect();
-        var mouseX = Math.round((e.clientX - rect.left)/map_scale);
-        var mouseY = Math.round((e.clientY - rect.top)/map_scale);
-        if(0<mouseX && mouseX<document.getElementById("mapArea").getAttribute("width") && 0<mouseY && mouseY<document.getElementById("mapArea").getAttribute("height")) {
-            target = document.getElementById("output2");
-            target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY;// + "  this point's vortex is " + SecondInvariant.vortex_type[441-mouseY][mouseX];
-        }
-    },false);
-*/
+     //マウスクリックでその点の情報が出る機能
+     document.addEventListener('click',function(e){
+     var rect = document.getElementById("mapArea").getBoundingClientRect();
+     var mouseX = Math.round((e.clientX - rect.left)/map_scale);
+     var mouseY = Math.round((e.clientY - rect.top)/map_scale);
+     if(0<mouseX && mouseX<document.getElementById("mapArea").getAttribute("width") && 0<mouseY && mouseY<document.getElementById("mapArea").getAttribute("height")) {
+     target = document.getElementById("output2");
+     target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY;// + "  this point's vortex is " + SecondInvariant.vortex_type[441-mouseY][mouseX];
+     }
+     },false);
+     */
 }
 
 
@@ -210,15 +206,15 @@ function CreateGeometry(SecondInvariant)
             var color2 = new THREE.Color();
             var color3 = new THREE.Color();
             /*
-            var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
-            var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
-            var tmp_color2 = SecondInvariantToRGB(SecondInvariant.data[y+1][x+1]);
-            var tmp_color3 = SecondInvariantToRGB(SecondInvariant.data[y+1][x]);
-            color0.setRGB(tmp_color0.red,tmp_color0.green,tmp_color0.blue);
-            color1.setRGB(tmp_color1.red,tmp_color1.green,tmp_color1.blue);
-            color2.setRGB(tmp_color2.red,tmp_color2.green,tmp_color2.blue);
-            color3.setRGB(tmp_color3.red,tmp_color3.green,tmp_color3.blue);
-            */
+             var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
+             var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
+             var tmp_color2 = SecondInvariantToRGB(SecondInvariant.data[y+1][x+1]);
+             var tmp_color3 = SecondInvariantToRGB(SecondInvariant.data[y+1][x]);
+             color0.setRGB(tmp_color0.red,tmp_color0.green,tmp_color0.blue);
+             color1.setRGB(tmp_color1.red,tmp_color1.green,tmp_color1.blue);
+             color2.setRGB(tmp_color2.red,tmp_color2.green,tmp_color2.blue);
+             color3.setRGB(tmp_color3.red,tmp_color3.green,tmp_color3.blue);
+             */
 
             var tmp_color0 = SecondInvariantToHSL_white(SecondInvariant.data[y][x]);
             var tmp_color1 = SecondInvariantToHSL_white(SecondInvariant.data[y][x+1]);
@@ -230,15 +226,15 @@ function CreateGeometry(SecondInvariant)
             color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
 
             /*
-            var tmp_color0 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y][x]);
-            var tmp_color1 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y][x+1]);
-            var tmp_color2 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y+1][x+1]);
-            var tmp_color3 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y+1][x]);
-            color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
-            color1.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
-            color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
-            color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
-            */
+             var tmp_color0 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y][x]);
+             var tmp_color1 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y][x+1]);
+             var tmp_color2 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y+1][x+1]);
+             var tmp_color3 = VortexTypeToHSL_white(SecondInvariant.vortex_type[y+1][x]);
+             color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
+             color1.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
+             color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
+             color3.setHSL(tmp_color3.h,tmp_color3.s,tmp_color3.l);
+             */
             var coord_index = y*(SecondInvariant.data[0].length-1)*4 + x*4;
             var face1 = new THREE.Face3(coord_index, coord_index + 1, coord_index + 3);
             face1.vertexColors[0] = color0;
@@ -325,9 +321,9 @@ function addColorLegend_Vertical()
 
     //var light = new THREE.DirectionalLight("#AAAAAA");
     //light.position.set(0,0,100);
-    map_scene = new THREE.Scene();
-    map_scene.add(mesh_triangle);
-    //map_scene.add(light);
+    var legend_scene = new THREE.Scene();
+    legend_scene.add(mesh_triangle);
+    //legend_scene.add(light);
 
     mesh_triangle.position.set(0, 0, 0);
 
@@ -342,12 +338,12 @@ function addColorLegend_Vertical()
     document.getElementById("ColorLegend").setAttribute("width",width);
     document.getElementById("ColorLegend").setAttribute("height",height);
 
-    //map_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
-    map_camera = new THREE.OrthographicCamera(-width/2-50, width/2+50, height/2, -height/2, 0.01, 1000);
-    map_camera.position.set(0, 0, 1);
-    map_camera.lookAt({x: 0, y: 0, z: 0});
-    map_camera.position.set(width/2+50, height/2, 30);
-    legend_renderer.render(map_scene, map_camera);
+    //legend_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    var legend_camera = new THREE.OrthographicCamera(-width/2-50, width/2+50, height/2, -height/2, 0.01, 1000);
+    legend_camera.position.set(0, 0, 1);
+    legend_camera.lookAt({x: 0, y: 0, z: 0});
+    legend_camera.position.set(width/2+50, height/2, 30);
+    legend_renderer.render(map_scene, legend_camera);
 }
 
 function addColorLegend_Horizontal()
@@ -410,9 +406,9 @@ function addColorLegend_Horizontal()
 
     //var light = new THREE.DirectionalLight("#AAAAAA");
     //light.position.set(0,0,100);
-    map_scene = new THREE.Scene();
-    map_scene.add(mesh_triangle);
-    //map_scene.add(light);
+    var legend_scene = new THREE.Scene();
+    legend_scene.add(mesh_triangle);
+    //legend_scene.add(light);
 
     var textGeoMin = new THREE.TextGeometry(colorlegend_min,{
         size: 13,
@@ -422,7 +418,7 @@ function addColorLegend_Horizontal()
     var textMin = new THREE.Mesh(textGeoMin, textMaterialMin);
     textMin.position.set(0,-15,100);
     textMin.doubleSided=true;
-    map_scene.add( textMin );
+    legend_scene.add( textMin );
 
     var textGeoMax = new THREE.TextGeometry(colorlegend_max,{
         size: 13,
@@ -432,7 +428,7 @@ function addColorLegend_Horizontal()
     var textMax = new THREE.Mesh(textGeoMax, textMaterialMax);
     textMax.position.set(370,-15,100);
     textMax.doubleSided=true;
-    map_scene.add( textMax );
+    legend_scene.add( textMax );
 
     mesh_triangle.position.set(0, 0, 0);
 
@@ -446,12 +442,12 @@ function addColorLegend_Horizontal()
     document.getElementById("ColorLegend").setAttribute("width",width);
     document.getElementById("ColorLegend").setAttribute("height",height);
 
-    //map_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
-    map_camera = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2-40, 0.01, 1000);
-    map_camera.position.set(0, 0, 1);
-    map_camera.lookAt({x: 0, y: 0, z: 0});
-    map_camera.position.set(width/2, height/2, 300);
-    legend_renderer.render(map_scene, map_camera);
+    //legend_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
+    var legend_camera = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2-40, 0.01, 1000);
+    legend_camera.position.set(0, 0, 1);
+    legend_camera.lookAt({x: 0, y: 0, z: 0});
+    legend_camera.position.set(width/2, height/2, 300);
+    legend_renderer.render(legend_scene, legend_camera);
 }
 
 var interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);
