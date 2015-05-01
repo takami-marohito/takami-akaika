@@ -4,6 +4,7 @@
 
 
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
+var camera_position = {x:0,y:0};
 
 var map_renderer = new THREE.WebGLRenderer({
     preserveDrawingBuffer:true
@@ -21,21 +22,34 @@ var MapGrid = {width:834, height:502};
 ( function()
 {
     //this is initializing function, so this setting does not reflect.
+
     var width = MapGrid.width;
     var height = MapGrid.height;
     map_scene = new THREE.Scene();
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
     map_renderer.shadowMapEnabled = false;
+
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
 
     map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
     map_camera.position.set(0, 0, 50);
     map_camera.lookAt({x: 0, y: 0, z: 0});
 
-    map_renderer.render(map_scene, map_camera);
+    //map_renderer.render(map_scene, map_camera);
+    render();
 }
 )();
+
+function render()
+{
+    map_renderer.clear();
+
+    map_renderer.setSize(MapGrid.width, MapGrid.height);
+    map_renderer.setClearColor(0xaaaaaa, 1);
+    map_renderer.shadowMapEnabled = false;
+    map_renderer.render(map_scene, map_camera);
+}
 
 function draw_map(Data)
 {
@@ -43,6 +57,32 @@ function draw_map(Data)
     if(document.getElementById("LineOnOff").checked){
         draw_line(Data);
     }
+
+    //マウスイベント
+    var mousedown = false;
+    var mouselocation ={x:0,y:0};
+    map_renderer.domElement.addEventListener('mousedown',function(e){
+        mousedown = true;
+        mouselocation = {x: e.pageX, y: e.pageY};
+    },false);
+    map_renderer.domElement.addEventListener('mousemove', function(e){
+        if(!mousedown) return;
+        moveDistance = {x: mouselocation.x - e.pageX, y: mouselocation.y - e.pageY};
+        camera_position.x += moveDistance.x;
+        camera_position.y += moveDistance.y;
+        map_camera.position.set(camera_position.x,camera_position.y,100);
+        //map_camera.lookAt(camera_position.x,camera_position.y,0);
+        console.log(camera_position);
+        mouselocation = {x: e.pageX, y: e.pageY};
+
+    }, false);
+
+    map_renderer.domElement.addEventListener('mouseup', function(e){
+        mousedown = false;
+        render();
+        //map_renderer.render(map_scene, map_camera);
+    }, false);
+
 }
 
 function draw_line(Data)
@@ -72,7 +112,9 @@ function draw_line(Data)
         line[i] = new THREE.Line(geo[i], new THREE.LineBasicMaterial({color:0xff00ff,linewidth:5}));
         map_scene.add(line[i]);
     }
-    map_renderer.render(map_scene,map_camera);
+    map_camera.position.set(50,50,100);
+    //map_camera.lookAt(50,50,0);
+    render();
 }
 
 function draw_polygon(SecondInvariant)
@@ -123,11 +165,11 @@ function draw_polygon(SecondInvariant)
     map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,Latitude.max*10.0,Latitude.min*10.0, 0.01, 3000);
     map_camera.position.set(0, 0, 1);
     map_camera.lookAt({x: 0, y: 0, z: 0});
-    map_camera.position.set(0, 0, 100);
+    map_camera.position.set(camera_position.x, camera_position.y, 100);
     //map_camera.lookAt({x: 500, y: 300, z: 0});
     //map_renderer.setSize(lon,lat);
-    map_renderer.render(map_scene, map_camera);
-
+    //map_renderer.render(map_scene, map_camera);
+    render();
     /*
    //マウスクリックでその点の情報が出る機能
     document.addEventListener('click',function(e){
