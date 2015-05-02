@@ -6,13 +6,13 @@
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
 
-var map_renderer = new THREE.WebGLRenderer();
+var map_renderer = new THREE.WebGLRenderer({antialias: true});
+map_renderer.shadowMapEnabled = false;
 
 var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
 var map_scene = new THREE.Scene();
 //new webglrenderer()するとコンソールログが出る
 
-var map_scale = 1.0;
 
 var MapGrid = {width:834, height:502};
 
@@ -20,8 +20,6 @@ var MapGrid = {width:834, height:502};
 //tmp map before loading geometry data
 ( function()
 {
-    //this is initializing function, so this setting does not reflect.
-
     var width = MapGrid.width;
     var height = MapGrid.height;
     map_scene = new THREE.Scene();
@@ -34,8 +32,6 @@ var MapGrid = {width:834, height:502};
     map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
     map_camera.position.set(0, 0, 50);
     map_camera.lookAt({x: 0, y: 0, z: 0});
-
-    //map_renderer.render(map_scene, map_camera);
     render();
 }
 )();
@@ -63,35 +59,44 @@ function draw_map(Data)
     map_renderer.domElement.addEventListener('mousemove', function(e){
         if(!mousedown) return;
         moveDistance = {x: mouselocation.x - e.pageX, y: mouselocation.y - e.pageY};
-        camera_position.x += moveDistance.x;
-        camera_position.y -= moveDistance.y;
+        camera_position.x += moveDistance.x/map_scale;
+        camera_position.y -= moveDistance.y/map_scale;
         map_camera.position.set(camera_position.x,camera_position.y,100);
-        //map_camera.lookAt(camera_position.x,camera_position.y,0);
-        console.log(camera_position);
         mouselocation = {x: e.pageX, y: e.pageY};
     }, false);
 
     map_renderer.domElement.addEventListener('mouseup', function(e){
         mousedown = false;
-        //render();
-        //map_renderer.render(map_scene, map_camera);
     }, false);
 
 
     //縮尺変更中はマウスホイールのスクロールを無効にしている
 
+    var map_scale = 1.0;
+
     map_renderer.domElement.addEventListener('mousewheel', function(e){
         mousedown = false;
         var wheel_delta = e.detail ? e.detail / -3 : e.wheelDelta / 120;
-        //map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,Latitude.max*10.0,Latitude.min*10.0, 0.01, 3000);
         if(e.preventDefault()){
             e.preventDefault();
         }
         e.returnValue = false;
+        if(wheel_delta > 0){
+            map_scale += 0.2;
+        }else{
+            if(map_scale > 1.0) {
+                map_scale -= 0.2;
+            }
+        }
         console.log(wheel_delta);
+        var scaled_width = MapGrid.width/map_scale;
+        var scaled_height = MapGrid.height/map_scale;
+        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(Latitude.max*10.0+Latitude.min*10.0)/2.0};
+        map_camera = new THREE.OrthographicCamera(center_Grid.x-scaled_width/2.0,center_Grid.x+scaled_width/2.0,center_Grid.y+scaled_height/2.0,center_Grid.y-scaled_height/2.0, 0.01, 3000);
+        map_camera.position.set(0, 0, 1);
+        map_camera.lookAt({x: 0, y: 0, z: 0});
+        map_camera.position.set(camera_position.x, camera_position.y, 100);
     }, false);
-
-    //render();
 }
 
 function draw_line(Data)
@@ -152,32 +157,13 @@ function draw_polygon(SecondInvariant)
     document.getElementById("mapArea").setAttribute("width",width);
     document.getElementById("mapArea").setAttribute("height",height);
 
-    //map_camera = new THREE.PerspectiveCamera(75, 1, 0.01, 1000);
     var lon = MapGrid.width * (Longitude.max - Longitude.min)/(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
     var lat = MapGrid.height * (Latitude.max - Latitude.min)/(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
 
-    //map_camera = new THREE.OrthographicCamera(-SecondInvariant.data[0].length/2, SecondInvariant.data[0].length/2, SecondInvariant.data.length/2, -SecondInvariant.data.length/2, 0.01, 1000);
-    //map_camera = new THREE.OrthographicCamera(500,500+804,300+502,300, 0.01, 1000);
     map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,Latitude.max*10.0,Latitude.min*10.0, 0.01, 3000);
     map_camera.position.set(0, 0, 1);
     map_camera.lookAt({x: 0, y: 0, z: 0});
     map_camera.position.set(camera_position.x, camera_position.y, 100);
-    //map_camera.lookAt({x: 500, y: 300, z: 0});
-    //map_renderer.setSize(lon,lat);
-    //map_renderer.render(map_scene, map_camera);
-    //render();
-    /*
-     //マウスクリックでその点の情報が出る機能
-     document.addEventListener('click',function(e){
-     var rect = document.getElementById("mapArea").getBoundingClientRect();
-     var mouseX = Math.round((e.clientX - rect.left)/map_scale);
-     var mouseY = Math.round((e.clientY - rect.top)/map_scale);
-     if(0<mouseX && mouseX<document.getElementById("mapArea").getAttribute("width") && 0<mouseY && mouseY<document.getElementById("mapArea").getAttribute("height")) {
-     target = document.getElementById("output2");
-     target.innerHTML = "SecondInvariant is " + SecondInvariant.data[441 - mouseY][mouseX] + "  mouse position is " + mouseX + " " + mouseY;// + "  this point's vortex is " + SecondInvariant.vortex_type[441-mouseY][mouseX];
-     }
-     },false);
-     */
 }
 
 
