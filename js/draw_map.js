@@ -18,6 +18,52 @@ var MapGrid = {width:834, height:502};
 
 var gmap;
 
+function OverLayer(map,lat,lng)
+{
+    this.lat_ = lat;
+    this.lng_ = lng;
+    this.setMap(map);
+}
+OverLayer.prototype = new google.maps.OverlayView();
+OverLayer.prototype.draw = function(){
+    if(!this.div_) {
+        this.div_ = document.createElement('div');
+        this.div_.id = "gmapCanvas";
+        /*
+         this.div_.style.position = "absolute";
+         this.div_.style.fontSize = "700%";
+         this.div_.innerHTML = "hello";
+         */
+
+        var panes = this.getPanes();
+        panes.overlayLayer.appendChild(this.div_);
+        //var can = document.getElementById("gmapCanvas");
+        //console.log(can);
+        //var canv = can.getContext("2d");
+        //canv.fillRect(20, 20, 100, 100);
+        var point = this.getProjection().fromLatLngToDivPixel(new google.maps.LatLng(this.lat_, this.lng_));
+        this.div_.style.left = point.x + 'px';
+        this.div_.style.top = point.y + 'px';
+
+        var width = MapGrid.width;
+        var height = MapGrid.height;
+        map_renderer = new THREE.WebGLRenderer({antialias: true});
+        map_renderer.setSize(width, height);
+        map_renderer.setClearColor(0xaaaaaa, 1);
+        map_renderer.shadowMapEnabled = false;
+        map_renderer.render(map_scene,map_camera);
+        document.getElementById("gmapCanvas").appendChild(map_renderer.domElement);
+        document.getElementById("gmapCanvas").setAttribute("width", width);
+        document.getElementById("gmapCanvas").setAttribute("height", height);
+    }
+};
+OverLayer.prototype.remove = function() {
+    if (this.div_) {
+        this.div_.parentNode.removeChild(this.div_);
+        this.div_ = null;
+    }
+};
+
 google.maps.event.addDomListener(window, 'load', function() {
     var mapDom = document.getElementById("gmap");
     var options = {
@@ -46,8 +92,12 @@ google.maps.event.addDomListener(window, 'load', function() {
     var polygon = new google.maps.Polygon(polygonOpt);
 
     gmap = new google.maps.Map(mapDom, options);
+
     polygon.setMap(gmap);
+
+    var over = new OverLayer(gmap,36,120);
 });
+
 
 
 function draw_map(Data)
@@ -72,26 +122,6 @@ function draw_map(Data)
         fillOpacity:1.0,
         clickable:false
     };
-
-    var heatdata = new Array();
-
-    for(var i=0;i<10;i++){
-        for(var j=0;j<10;j++){
-            pos = new google.maps.LatLng(26+i,150+j);
-            heatdata.push({
-                location:pos,
-                weight:i*10+j
-            });
-        }
-    }
-
-    var heatmap = new google.maps.visualization.HeatmapLayer({
-        radius:15, //ヒートマップの各ポイントの大きさ
-        opacity:1.0
-    });
-
-    heatmap.setData(heatdata);
-    heatmap.setMap(gmap);
 
     var polygon = new google.maps.Polygon(polygonOpt);
 console.log(gmap);
