@@ -109,12 +109,12 @@ function draw_map(Data)
 {
     draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
-        draw_line(Data);
+        //draw_line(Data);
     }
-    setCamera();
+    setThreeCameraToGoogleMap();
 }
 
-function setCamera()
+function setThreeCameraToGoogleMap()
 {
 
     var gmap_bounds = gmap.getBounds();
