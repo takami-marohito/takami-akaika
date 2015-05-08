@@ -17,7 +17,7 @@ google.maps.event.addDomListener(window, 'load', function() {
     var mapDom = document.getElementById("gmap");
     var options = {
         zoom: 4,
-        center: new google.maps.LatLng(40, 150),
+        center: new google.maps.LatLng((LatLon.Latitude.data[LatLon.Latitude.data.length-1]+LatLon.Latitude.data[0])/2.0, (LatLon.Longitude.data[LatLon.Longitude.data.length-1]+LatLon.Longitude.data[0])/2.0),
         mapTypeId: google.maps.MapTypeId.TERRAIN,  //SATELLITE
         mapTypeControl:false,
         streetViewControl:false,
@@ -68,7 +68,8 @@ function ThreeInit()
     map_renderer = new THREE.WebGLRenderer({antialias: true, alpha:true});
     map_renderer.setSize(MapGrid.width,MapGrid.height);
     map_renderer.shadowMapEnabled = false;
-    map_camera = new THREE.OrthographicCamera(1200,2000,600,200, 0.01, 3000);
+    console.log(LatLon);
+    map_camera = new THREE.OrthographicCamera(LatLon.Longitude.data[0]*10.0,LatLon.Longitude.data[LatLon.Longitude.data.length-1]*10.0,LatLon.Latitude.data[LatLon.Latitude.data.length-1]*10.0,LatLon.Latitude.data[0]*10.0, 0.01, 3000);
     console.log(MapGrid);
     console.log(Longitude);
     console.log(Latitude);
@@ -106,12 +107,33 @@ function ThreeInit()
 
 function draw_map(Data)
 {
-    //draw_polygon(Data);
+    draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
         draw_line(Data);
     }
+    setCamera();
+}
 
-    //render();
+function setCamera()
+{
+
+    var gmap_bounds = gmap.getBounds();
+    var gmap_lon_min = gmap_bounds.getSouthWest().lng();
+    var gmap_lon_max = gmap_bounds.getNorthEast().lng();
+    var gmap_lat_min = gmap_bounds.getSouthWest().lat();
+    var gmap_lat_max = gmap_bounds.getNorthEast().lat();
+    if(gmap_lon_max<0){
+        gmap_lon_max+=360.0;
+    }
+    map_camera = new THREE.OrthographicCamera(gmap_lon_min*10.0,gmap_lon_max*10.0,gmap_lat_max*10.0,gmap_lat_min*10.0, 0.01, 3000);
+    map_camera.position.set(0, 0, 1);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera.position.set(0,0, 100);
+    console.log(gmap_bounds);
+    console.log( gmap_lon_min);
+    console.log( gmap_lon_max);
+    console.log( gmap_lat_min);
+    console.log( gmap_lat_max);
 }
 
 function draw_line(Data)
@@ -136,7 +158,6 @@ function draw_line(Data)
 function draw_polygon(SecondInvariant)
 {
     updateSecondInvariantMinMax();
-
     var width = MapGrid.width;
     var height = MapGrid.height;
     geometry = new THREE.Geometry();
@@ -168,9 +189,9 @@ function draw_polygon(SecondInvariant)
     map_renderer.setSize(width, height);
     map_renderer.setClearColor(0xaaaaaa, 1);
     map_renderer.shadowMapEnabled = false;
-    document.getElementById("mapArea").appendChild(map_renderer.domElement);
-    document.getElementById("mapArea").setAttribute("width",width);
-    document.getElementById("mapArea").setAttribute("height",height);
+    //document.getElementById("mapArea").appendChild(map_renderer.domElement);
+    //document.getElementById("mapArea").setAttribute("width",width);
+    //document.getElementById("mapArea").setAttribute("height",height);
 
     var lon = MapGrid.width * (Longitude.max - Longitude.min)/(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
     var lat = MapGrid.height * (Latitude.max - Latitude.min)/(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);

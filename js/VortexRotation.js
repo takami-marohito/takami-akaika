@@ -91,6 +91,6 @@ function LatLonToMapGrid_Vector3(lon,lat)
         console.log("line vertex has Longitude that is out of range.");
         return vector;
     }
-    vector = new THREE.Vector3(lon*10.0,lat*10.0, 50);
+    vector = new THREE.Vector3(lon*10.0,lat*10.0, 0);
     return vector;
 }

@@ -13,11 +13,10 @@
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
-        loadLatandLonData(),
         loadTimeArray(),
         button_loading_text(),
         CalcVariable()
-    ).then(function (retvalue0,retvalue1,retvalue2,retvalue3, m_secondinvariant) {
+    ).then(function (retvalue0,retvalue1,retvalue3, m_secondinvariant) {
             if (DEBUG == 1) {
                 //console.log(m_secondinvariant);
             }
