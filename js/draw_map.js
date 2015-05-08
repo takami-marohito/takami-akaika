@@ -2,56 +2,55 @@
  * Created by vizlab on 15/03/26.
  */
 
-
-//地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
 
-var map_renderer = new THREE.WebGLRenderer({antialias: true});
-map_renderer.shadowMapEnabled = false;
-
+var map_renderer = new THREE.WebGLRenderer();
 var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
 var map_scene = new THREE.Scene();
-//new webglrenderer()するとコンソールログが出る
-
-
 var MapGrid = {width:834, height:502};
 
 var gmap;
 
-function OverLayer(map,lat,lng)
+ThreeInit();
+
+google.maps.event.addDomListener(window, 'load', function() {
+    var mapDom = document.getElementById("gmap");
+    var options = {
+        zoom: 4,
+        center: new google.maps.LatLng(40, 150),
+        mapTypeId: google.maps.MapTypeId.TERRAIN,  //SATELLITE
+        mapTypeControl:false,
+        streetViewControl:false,
+        panControl:false
+    };
+    gmap = new google.maps.Map(mapDom, options);
+    var over = new OverLayer(gmap);
+});
+
+//ここまで初期化
+
+function render()
 {
-    this.lat_ = lat;
-    this.lng_ = lng;
+    requestAnimationFrame(render);
+    map_renderer.render(map_scene, map_camera);
+}
+
+function OverLayer(map)
+{
     this.setMap(map);
 }
+
 OverLayer.prototype = new google.maps.OverlayView();
+
 OverLayer.prototype.draw = function(){
     if(!this.div_) {
         this.div_ = document.createElement('div');
         this.div_.id = "gmapCanvas";
-        /*
-         this.div_.style.position = "absolute";
-         this.div_.style.fontSize = "700%";
-         this.div_.innerHTML = "hello";
-         */
-
         var panes = this.getPanes();
         panes.overlayLayer.appendChild(this.div_);
-        //var can = document.getElementById("gmapCanvas");
-        //console.log(can);
-        //var canv = can.getContext("2d");
-        //canv.fillRect(20, 20, 100, 100);
-        var point = this.getProjection().fromLatLngToDivPixel(new google.maps.LatLng(this.lat_, this.lng_));
-        this.div_.style.left = point.x + 'px';
-        this.div_.style.top = point.y + 'px';
 
         var width = MapGrid.width;
         var height = MapGrid.height;
-        map_renderer = new THREE.WebGLRenderer({antialias: true});
-        map_renderer.setSize(width, height);
-        map_renderer.setClearColor(0xaaaaaa, 1);
-        map_renderer.shadowMapEnabled = false;
-        map_renderer.render(map_scene,map_camera);
         document.getElementById("gmapCanvas").appendChild(map_renderer.domElement);
         document.getElementById("gmapCanvas").setAttribute("width", width);
         document.getElementById("gmapCanvas").setAttribute("height", height);
@@ -64,117 +63,55 @@ OverLayer.prototype.remove = function() {
     }
 };
 
-google.maps.event.addDomListener(window, 'load', function() {
-    var mapDom = document.getElementById("gmap");
-    var options = {
-        zoom: 4,
-        center: new google.maps.LatLng(40, 150),
-        mapTypeId: google.maps.MapTypeId.TERRAIN,  //SATELLITE
-        mapTypeControl:false,
-        streetViewControl:false,
-        panControl:false
-    };
-    var points = [
-        new google.maps.LatLng(40,150),
-        new google.maps.LatLng(43,150),
-        new google.maps.LatLng(46,160)
-    ];
+function ThreeInit()
+{
+    map_renderer = new THREE.WebGLRenderer({antialias: true, alpha:true});
+    map_renderer.setSize(MapGrid.width,MapGrid.height);
+    map_renderer.shadowMapEnabled = false;
+    map_camera = new THREE.OrthographicCamera(1200,2000,600,200, 0.01, 3000);
+    console.log(MapGrid);
+    console.log(Longitude);
+    console.log(Latitude);
+    map_camera.position.set(0, 0, 1);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera.position.set(camera_position.x, camera_position.y, 100);
+    map_scene = new THREE.Scene();
 
-    var polygonOpt = {
-        geodesic: false,
-        path:points,
-        strokeOpacity:0.0,
-        fillColor:"#000000",
-        fillOpacity:1.0,
-        clickable:false
-    };
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3(1500, 300, 0));
+    geometry.vertices.push(new THREE.Vector3(1660, 350, 0));
+    geometry.vertices.push(new THREE.Vector3(1600, 200, 0));
 
-    var polygon = new google.maps.Polygon(polygonOpt);
+    var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
+        vertexColors: THREE.VertexColors,
+        side: THREE.DoubleSide,
+        opacity: 1.0,
+        transparent: false
+    });
 
-    gmap = new google.maps.Map(mapDom, options);
+    var face1 = new THREE.Face3(0,1,2);
+    face1.vertexColors[0] = new THREE.Color(0xff0000);
+    face1.vertexColors[1] = new THREE.Color(0xffffff);
+    face1.vertexColors[2] = new THREE.Color(0x0000ff);
 
-    polygon.setMap(gmap);
+    geometry.faces.push(face1);
+    //var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
+    var mesh_triangle = new THREE.Mesh(geometry, material_triangle);
+    geometry.dispose();
+    material_triangle.dispose();
+    map_scene.add(mesh_triangle);
+    render();
 
-    var over = new OverLayer(gmap,36,120);
-});
-
-
+}
 
 function draw_map(Data)
 {
     //draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
-        //draw_line(Data);
+        draw_line(Data);
     }
 
-
-
-    var points = [
-        new google.maps.LatLng(40,150),
-        new google.maps.LatLng(43,150),
-        new google.maps.LatLng(46,160)
-    ];
-
-    var polygonOpt = {
-        path:points,
-        strokeOpacity:0.0,
-        fillColor:"#ff0000",
-        fillOpacity:1.0,
-        clickable:false
-    };
-
-    var polygon = new google.maps.Polygon(polygonOpt);
-console.log(gmap);
-    polygon.setMap(gmap);
-
-    //マウスイベント
-    var mousedown = false;
-    var mouselocation ={x:0,y:0};
-    map_renderer.domElement.addEventListener('mousedown',function(e){
-        mousedown = true;
-        mouselocation = {x: e.pageX, y: e.pageY};
-    },false);
-    map_renderer.domElement.addEventListener('mousemove', function(e){
-        if(!mousedown) return;
-        moveDistance = {x: mouselocation.x - e.pageX, y: mouselocation.y - e.pageY};
-        camera_position.x += moveDistance.x/map_scale;
-        camera_position.y -= moveDistance.y/map_scale;
-        map_camera.position.set(camera_position.x,camera_position.y,100);
-        mouselocation = {x: e.pageX, y: e.pageY};
-    }, false);
-
-    map_renderer.domElement.addEventListener('mouseup', function(e){
-        mousedown = false;
-    }, false);
-
-
-    //縮尺変更中はマウスホイールのスクロールを無効にしている
-
-    var map_scale = 1.0;
-
-    map_renderer.domElement.addEventListener('mousewheel', function(e){
-        mousedown = false;
-        var wheel_delta = e.detail ? e.detail / -3 : e.wheelDelta / 120;
-        if(e.preventDefault()){
-            e.preventDefault();
-        }
-        e.returnValue = false;
-        if(wheel_delta > 0){
-            map_scale += 0.2;
-        }else{
-            if(map_scale > 1.0) {
-                map_scale -= 0.2;
-            }
-        }
-        console.log(wheel_delta);
-        var scaled_width = MapGrid.width/map_scale;
-        var scaled_height = MapGrid.height/map_scale;
-        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(Latitude.max*10.0+Latitude.min*10.0)/2.0};
-        map_camera = new THREE.OrthographicCamera(center_Grid.x-scaled_width/2.0,center_Grid.x+scaled_width/2.0,center_Grid.y+scaled_height/2.0,center_Grid.y-scaled_height/2.0, 0.01, 3000);
-        map_camera.position.set(0, 0, 1);
-        map_camera.lookAt({x: 0, y: 0, z: 0});
-        map_camera.position.set(camera_position.x, camera_position.y, 100);
-    }, false);
+    //render();
 }
 
 function draw_line(Data)
