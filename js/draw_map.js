@@ -7,7 +7,7 @@ var camera_position = {x:0,y:0};
 var map_renderer = new THREE.WebGLRenderer();
 var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
 var map_scene = new THREE.Scene();
-var MapGrid = {width:834, height:502};
+var MapGrid = {height:Math.round((LatLon.Latitude.data[LatLon.Latitude.data.length-1]-LatLon.Latitude.data[0])*10.0), width:Math.round((LatLon.Longitude.data[LatLon.Longitude.data.length-1]-LatLon.Longitude.data[0])*10.0)};
 
 var gmap;
 
@@ -25,6 +25,9 @@ google.maps.event.addDomListener(window, 'load', function() {
     };
     gmap = new google.maps.Map(mapDom, options);
     var over = new OverLayer(gmap);
+console.log(MapGrid);
+    console.log(LatLon.Latitude);
+    console.log(LatLon.Longitude);
 });
 
 //ここまで初期化
@@ -38,6 +41,7 @@ function render()
 function OverLayer(map)
 {
     this.setMap(map);
+
 }
 
 OverLayer.prototype = new google.maps.OverlayView();
@@ -55,7 +59,11 @@ OverLayer.prototype.draw = function(){
         document.getElementById("gmapCanvas").setAttribute("width", width);
         document.getElementById("gmapCanvas").setAttribute("height", height);
     }
+    console.log(this.getProjection().fromLatLngToDivPixel(gmap.getCenter()));
+    console.log(gmap.getProjection().fromLatLngToPoint(gmap.getCenter()));
 };
+
+
 OverLayer.prototype.remove = function() {
     if (this.div_) {
         this.div_.parentNode.removeChild(this.div_);
@@ -68,20 +76,16 @@ function ThreeInit()
     map_renderer = new THREE.WebGLRenderer({antialias: true, alpha:true});
     map_renderer.setSize(MapGrid.width,MapGrid.height);
     map_renderer.shadowMapEnabled = false;
-    console.log(LatLon);
     map_camera = new THREE.OrthographicCamera(LatLon.Longitude.data[0]*10.0,LatLon.Longitude.data[LatLon.Longitude.data.length-1]*10.0,LatLon.Latitude.data[LatLon.Latitude.data.length-1]*10.0,LatLon.Latitude.data[0]*10.0, 0.01, 3000);
-    console.log(MapGrid);
-    console.log(Longitude);
-    console.log(Latitude);
     map_camera.position.set(0, 0, 1);
     map_camera.lookAt({x: 0, y: 0, z: 0});
     map_camera.position.set(camera_position.x, camera_position.y, 100);
     map_scene = new THREE.Scene();
 
     var geometry = new THREE.Geometry();
-    geometry.vertices.push(new THREE.Vector3(1500, 300, 0));
-    geometry.vertices.push(new THREE.Vector3(1660, 350, 0));
-    geometry.vertices.push(new THREE.Vector3(1600, 200, 0));
+    geometry.vertices.push(new THREE.Vector3(1400, 200, 0));
+    geometry.vertices.push(new THREE.Vector3(1500, 160, 0));
+    geometry.vertices.push(new THREE.Vector3(1168.5, 148.5, 0));
 
     var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
         vertexColors: THREE.VertexColors,
@@ -134,6 +138,12 @@ function setThreeCameraToGoogleMap()
     console.log( gmap_lon_max);
     console.log( gmap_lat_min);
     console.log( gmap_lat_max);
+
+    console.log(gmap.getCenter());
+    console.log(gmap.getProjection().fromLatLngToPoint(gmap.getCenter()));
+
+    console.log(gmap.getProjection().fromPointToLatLng(new google.maps.Point(gmap.getProjection().fromLatLngToPoint(gmap.getCenter()))));
+    console.log(gmap.getProjection().fromPointToLatLng(new google.maps.Point(834,502)));
 }
 
 function draw_line(Data)
@@ -187,7 +197,6 @@ function draw_polygon(SecondInvariant)
     map_renderer.clear();
 
     map_renderer.setSize(width, height);
-    map_renderer.setClearColor(0xaaaaaa, 1);
     map_renderer.shadowMapEnabled = false;
     //document.getElementById("mapArea").appendChild(map_renderer.domElement);
     //document.getElementById("mapArea").setAttribute("width",width);
@@ -196,10 +205,6 @@ function draw_polygon(SecondInvariant)
     var lon = MapGrid.width * (Longitude.max - Longitude.min)/(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
     var lat = MapGrid.height * (Latitude.max - Latitude.min)/(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
 
-    map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,Latitude.max*10.0,Latitude.min*10.0, 0.01, 3000);
-    map_camera.position.set(0, 0, 1);
-    map_camera.lookAt({x: 0, y: 0, z: 0});
-    map_camera.position.set(camera_position.x, camera_position.y, 100);
 }
 
 
@@ -209,13 +214,16 @@ function CreateGeometry(SecondInvariant)
     var x_grid_org = Longitude.min*10.0;
     var x_grid = x_grid_org;
     var y_grid = Latitude.min*10.0;
+
+    console.log(x_grid);
+    console.log(y_grid);
     var geometry = new THREE.Geometry();
     for(var y=0;y<SecondInvariant.data.length-1;y++){
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
             //var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(Longitude.max - Longitude.min);
             //var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
-            var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(LatLon.Longitude.data[LatLon.Longitude.data.length-1]-LatLon.Longitude.data[0]);
-            var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])/(LatLon.Latitude.data[LatLon.Latitude.data.length-1]-LatLon.Latitude.data[0]);
+            var x_grid_step = (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x])*10.0;
+            var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
 
             geometry.vertices.push(new THREE.Vector3(x_grid, y_grid, 0));
             geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid, 0));
@@ -271,11 +279,13 @@ function CreateGeometry(SecondInvariant)
             geometry.faces.push(face1);
             geometry.faces.push(face2);
         }
-        var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])/(LatLon.Latitude.data[LatLon.Latitude.data.length-1]-LatLon.Latitude.data[0]);
+        var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
         //var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
         x_grid = x_grid_org;
         y_grid += y_grid_step;
     }
+    console.log(x_grid);
+    console.log(y_grid);
     return geometry;
 }
 
