@@ -68,11 +68,9 @@ function VortexRotation(Time, Depth, Range)
 
             //lineの座標を設定
             for(var i=0;i<lineNum;i++){
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 154.0, 24 + 16.0/60.0 ));
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 148 + 45.0/60.0, 45 + 33.0/60.0 ));
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 122 + 56.0/60.0, 24 + 26.0/60.0 ));
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 136 + 4.0/60.0, 20 + 25.0/60.0 ));
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 139.7, 35.7 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 116.9, 14.9 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 156.94, 51.12 ));
+                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 200.25, 65.08 ));
             }
 
             return returnObject;
