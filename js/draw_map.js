@@ -2,7 +2,17 @@
  * Created by vizlab on 15/03/26.
  */
 
+//地図は経度1度が10pxになるようにしているから地球一周は3600px
+//google mapは全体が正方形になっている（そのために緯度の最大値は85.05112878らしい）
+//経度方向は83.5度の幅があるので835px
+//緯度方向は14.85から65.08までの幅がある
+//log(tand(k/2+45))にそれぞれ入れると0.1138と0.6557になる
+//緯度85.051128度まで入れると正方形になるので
+//3600px = 2 * (log(tand(85.051128/2+45)) * x
+//xは係数　1319.28
+    //1319.28 * (0.6557-0.1138)が緯度方向の幅 714.92px
 
+    var MAP_COE = 1800/ ( Math.LOG10E*Math.log(Math.tan(Math.PI/180.0*(85.051128/2.0+45.0))));
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
 
@@ -11,10 +21,11 @@ map_renderer.shadowMapEnabled = false;
 
 var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
 var map_scene = new THREE.Scene();
+
 //new webglrenderer()するとコンソールログが出る
 
 
-var MapGrid = {width:835, height:542};
+var MapGrid = {width:835, height:715};
 
 
 //tmp map before loading geometry data
@@ -88,10 +99,9 @@ function draw_map(Data)
                 map_scale -= 0.2;
             }
         }
-        console.log(wheel_delta);
         var scaled_width = MapGrid.width/map_scale;
         var scaled_height = MapGrid.height/map_scale;
-        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(Latitude.max*10.0+Latitude.min*10.0)/2.0};
+        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(FromLatToMapGrid(Latitude.max)+FromLatToMapGrid(Latitude.min))/2.0};
         map_camera = new THREE.OrthographicCamera(center_Grid.x-scaled_width/2.0,center_Grid.x+scaled_width/2.0,center_Grid.y+scaled_height/2.0,center_Grid.y-scaled_height/2.0, 0.01, 3000);
         map_camera.position.set(0, 0, 1);
         map_camera.lookAt({x: 0, y: 0, z: 0});
@@ -157,10 +167,8 @@ function draw_polygon(SecondInvariant)
     document.getElementById("mapArea").setAttribute("width",width);
     document.getElementById("mapArea").setAttribute("height",height);
 
-    var lon = MapGrid.width * (Longitude.max - Longitude.min)/(LatLon.Longitude.data[LatLon.Longitude.data.length-1] - LatLon.Longitude.data[0]);
-    var lat = MapGrid.height * (Latitude.max - Latitude.min)/(LatLon.Latitude.data[LatLon.Latitude.data.length-1] - LatLon.Latitude.data[0]);
 
-    map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,Latitude.max*10.0,Latitude.min*10.0, 0.01, 3000);
+    map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,FromLatToMapGrid(Latitude.max),FromLatToMapGrid(Latitude.min), 0.01, 3000);
     console.log(map_camera);
     map_camera.position.set(0, 0, 1);
     map_camera.lookAt({x: 0, y: 0, z: 0});
@@ -171,7 +179,7 @@ function draw_polygon(SecondInvariant)
 
 function CreateGeometry(SecondInvariant)
 {
-    var y_mercator
+    //var y_mercator
 
 
     var x_grid_org = Longitude.min*10.0;
@@ -187,7 +195,8 @@ function CreateGeometry(SecondInvariant)
             //メルカトルだと緯度が高いときyがのびる
 
             var x_grid_step = (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x])*10.0 ;
-            var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
+            //var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
+            var y_grid_step = FromLatToMapGrid(LatLon.Latitude.data[y+1]) - FromLatToMapGrid(LatLon.Latitude.data[y]);
 
             geometry.vertices.push(new THREE.Vector3(x_grid, y_grid, 0));
             geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid, 0));
@@ -243,13 +252,21 @@ function CreateGeometry(SecondInvariant)
             geometry.faces.push(face1);
             geometry.faces.push(face2);
         }
-        var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
+        //var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
+        var y_grid_step = FromLatToMapGrid(LatLon.Latitude.data[y+1]) - FromLatToMapGrid(LatLon.Latitude.data[y]);
         //var y_grid_step = MapGrid.height * (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y]) /(Latitude.max - Latitude.min);
         x_grid = x_grid_org;
         y_grid += y_grid_step;
     }
     return geometry;
 }
+
+function FromLatToMapGrid(lat)
+{
+   return(MAP_COE*Math.LOG10E*Math.log((Math.tan(Math.PI/180.0*(lat/2.0+45.0)))));
+}
+
+
 
 var colorlegend_min = -60;
 var colorlegend_max = 60;
