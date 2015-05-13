@@ -63,6 +63,8 @@ function render()
 
 function draw_map(Data)
 {
+    //何度もUpdateボタンを押すと遅くなるのはWebGLRendererに古いsceneが残っているから
+
     draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
         draw_line(Data);
@@ -163,8 +165,6 @@ function draw_polygon(SecondInvariant)
 
     mesh_triangle.position.set(0, 0, 0);
 
-    geometry.dispose();
-    material_triangle.dispose();
 
     map_renderer.clear();
 

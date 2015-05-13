@@ -111,7 +111,7 @@ function VortexRotation(Time, Depth, Range)
 //time は0からtime_backward-2まで
 function CalcTurningAngle(beforeTurningAngle,pathline,time)
 {
-    //Javascriptはすべてポインタだった気がする->同じオブジェクトを上書きしていくと計算途中でtではなくt+1のデータになりそう->DeepCopyした <--TurningAngleは計算に使ってないから上書きしても大丈夫
+    //Javascriptはすべてポインタだった気がする->同じオブジェクトを上書きしていくと計算途中でtではなくt+1のデータになりそう->DeepCopyした
     var TurningAngle = new Array(beforeTurningAngle.length);
     for(var i=0;i<TurningAngle.length;i++){
         TurningAngle[i] = new Array(beforeTurningAngle[0].length);
@@ -147,6 +147,7 @@ function CalcTurningAngle(beforeTurningAngle,pathline,time)
                 vec2.subVectors(position[2],position[1]);
                 var crossed = new THREE.Vector3();
 
+                //vec1.angleTo(vec2)は必ず正で0から3.14までとる
                 if(vec1.length() != 0 && vec2.length() != 0){
                     crossed.crossVectors(vec1,vec2);
                     if(crossed.z>0){
@@ -156,13 +157,18 @@ function CalcTurningAngle(beforeTurningAngle,pathline,time)
                         TurningAngle[i][j] -=vec1.angleTo(vec2);
                     }
                 }
+                //rad -> 回転数にする
+                TurningAngle[i][j] = TurningAngle[i][j] / (2*Math.PI);
+
                 PathLine_UpdatePosition[i][j] = new THREE.Vector3(position[1].x, position[1].y,0);
                 //TurningAngle[i][j] += VortexRotation_matrix[0].u.data[i][j];
+            }
+            if(LatLon.Latitude.data[i] == 48.650001525747906){
+                //console.log(TurningAngle[i][j]);
             }
         }
        // console.log(TurningAngle[i][400]);
     }
-
     pathline.push(PathLine_UpdatePosition);
     return(TurningAngle);
 }
@@ -224,6 +230,7 @@ function interpolateVelocity(position,time)
     if(position.y == LatLon.Latitude.data[LatLon.Latitude.data.length-1]){
         array_y = LatLon.Latitude.data.length-1;
     }
+
     //格子点上の場合
     if(LatLon.Longitude.data[array_x] == position.x && LatLon.Latitude.data[array_y] == position.y){
         var u = VortexRotation_matrix[time].u.data[array_y][array_x];
