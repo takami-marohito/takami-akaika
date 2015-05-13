@@ -63,7 +63,7 @@ function VortexRotation(Time, Depth, Range)
             }
 
             //init PathLine, PathLine starts from Grid Point.
-            var PathLine = new Array();
+            var PathLine = [];
             var PathLine_InitPosition = new Array(VortexRotation_matrix[0].u.data.length);
             for(var i=0;i<PathLine_InitPosition.length;i++){
                 PathLine_InitPosition[i] = new Array(VortexRotation_matrix[0].u.data[0].length);
@@ -73,10 +73,11 @@ function VortexRotation(Time, Depth, Range)
                     var pos = {};
                     pos.x = LatLon.Longitude.data[j];
                     pos.y = LatLon.Latitude.data[i];
-                    PathLine_InitPosition[i][j] = new THREE.Vector2(pos.x,pos.y);
+                    PathLine_InitPosition[i][j] = new THREE.Vector3(pos.x,pos.y,0);
                 }
             }
-            PathLine.push(PathLine_InitPosition);
+            PathLine[0] = PathLine_InitPosition;
+            //console.log(PathLine);
 
             if(Time_backward < 2) {
                 console.log("Time Range is too narrow to calc turning angle.");
@@ -101,11 +102,6 @@ function VortexRotation(Time, Depth, Range)
                 returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 156.94, 51.12 ));
                 returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3( 200.25, 65.08 ));
             }
-
-            if(DEBUG==1){
-                console.log(VortexRotation_matrix);
-            }
-
             return returnObject;
         });
 }
@@ -115,7 +111,7 @@ function VortexRotation(Time, Depth, Range)
 //time は0からtime_backward-2まで
 function CalcTurningAngle(beforeTurningAngle,pathline,time)
 {
-    //Javascriptはすべてポインタだった気がする->同じオブジェクトを上書きしていくと計算途中でtではなくt+1のデータになりそう->DeepCopyした
+    //Javascriptはすべてポインタだった気がする->同じオブジェクトを上書きしていくと計算途中でtではなくt+1のデータになりそう->DeepCopyした <--TurningAngleは計算に使ってないから上書きしても大丈夫
     var TurningAngle = new Array(beforeTurningAngle.length);
     for(var i=0;i<TurningAngle.length;i++){
         TurningAngle[i] = new Array(beforeTurningAngle[0].length);
@@ -134,22 +130,37 @@ function CalcTurningAngle(beforeTurningAngle,pathline,time)
     for(var i=0;i<VortexRotation_matrix[0].u.data.length;i++){
         for(var j=0;j<VortexRotation_matrix[0].u.data[0].length;j++){
             if(VortexRotation_matrix[0].u.data[i][j] < -1e+32) {
-                TurningAngle[i][j] = -9.989999710577421e+33;  //陸地
+                TurningAngle[i][j] += 0;  //陸地
             }else {
                 var position = new Array(3);
                 var velocity = new Array(3);
-                position[0] = new THREE.Vector2(pathline[time].x, pathline[time].y);
+
+                position[0] = new THREE.Vector3(pathline[time][i][j].x, pathline[time][i][j].y,0);
                 velocity[0] = interpolateVelocity(position[0], time);
                 position[1] = beforePosition(position[0], velocity[0]);
                 velocity[1] = interpolateVelocity(position[1], time + 1);
                 position[2] = beforePosition(position[1], velocity[1]);
 
+                var vec1 = new THREE.Vector3();
+                var vec2 = new THREE.Vector3();
+                vec1.subVectors(position[1],position[0]);
+                vec2.subVectors(position[2],position[1]);
+                var crossed = new THREE.Vector3();
 
-
-                PathLine_UpdatePosition[i][j] = new THREE.Vector2(position[1].x, position[1].y);
-                TurningAngle[i][j] += VortexRotation_matrix[0].u.data[i][j];
+                if(vec1.length() != 0 && vec2.length() != 0){
+                    crossed.crossVectors(vec1,vec2);
+                    if(crossed.z>0){
+                        TurningAngle[i][j] += vec1.angleTo(vec2);
+                    }
+                    if(crossed.z<0){
+                        TurningAngle[i][j] -=vec1.angleTo(vec2);
+                    }
+                }
+                PathLine_UpdatePosition[i][j] = new THREE.Vector3(position[1].x, position[1].y,0);
+                //TurningAngle[i][j] += VortexRotation_matrix[0].u.data[i][j];
             }
         }
+       // console.log(TurningAngle[i][400]);
     }
 
     pathline.push(PathLine_UpdatePosition);
@@ -174,7 +185,7 @@ function beforePosition(position, velocity)
     lat_velocity_deg = v_back_day / MeterPerDegLat;
     var y = position.y + lat_velocity_deg * 1.0;
 
-    return(new THREE.Vector2(x,y));
+    return(new THREE.Vector3(x,y,0));
 }
 
 function interpolateVelocity(position,time)
@@ -191,54 +202,59 @@ function interpolateVelocity(position,time)
         var v = -9.989999710577421e+33;
         return({u:u,v:v})
     }
-
     //陸地は速度が -9.9e+33になる->速度0にする
 
     //Gridは等間隔でないのでひとつずつ見ていく必要があるはず
     var array_x;
     for(var x=0;x<LatLon.Longitude.data.length-1;x++){
-        if(LatLon.Longitude.data[x] <= position.x && LatLon.Longitude.data[x+1] >= position.x ){
+        if(LatLon.Longitude.data[x] <= position.x && LatLon.Longitude.data[x+1] > position.x ){
             array_x = x;
         }
     }
+    if(position.x == LatLon.Longitude.data[LatLon.Longitude.data.length-1]){
+        array_x = LatLon.Longitude.data.length-1;
+    }
+
     var array_y;
-    for(var y=0;y<LatLon.Longitude.data.length-1;y++){
-        if(LatLon.Latitude.data[y] <= position.y && LatLon.Latitude.data[y+1] >= position.y){
+    for(var y=0;y<LatLon.Latitude.data.length-1;y++){
+        if(LatLon.Latitude.data[y] <= position.y && LatLon.Latitude.data[y+1] > position.y){
             array_y = y;
         }
     }
-
+    if(position.y == LatLon.Latitude.data[LatLon.Latitude.data.length-1]){
+        array_y = LatLon.Latitude.data.length-1;
+    }
     //格子点上の場合
     if(LatLon.Longitude.data[array_x] == position.x && LatLon.Latitude.data[array_y] == position.y){
-        var u = VortexRotation_matrix[time].u.data[array_x][array_y];
-        var v = VortexRotation_matrix[time].v.data[array_x][array_y];
+        var u = VortexRotation_matrix[time].u.data[array_y][array_x];
+        var v = VortexRotation_matrix[time].v.data[array_y][array_x];
         return({u:u,v:v});
     }
 
-    var u_00 = VortexRotation_matrix[time].u.data[LatLon.Latitude.data[y+1]][LatLon.Longitude.data[x]];
-    var u_01 = VortexRotation_matrix[time].u.data[LatLon.Latitude.data[y+1]][LatLon.Longitude.data[x+1]];
-    var u_10 = VortexRotation_matrix[time].u.data[LatLon.Latitude.data[y]][LatLon.Longitude.data[x]];
-    var u_11 = VortexRotation_matrix[time].u.data[LatLon.Latitude.data[y]][LatLon.Longitude.data[x+1]];
+    var u_00 = VortexRotation_matrix[time].u.data[array_y+1][array_x];
+    var u_01 = VortexRotation_matrix[time].u.data[array_y+1][array_x+1];
+    var u_10 = VortexRotation_matrix[time].u.data[array_y][array_x];
+    var u_11 = VortexRotation_matrix[time].u.data[array_y][array_x+1];
 
-    var u_00_position = new THREE.Vector2(LatLon.Longitude.data[x], LatLon.Latitude.data[y+1]);
-    var u_01_position = new THREE.Vector2(LatLon.Longitude.data[x+1], LatLon.Latitude.data[y+1]);
-    var u_10_position = new THREE.Vector2(LatLon.Longitude.data[x], LatLon.Latitude.data[y]);
-    var u_11_position = new THREE.Vector2(LatLon.Longitude.data[x+1], LatLon.Latitude.data[y]);
+    var u_00_position = new THREE.Vector2(LatLon.Longitude.data[array_x], LatLon.Latitude.data[array_y+1]);
+    var u_01_position = new THREE.Vector2(LatLon.Longitude.data[array_x+1], LatLon.Latitude.data[array_y+1]);
+    var u_10_position = new THREE.Vector2(LatLon.Longitude.data[array_x], LatLon.Latitude.data[array_y]);
+    var u_11_position = new THREE.Vector2(LatLon.Longitude.data[array_x+1], LatLon.Latitude.data[array_y]);
 
     var u_numerator = u_00/u_00_position.distanceTo(position) + u_01/u_01_position.distanceTo(position) + u_10/u_10_position.distanceTo(position) + u_11/u_11_position.distanceTo(position);
     var u_denominator = 1.0/u_00_position.distanceTo(position) + 1.0/u_01_position.distanceTo(position) + 1.0/u_10_position.distanceTo(position) + 1.0/u_11_position.distanceTo(position);
 
     var u = u_numerator/u_denominator;
 
-    var v_00 = VortexRotation_matrix[time].v.data[LatLon.Latitude.data[y+1]][LatLon.Longitude.data[x]];
-    var v_01 = VortexRotation_matrix[time].v.data[LatLon.Latitude.data[y+1]][LatLon.Longitude.data[x+1]];
-    var v_10 = VortexRotation_matrix[time].v.data[LatLon.Latitude.data[y]][LatLon.Longitude.data[x]];
-    var v_11 = VortexRotation_matrix[time].v.data[LatLon.Latitude.data[y]][LatLon.Longitude.data[x+1]];
+    var v_00 = VortexRotation_matrix[time].v.data[array_y+1][array_x];
+    var v_01 = VortexRotation_matrix[time].v.data[array_y+1][array_x+1];
+    var v_10 = VortexRotation_matrix[time].v.data[array_y][array_x];
+    var v_11 = VortexRotation_matrix[time].v.data[array_y][array_x+1];
 
-    var v_00_position = new THREE.Vector2(LatLon.Longitude.data[x], LatLon.Latitude.data[y+1]);
-    var v_01_position = new THREE.Vector2(LatLon.Longitude.data[x+1], LatLon.Latitude.data[y+1]);
-    var v_10_position = new THREE.Vector2(LatLon.Longitude.data[x], LatLon.Latitude.data[y]);
-    var v_11_position = new THREE.Vector2(LatLon.Longitude.data[x+1], LatLon.Latitude.data[y]);
+    var v_00_position = new THREE.Vector2(LatLon.Longitude.data[array_x], LatLon.Latitude.data[array_y+1]);
+    var v_01_position = new THREE.Vector2(LatLon.Longitude.data[array_x+1], LatLon.Latitude.data[array_y+1]);
+    var v_10_position = new THREE.Vector2(LatLon.Longitude.data[array_x], LatLon.Latitude.data[array_y]);
+    var v_11_position = new THREE.Vector2(LatLon.Longitude.data[array_x+1], LatLon.Latitude.data[array_y]);
 
     var v_numerator = v_00/v_00_position.distanceTo(position) + v_01/v_01_position.distanceTo(position) + v_10/v_10_position.distanceTo(position) + v_11/v_11_position.distanceTo(position);
     var v_denominator = 1.0/v_00_position.distanceTo(position) + 1.0/v_01_position.distanceTo(position) + 1.0/v_10_position.distanceTo(position) + 1.0/v_11_position.distanceTo(position);

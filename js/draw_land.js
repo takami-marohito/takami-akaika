@@ -2,7 +2,7 @@
  * Created by vizlab on 15/03/25.
  */
 
-var GROUND_COLOR={h:0.3,s:0.5,l:0.50};
+var GROUND_COLOR={h:0.3,s:0.5,l:0.0};
 
 function draw_land()
 {
@@ -88,7 +88,7 @@ function draw_land()
 
 function ground_color(value)
 {
-    if(value < -5000){
+    if(value < -9.989999710577421e+20){
         return(GROUND_COLOR);
     }else{
         var color = {
