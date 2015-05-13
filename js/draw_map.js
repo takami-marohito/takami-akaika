@@ -10,13 +10,15 @@
 //緯度85.051128度まで入れると正方形になるので
 //3600px = 2 * (log(tand(85.051128/2+45)) * x
 //xは係数　1319.28
+    //log(tand(Latitude.max)) = 0.6557
+//log(tand(Latitude.min)) = 0.1138
     //1319.28 * (0.6557-0.1138)が緯度方向の幅 714.92px
 
     var MAP_COE = 1800/ ( Math.LOG10E*Math.log(Math.tan(Math.PI/180.0*(85.051128/2.0+45.0))));
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
 
-var map_renderer = new THREE.WebGLRenderer({antialias: true});
+var map_renderer = new THREE.WebGLRenderer({antialias: true, alpha:true});
 map_renderer.shadowMapEnabled = false;
 
 var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
@@ -27,6 +29,12 @@ var map_scene = new THREE.Scene();
 
 var MapGrid = {width:835, height:715};
 
+/*
+//This Variable is used for calculating turning angle.
+var MapRange = {};
+MapRange.lat = {min:0,max:0};
+MapRange.lon = {min:0,max:0};
+*/
 
 //tmp map before loading geometry data
 ( function()
@@ -141,8 +149,8 @@ function draw_polygon(SecondInvariant)
     var material_triangle = new THREE.MeshBasicMaterial({//////////////////////////////// for 3d
         vertexColors: THREE.VertexColors,
         side: THREE.FrontSide,
-        opacity: 0,
-        transparent: false
+        opacity: 1.0,
+        transparent: true
     });
     //var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
     var mesh_triangle = new THREE.Mesh(geometry, material_triangle);
@@ -169,7 +177,6 @@ function draw_polygon(SecondInvariant)
 
 
     map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,FromLatToMapGrid(Latitude.max),FromLatToMapGrid(Latitude.min), 0.01, 3000);
-    console.log(map_camera);
     map_camera.position.set(0, 0, 1);
     map_camera.lookAt({x: 0, y: 0, z: 0});
     map_camera.position.set(camera_position.x, camera_position.y, 100);
@@ -185,7 +192,6 @@ function CreateGeometry(SecondInvariant)
     var x_grid_org = Longitude.min*10.0;
     var x_grid = x_grid_org;
     var y_grid = Latitude.min*10.0;
-    console.log(x_grid + "** " + y_grid);
     var geometry = new THREE.Geometry();
     for(var y=0;y<SecondInvariant.data.length-1;y++){
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
@@ -441,6 +447,16 @@ function addColorLegend_Horizontal()
     textMax.doubleSided=true;
     legend_scene.add( textMax );
 
+    var textGeoCenter = new THREE.TextGeometry((colorlegend_max+colorlegend_min)/2.0,{
+        size: 13,
+        height: 20
+    }) ;
+    var textMaterialCenter = new THREE.MeshBasicMaterial({color:0x000000});
+    var textCenter = new THREE.Mesh(textGeoCenter, textMaterialCenter);
+    textCenter.position.set(185,-15,100);
+    textCenter.doubleSided=true;
+    legend_scene.add( textCenter );
+
     mesh_triangle.position.set(0, 0, 0);
 
     legend_geometry.dispose();
@@ -575,8 +591,8 @@ function VortexTypeToHSL_white(value)
 
 function updateSecondInvariantMinMax()
 {
-    colorlegend_min = eval(document.forms.SecondInvariant.SecondInvariantMin.value);
-    colorlegend_max = eval(document.forms.SecondInvariant.SecondInvariantMax.value);
+    colorlegend_min = eval(document.forms.ColorLegendRange.Min.value);
+    colorlegend_max = eval(document.forms.ColorLegendRange.Max.value);
     interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0,0.5,1]).clamp(true);
     interpolate_hsl = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0.66,0.33,0]).clamp(true);
     interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);

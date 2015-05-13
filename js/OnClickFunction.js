@@ -21,7 +21,7 @@ function OnClickFunction() {
                 //console.log(m_secondinvariant);
             }
             draw_map(m_secondinvariant);
-            draw_land();
+            draw_land(m_secondinvariant);
             addColorLegend_Horizontal();
             button_calculating_finish();
             return m_secondinvariant;
@@ -97,7 +97,9 @@ function CalcVariable()
     return jQuery.when.apply(
         $,exec_function
     ).then(function(){
-            //console.log(arguments[0]);
+            if(DEBUG==1) {
+                console.log(arguments[0]);
+            }
             return arguments[0];
         });
 }

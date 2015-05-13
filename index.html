@@ -15,7 +15,6 @@
     <script src="js/SecondInvariant.js"></script>
     <script src="js/VortexRotation.js"></script>
     <script src="js/LoadingFile.js"></script>
-    <script src="js/draw_land.js"></script>
     <script src="js/lib/three.min.js"></script>
     <script src="js/lib/d3.js" charset="utf-8"></script>
     <script src="js/lib/topojson.v0.min.js"></script>
@@ -50,6 +49,7 @@
                         <input type="number" name="name2" id="LongitudeMaxInt" class="form-control"  value="200" />
                         度
                         <input type="number" name="name2" id="LongitudeMaxDec" class="form-control"  value="15" />
+                        分
                     </form>
                 </div>
             </div>
@@ -64,6 +64,7 @@
                         <input type="number" name="name2" id="LatitudeMaxInt" class="form-control"  value="65" />
                         度
                         <input type="number" name="name2" id="LatitudeMaxDec" class="form-control"  value="5" />
+                        分
                     </form>
                 </div>
             </div>
@@ -124,11 +125,11 @@
             </div>
             <div class="row">
                 <div class="col col-lg-12">
-                    <form id="SecondInvariant" class="form-inline" role="form">
-                        <label>SecondInvariant Color Range</label>
-                        <input type="text" name="name1" id="SecondInvariantMin" class="form-control"  value="-60" />
+                    <form id="ColorLegendRange" class="form-inline" role="form">
+                        <label>Color Legend Range</label>
+                        <input type="text" name="name1" id="Min" class="form-control"  value="-60" />
                         ~
-                        <input type="text" name="name2" id="SecondInvariantMax" class="form-control"  value="60" />
+                        <input type="text" name="name2" id="Max" class="form-control"  value="60" />
                     </form>
                 </div>
             </div>
@@ -190,6 +191,7 @@
                 <div class="col-lg-12">
                     <div id="mapArea"></div>
                     <script src="js/draw_map.js"></script>
+                    <script src="js/draw_land.js"></script>
                 </div>
             </div>
             <div class="row">
