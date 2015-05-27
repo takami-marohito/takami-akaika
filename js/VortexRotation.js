@@ -17,13 +17,14 @@ const VELOCITY_NAN =-9.989999710577421e+33;
 var position =[];
 var velocity = [];
 
-var Button_counter=0;
+var loop_counter=0;
 
 function VortexRotation(Time, Depth, Range)
 {
-    Button_counter++;
+
+    loop_counter++;
     var target = document.getElementById("button_exec");
-    target.innerHTML = Button_counter;
+    target.innerHTML = loop_counter;
 
     var Time_backward=Range;
 
@@ -51,7 +52,9 @@ function VortexRotation(Time, Depth, Range)
             VortexRotation_matrix.data = new Array(VortexRotation_matrix.height);
 
             //returnObject Init if returnObject is nullObject
-            if ($.isEmptyObject(returnObject)) {
+            //if ($.isEmptyObject(returnObject)) {
+            if (loop_counter == 1) {
+                console.log("abc");
                 returnObject.data = new Array(VortexRotation_matrix.height);
                 for (var i = 0; i < returnObject.data.length; i++) {
                     returnObject.data[i] = new Array(VortexRotation_matrix.width);
@@ -66,7 +69,7 @@ function VortexRotation(Time, Depth, Range)
 
 
             //init PathLine, PathLine starts from Grid Point.
-            if(position.length == 0) {
+            if(loop_counter == 1) {
                 for(var t=0;t<2;t++) {
                     position[t] = new Array(VortexRotation_matrix.height);
                     velocity[t] = new Array(VortexRotation_matrix.height);
@@ -143,6 +146,7 @@ function VortexRotation(Time, Depth, Range)
             return VortexRotation(Time-1,Depth,Range-1);
         } else {
             postProcessing();
+            loop_counter =0;
             return returnObject;
         }
     });
