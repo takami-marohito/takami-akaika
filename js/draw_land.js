@@ -3,9 +3,11 @@
  */
 
 var GROUND_COLOR={h:0.3,s:0.5,l:0.0};
+var land_mesh;
 
 function draw_land()
 {
+    map_scene.remove(land_mesh);
     var dfds = [];
     dfds.push(loadMOVEdata(0, 0, 0, 441, 0, 672, "U"));
 
@@ -77,12 +79,12 @@ function draw_land()
                 opacity: 1.0,
                 transparent: true
             });
-            var mesh_triangle = new THREE.Mesh(geometry, material_triangle);
+            land_mesh = new THREE.Mesh(geometry, material_triangle);
             geometry.dispose();
             material_triangle.dispose();
             //var light = new THREE.DirectionalLight("#AAAAAA");
             //light.position.set(0,0,100);
-            map_scene.add(mesh_triangle);
+            map_scene.add(land_mesh);
         });
 }
 

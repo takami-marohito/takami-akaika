@@ -98,7 +98,7 @@ function CalcVariable()
         $,exec_function
     ).then(function(){
             if(DEBUG==1) {
-                console.log(arguments[0]);
+                //console.log(arguments[0]);
             }
             return arguments[0];
         });

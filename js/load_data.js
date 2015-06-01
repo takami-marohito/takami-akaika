@@ -30,7 +30,7 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
 {
     var MOVEdata={};
     if(DEBUG==1) {
-        console.log("load_data start\n");
+        //console.log("load_data start\n");
     }
     var dap_line = "http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?";
     dap_line+=arg_string;
@@ -47,7 +47,7 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
             //loadしたデータは扱いづらいので並び替える
             //MOVEdata.dataの初期化
             if(DEBUG==1) {
-                console.log(tmp_T);
+                //console.log(tmp_T);
             }
             MOVEdata.time = arg_time;
             MOVEdata.time_string = tmp_T[0][1];

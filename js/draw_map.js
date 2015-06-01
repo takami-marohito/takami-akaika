@@ -10,11 +10,11 @@
 //緯度85.051128度まで入れると正方形になるので
 //3600px = 2 * (log(tand(85.051128/2+45)) * x
 //xは係数　1319.28
-    //log(tand(Latitude.max)) = 0.6557
+//log(tand(Latitude.max)) = 0.6557
 //log(tand(Latitude.min)) = 0.1138
-    //1319.28 * (0.6557-0.1138)が緯度方向の幅 714.92px
+//1319.28 * (0.6557-0.1138)が緯度方向の幅 714.92px
 
-    var MAP_COE = 1800/ ( Math.LOG10E*Math.log(Math.tan(Math.PI/180.0*(85.051128/2.0+45.0))));
+var MAP_COE = 1800/ ( Math.LOG10E*Math.log(Math.tan(Math.PI/180.0*(85.051128/2.0+45.0))));
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
 
@@ -24,17 +24,19 @@ map_renderer.shadowMapEnabled = false;
 var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
 var map_scene = new THREE.Scene();
 
+var variable_mesh;
+
 //new webglrenderer()するとコンソールログが出る
 
 
 var MapGrid = {width:835, height:715};
 
 /*
-//This Variable is used for calculating turning angle.
-var MapRange = {};
-MapRange.lat = {min:0,max:0};
-MapRange.lon = {min:0,max:0};
-*/
+ //This Variable is used for calculating turning angle.
+ var MapRange = {};
+ MapRange.lat = {min:0,max:0};
+ MapRange.lon = {min:0,max:0};
+ */
 
 //tmp map before loading geometry data
 ( function()
@@ -63,7 +65,7 @@ function render()
 
 function draw_map(Data)
 {
-    //何度もUpdateボタンを押すと遅くなるのはWebGLRendererに古いsceneが残っているから
+    map_scene.remove(variable_mesh);
 
     draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
@@ -89,7 +91,6 @@ function draw_map(Data)
     map_renderer.domElement.addEventListener('mouseup', function(e){
         mousedown = false;
     }, false);
-
 
     //縮尺変更中はマウスホイールのスクロールを無効にしている
 
@@ -155,15 +156,15 @@ function draw_polygon(SecondInvariant)
         transparent: true
     });
     //var mesh_triangle = new THREE.Mesh(geometry, material_triangle, mesh_triangle);
-    var mesh_triangle = new THREE.Mesh(geometry, material_triangle);
+    variable_mesh = new THREE.Mesh(geometry, material_triangle);
 
     //var light = new THREE.DirectionalLight("#AAAAAA");
     //light.position.set(0,0,100);
     map_scene = new THREE.Scene();
-    map_scene.add(mesh_triangle);
+    map_scene.add(variable_mesh);
     //map_scene.add(light);
 
-    mesh_triangle.position.set(0, 0, 0);
+    variable_mesh.position.set(0, 0, 0);
 
 
     map_renderer.clear();
@@ -269,7 +270,7 @@ function CreateGeometry(SecondInvariant)
 
 function FromLatToMapGrid(lat)
 {
-   return(MAP_COE*Math.LOG10E*Math.log((Math.tan(Math.PI/180.0*(lat/2.0+45.0)))));
+    return(MAP_COE*Math.LOG10E*Math.log((Math.tan(Math.PI/180.0*(lat/2.0+45.0)))));
 }
 
 
@@ -534,11 +535,11 @@ var interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_m
 function SecondInvariantToHSL_white(value)
 {
     //陸地の処理
-    if(value < -5000){
+    if(value < -5000 || value == undefined){
         var color_land = {
-            h:0.1,
+            h:0,
             s:0,
-            l:0
+            l:0.2
         };
         return(color_land);
     }
