@@ -18,7 +18,7 @@ var position =[];
 var velocity = [];
 
 var loop_counter=0;
-//
+
 function VortexRotation(Time, Depth, Range)
 {
     loop_counter++;
@@ -27,9 +27,14 @@ function VortexRotation(Time, Depth, Range)
 
     var dfds = [];
 
-    dfds.push(loadMOVEdata(Time, Depth, 0, 441, 0, 672, "U"));
-    dfds.push(loadMOVEdata(Time, Depth, 0, 441, 0, 672, "V"));
-    dfds.push(loadMOVEdata(Time, Depth, 0, 441, 0, 672, "W"));
+    dfds.push(loadMOVEdata(Time-1, Depth, 0, 441, 0, 672, "U"));
+    dfds.push(loadMOVEdata(Time-1, Depth, 0, 441, 0, 672, "V"));
+    dfds.push(loadMOVEdata(Time-1, Depth, 0, 441, 0, 672, "W"));
+    if(loop_counter==1){
+        dfds.push(loadMOVEdata(Time, Depth, 0, 441, 0, 672, "U"));
+        dfds.push(loadMOVEdata(Time, Depth, 0, 441, 0, 672, "V"));
+        dfds.push(loadMOVEdata(Time, Depth, 0, 441, 0, 672, "W"));
+    }
 
     return jQuery.when.apply(
         $,dfds
@@ -63,19 +68,29 @@ function VortexRotation(Time, Depth, Range)
                 }
             }
 
-
+//ルンゲクッタ法を使うためには位置がn、速度がn+1必要
             //init PathLine, PathLine starts from Grid Point.
             if(loop_counter == 1) {
+                //position Init
                 for(var t=0;t<3;t++) {
                     position[t] = new Array(VortexRotation_matrix.height);
-                    velocity[t] = new Array(VortexRotation_matrix.height);
                     for (var i = 0; i <  position[t].length; i++) {
                         position[t][i] = new Array(VortexRotation_matrix.width);
-                        velocity[t][i] = new Array(VortexRotation_matrix.width);
                     }
                     for (var i = 0; i < VortexRotation_matrix.height; i++) {
                         for (var j = 0; j < VortexRotation_matrix.width; j++) {
                             position[t][i][j] = new THREE.Vector3(500, 500, 0);  //CalcTurningAngle で(500,500)を使っているから、変えるときは気をつける
+                        }
+                    }
+                }
+                //velocity Init
+                for(var t=0;t<4;t++) {
+                    velocity[t] = new Array(VortexRotation_matrix.height);
+                    for (var i = 0; i <  position[0].length; i++) {
+                        velocity[t][i] = new Array(VortexRotation_matrix.width);
+                    }
+                    for (var i = 0; i < VortexRotation_matrix.height; i++) {
+                        for (var j = 0; j < VortexRotation_matrix.width; j++) {
                             velocity[t][i][j] = new THREE.Vector3(VELOCITY_NAN, VELOCITY_NAN, 0);
                         }
                     }
@@ -86,7 +101,8 @@ function VortexRotation(Time, Depth, Range)
                         pos.x = LatLon.Longitude.data[j];
                         pos.y = LatLon.Latitude.data[i];
                         position[2][i][j] = new THREE.Vector3(pos.x, pos.y, 0);
-                        velocity[2][i][j] = new THREE.Vector3(VortexRotation_matrix.u.data[i][j], VortexRotation_matrix.v.data[i][j], 0);
+                        velocity[3][i][j] = new THREE.Vector3(VortexRotation_matrix.u.data[i][j], VortexRotation_matrix.v.data[i][j], 0);
+                        velocity[2][i][j] = new THREE.Vector3(arguments[3].data[i][j], arguments[4].data[i][j], 0);
                     }
                 }
 
@@ -161,9 +177,10 @@ function CalcTurningAngle()
     for(var i=0;i<VortexRotation_matrix.height;i++) {
         for (var j = 0; j < VortexRotation_matrix.width; j++) {
             position[0][i][j].copy(position[1][i][j]);
-            position[1][i][j].copy(position[2][i][j]);
             velocity[0][i][j].copy(velocity[1][i][j]);
+            position[1][i][j].copy(position[2][i][j]);
             velocity[1][i][j].copy(velocity[2][i][j]);
+            velocity[2][i][j] = velocity[3][i][j];
         }
     }
 
@@ -175,7 +192,7 @@ function CalcTurningAngle()
                 TurningAngle[i][j] += 0;  //陸地
             }else {
                 position[2][i][j] = beforePosition(position[1][i][j],velocity[1][i][j]);
-                velocity[2][i][j] = interpolateVelocity(position[1][i][j]);
+                velocity[2][i][j] = interpolateVelocity(position[2][i][j]);
 
                 if (position[0][i][j].x > 360 || position[0][i][j].y > 360) {
                     continue;
