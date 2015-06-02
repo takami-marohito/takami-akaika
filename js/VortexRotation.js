@@ -18,7 +18,7 @@ var position =[];
 var velocity = [];
 
 var loop_counter=0;
-
+//
 function VortexRotation(Time, Depth, Range)
 {
     loop_counter++;
