@@ -192,7 +192,7 @@ function CalcTurningAngle()
                 TurningAngle[i][j] += 0;  //陸地
             }else {
                 position[2][i][j] = beforePosition(position[1][i][j],velocity[1][i][j]);
-                velocity[2][i][j] = interpolateVelocity(position[2][i][j]);
+                velocity[3][i][j] = interpolateVelocity(position[2][i][j]);
 
                 if (position[0][i][j].x > 360 || position[0][i][j].y > 360) {
                     continue;
