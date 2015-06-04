@@ -68,40 +68,16 @@
                     </form>
                 </div>
             </div>
-<!--
+
             <div class="row">
                 <div class="col-lg-12">
-                    <form id="Date" class="form-inline" role="form">
-                        <label>日付</label>
-                        From
-                        <input type="text" name="name1" id="dp1" class="form-control"  value="2006/02/01" />
-                        To
-                        <input type="text" name="name2" id="dp2" class="form-control"  value="2006/01/01" />
-                    </form>
-
+                    <label>CPUE Data</label>
+                    <input type="file" id="CPUEFileName"/>
                     <script type="text/javascript">
-                        $(function() {
-                            $('#dp1').datepicker({
-                                format: 'yyyy/mm/dd',
-                                language: 'ja',
-                                autoclose: true,
-                                clearBtn: true
-                            });
-                        });
-                    </script>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('#dp2').datepicker({
-                                format: 'yyyy/mm/dd',
-                                language: 'ja',
-                                autoclose: true,
-                                clearBtn: true
-                            });
-                        });
+                        CPUEDataEvent();
                     </script>
                 </div>
             </div>
-            -->
 
             <div class="row"><div class="col-lg-12 col-lg-offset-12">&nbsp;</div> </div>  <!--空白行-->
 
@@ -192,6 +168,12 @@
                     <div id="mapArea"></div>
                     <script src="js/draw_map.js"></script>
                     <script src="js/draw_land.js"></script>
+                    <script type="text/javascript">
+                        setVariable();
+                        InitMap();
+                        draw_land();
+                        setMapMouseEvent();
+                    </script>
                 </div>
             </div>
             <div class="row">

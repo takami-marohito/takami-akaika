@@ -31,14 +31,7 @@ var variable_mesh;
 
 var MapGrid = {width:835, height:715};
 
-/*
- //This Variable is used for calculating turning angle.
- var MapRange = {};
- MapRange.lat = {min:0,max:0};
- MapRange.lon = {min:0,max:0};
- */
-
-//tmp map before loading geometry data
+//tmp map before calculating the drawing data
 ( function()
 {
     var width = MapGrid.width;
@@ -65,59 +58,15 @@ function render()
 
 function draw_map(Data)
 {
+    updateSecondInvariantMinMax();
+    InitMap();
     map_scene.remove(variable_mesh);
 
     draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
         draw_line(Data);
     }
-
-    //マウスイベント
-    var mousedown = false;
-    var mouselocation ={x:0,y:0};
-    map_renderer.domElement.addEventListener('mousedown',function(e){
-        mousedown = true;
-        mouselocation = {x: e.pageX, y: e.pageY};
-    },false);
-    map_renderer.domElement.addEventListener('mousemove', function(e){
-        if(!mousedown) return;
-        moveDistance = {x: mouselocation.x - e.pageX, y: mouselocation.y - e.pageY};
-        camera_position.x += moveDistance.x/map_scale;
-        camera_position.y -= moveDistance.y/map_scale;
-        map_camera.position.set(camera_position.x,camera_position.y,100);
-        mouselocation = {x: e.pageX, y: e.pageY};
-    }, false);
-
-    map_renderer.domElement.addEventListener('mouseup', function(e){
-        mousedown = false;
-    }, false);
-
-    //縮尺変更中はマウスホイールのスクロールを無効にしている
-
-    var map_scale = 1.0;
-
-    map_renderer.domElement.addEventListener('mousewheel', function(e){
-        mousedown = false;
-        var wheel_delta = e.detail ? e.detail / -3 : e.wheelDelta / 120;
-        if(e.preventDefault()){
-            e.preventDefault();
-        }
-        e.returnValue = false;
-        if(wheel_delta > 0){
-            map_scale += 0.2;
-        }else{
-            if(map_scale > 1.0) {
-                map_scale -= 0.2;
-            }
-        }
-        var scaled_width = MapGrid.width/map_scale;
-        var scaled_height = MapGrid.height/map_scale;
-        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(FromLatToMapGrid(Latitude.max)+FromLatToMapGrid(Latitude.min))/2.0};
-        map_camera = new THREE.OrthographicCamera(center_Grid.x-scaled_width/2.0,center_Grid.x+scaled_width/2.0,center_Grid.y+scaled_height/2.0,center_Grid.y-scaled_height/2.0, 0.01, 3000);
-        map_camera.position.set(0, 0, 1);
-        map_camera.lookAt({x: 0, y: 0, z: 0});
-        map_camera.position.set(camera_position.x, camera_position.y, 100);
-    }, false);
+    setMapMouseEvent();
 }
 
 function draw_line(Data)
@@ -141,10 +90,6 @@ function draw_line(Data)
 
 function draw_polygon(SecondInvariant)
 {
-    updateSecondInvariantMinMax();
-
-    var width = MapGrid.width;
-    var height = MapGrid.height;
     geometry = new THREE.Geometry();
 
     geometry = CreateGeometry(SecondInvariant);
@@ -165,22 +110,6 @@ function draw_polygon(SecondInvariant)
     //map_scene.add(light);
 
     variable_mesh.position.set(0, 0, 0);
-
-
-    map_renderer.clear();
-
-    map_renderer.setSize(width, height);
-    map_renderer.setClearColor(0xaaaaaa, 1);
-    map_renderer.shadowMapEnabled = false;
-    document.getElementById("mapArea").appendChild(map_renderer.domElement);
-    document.getElementById("mapArea").setAttribute("width",width);
-    document.getElementById("mapArea").setAttribute("height",height);
-
-
-    map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,FromLatToMapGrid(Latitude.max),FromLatToMapGrid(Latitude.min), 0.01, 3000);
-    map_camera.position.set(0, 0, 1);
-    map_camera.lookAt({x: 0, y: 0, z: 0});
-    map_camera.position.set(camera_position.x, camera_position.y, 100);
 }
 
 
@@ -215,16 +144,6 @@ function CreateGeometry(SecondInvariant)
             var color1 = new THREE.Color();
             var color2 = new THREE.Color();
             var color3 = new THREE.Color();
-            /*
-             var tmp_color0 = SecondInvariantToRGB(SecondInvariant.data[y][x]);
-             var tmp_color1 = SecondInvariantToRGB(SecondInvariant.data[y][x+1]);
-             var tmp_color2 = SecondInvariantToRGB(SecondInvariant.data[y+1][x+1]);
-             var tmp_color3 = SecondInvariantToRGB(SecondInvariant.data[y+1][x]);
-             color0.setRGB(tmp_color0.red,tmp_color0.green,tmp_color0.blue);
-             color1.setRGB(tmp_color1.red,tmp_color1.green,tmp_color1.blue);
-             color2.setRGB(tmp_color2.red,tmp_color2.green,tmp_color2.blue);
-             color3.setRGB(tmp_color3.red,tmp_color3.green,tmp_color3.blue);
-             */
 
             var tmp_color0 = SecondInvariantToHSL_white(SecondInvariant.data[y][x]);
             var tmp_color1 = SecondInvariantToHSL_white(SecondInvariant.data[y][x+1]);
@@ -597,4 +516,83 @@ function updateSecondInvariantMinMax()
     interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0,0.5,1]).clamp(true);
     interpolate_hsl = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0.66,0.33,0]).clamp(true);
     interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);
+}
+
+function InitMap()
+{
+    setMapdomElement();
+    setMapRenderer();
+    setMapCamera();
+}
+
+function setMapdomElement()
+{
+    document.getElementById("mapArea").appendChild(map_renderer.domElement);
+    document.getElementById("mapArea").setAttribute("width",MapGrid.width);
+    document.getElementById("mapArea").setAttribute("height",MapGrid.height);
+}
+
+function setMapRenderer()
+{
+    map_renderer.clear();
+    map_renderer.setSize(MapGrid.width, MapGrid.height);
+    map_renderer.setClearColor(0xaaaaaa, 1);
+    map_renderer.shadowMapEnabled = false;
+}
+
+function setMapCamera()
+{
+    map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,FromLatToMapGrid(Latitude.max),FromLatToMapGrid(Latitude.min), 0.01, 3000);
+    map_camera.position.set(0, 0, 1);
+    map_camera.lookAt({x: 0, y: 0, z: 0});
+    map_camera.position.set(camera_position.x, camera_position.y, 100);
+}
+
+function setMapMouseEvent()
+{
+    var mousedown = false;
+    var mouselocation ={x:0,y:0};
+    map_renderer.domElement.addEventListener('mousedown',function(e){
+        mousedown = true;
+        mouselocation = {x: e.pageX, y: e.pageY};
+    },false);
+    map_renderer.domElement.addEventListener('mousemove', function(e){
+        if(!mousedown) return;
+        moveDistance = {x: mouselocation.x - e.pageX, y: mouselocation.y - e.pageY};
+        camera_position.x += moveDistance.x/map_scale;
+        camera_position.y -= moveDistance.y/map_scale;
+        map_camera.position.set(camera_position.x,camera_position.y,100);
+        mouselocation = {x: e.pageX, y: e.pageY};
+    }, false);
+
+    map_renderer.domElement.addEventListener('mouseup', function(e){
+        mousedown = false;
+    }, false);
+
+    //縮尺変更中はマウスホイールのスクロールを無効にしている
+
+    var map_scale = 1.0;
+
+    map_renderer.domElement.addEventListener('mousewheel', function(e){
+        mousedown = false;
+        var wheel_delta = e.detail ? e.detail / -3 : e.wheelDelta / 120;
+        if(e.preventDefault()){
+            e.preventDefault();
+        }
+        e.returnValue = false;
+        if(wheel_delta > 0){
+            map_scale += 0.2;
+        }else{
+            if(map_scale > 1.0) {
+                map_scale -= 0.2;
+            }
+        }
+        var scaled_width = MapGrid.width/map_scale;
+        var scaled_height = MapGrid.height/map_scale;
+        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(FromLatToMapGrid(Latitude.max)+FromLatToMapGrid(Latitude.min))/2.0};
+        map_camera = new THREE.OrthographicCamera(center_Grid.x-scaled_width/2.0,center_Grid.x+scaled_width/2.0,center_Grid.y+scaled_height/2.0,center_Grid.y-scaled_height/2.0, 0.01, 3000);
+        map_camera.position.set(0, 0, 1);
+        map_camera.lookAt({x: 0, y: 0, z: 0});
+        map_camera.position.set(camera_position.x, camera_position.y, 100);
+    }, false);
 }

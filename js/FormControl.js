@@ -31,3 +31,9 @@ function SelectVariableEvent()
         }
     });
 }
+
+function CPUEDataEvent() {
+    jQuery('#CPUEFileName').on('change', function () {
+        LoadingCPUEFile();
+    });
+}

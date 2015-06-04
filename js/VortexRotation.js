@@ -19,6 +19,8 @@ var velocity = [];
 
 var loop_counter=0;
 
+var lineNum = 10;
+
 function VortexRotation(Time, Depth, Range)
 {
     loop_counter++;
@@ -39,11 +41,6 @@ function VortexRotation(Time, Depth, Range)
     return jQuery.when.apply(
         $,dfds
     ).then(function () {
-            /*
-             var m=moment('2000/02/28', "YYYY/MM/DD");
-             m.add( 2,'days').format();
-             console.log(m);*/
-
             VortexRotation_matrix.u = arguments[0];
             VortexRotation_matrix.v = arguments[1];
             VortexRotation_matrix.w = arguments[2];
@@ -53,73 +50,20 @@ function VortexRotation(Time, Depth, Range)
             VortexRotation_matrix.height = arguments[0].data.length;
             VortexRotation_matrix.data = new Array(VortexRotation_matrix.height);
 
-            //returnObject Init if returnObject is nullObject
-            //if ($.isEmptyObject(returnObject)) {
-            if (loop_counter == 1) {
-                returnObject.data = new Array(VortexRotation_matrix.height);
-                for (var i = 0; i < returnObject.data.length; i++) {
-                    returnObject.data[i] = new Array(VortexRotation_matrix.width);
-                }
-
-                for (var j = 0; j < returnObject.data.length; j++) {
-                    for (var i = 0; i < returnObject.data[0].length; i++) {
-                        returnObject.data[j][i] = 0;
-                    }
-                }
+            if(loop_counter==1){
+                InitObjects(arguments);
             }
 
-//ルンゲクッタ法を使うためには位置がn、速度がn+1必要
-            //init PathLine, PathLine starts from Grid Point.
-            if(loop_counter == 1) {
-                //position Init
-                for(var t=0;t<3;t++) {
-                    position[t] = new Array(VortexRotation_matrix.height);
-                    for (var i = 0; i <  position[t].length; i++) {
-                        position[t][i] = new Array(VortexRotation_matrix.width);
-                    }
-                    for (var i = 0; i < VortexRotation_matrix.height; i++) {
-                        for (var j = 0; j < VortexRotation_matrix.width; j++) {
-                            position[t][i][j] = new THREE.Vector3(500, 500, 0);  //CalcTurningAngle で(500,500)を使っているから、変えるときは気をつける
-                        }
-                    }
-                }
-                //velocity Init
-                for(var t=0;t<4;t++) {
-                    velocity[t] = new Array(VortexRotation_matrix.height);
-                    for (var i = 0; i <  position[0].length; i++) {
-                        velocity[t][i] = new Array(VortexRotation_matrix.width);
-                    }
-                    for (var i = 0; i < VortexRotation_matrix.height; i++) {
-                        for (var j = 0; j < VortexRotation_matrix.width; j++) {
-                            velocity[t][i][j] = new THREE.Vector3(VELOCITY_NAN, VELOCITY_NAN, 0);
-                        }
-                    }
-                }
-                for (var i = 0; i < VortexRotation_matrix.height; i++) {
-                    for (var j = 0; j < VortexRotation_matrix.width; j++) {
-                        var pos = {};
-                        pos.x = LatLon.Longitude.data[j];
-                        pos.y = LatLon.Latitude.data[i];
-                        position[2][i][j] = new THREE.Vector3(pos.x, pos.y, 0);
-                        velocity[3][i][j] = new THREE.Vector3(VortexRotation_matrix.u.data[i][j], VortexRotation_matrix.v.data[i][j], 0);
-                        velocity[2][i][j] = new THREE.Vector3(arguments[3].data[i][j], arguments[4].data[i][j], 0);
-                    }
-                }
-
-            }
             returnObject.data = CalcTurningAngle();
 
-            //lineの配列を用意  配列の要素数は引きたい線の数（折れ線も一本で書ける）
-            var lineNum = 5;
-            returnObject.line = new Array(lineNum);
-            for (var i = 0; i < lineNum; i++) {
-                returnObject.line[i] = new THREE.Geometry();
-            }
-
-            //lineの座標を設定
-            for (var i = 0; i < lineNum; i++) {
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3(120, 20 + 10 * i));
-                returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3(200, 20 + 10 * i));
+            //CPUEが設定されているなら、遡って計算する
+            if(CPUE_Position!=null) {
+                //lineの座標を設定
+                for (var i = 0; i < lineNum; i++) {
+                    var cpue_velocity = interpolateVelocity(CPUE_Position[i]);
+                    CPUE_Position[i] = beforePosition(CPUE_Position[i], cpue_velocity);
+                    returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3(CPUE_Position[i].x, CPUE_Position[i].y));
+                }
             }
 
             var inputlonlat = new Array();
@@ -245,14 +189,14 @@ function interpolateVelocity(position)
 {
     if(LatLon.Latitude.data[LatLon.Latitude.data.length-1] < position.y || LatLon.Latitude.data[0] > position.y){
         //console.log("this latitude is out of range.");
-        var u = -9.989999710577421e+33;
-        var v = -9.989999710577421e+33;
+        var u = 0;
+        var v = 0;
         return({x:u,y:v})
     }
     if(LatLon.Longitude.data[LatLon.Longitude.data.length-1] < position.x || LatLon.Longitude.data[0] > position.x){
         //console.log("this longitude is out of MOVE data range.");
-        var u = -9.989999710577421e+33;
-        var v = -9.989999710577421e+33;
+        var u = 0;
+        var v = 0;
         return({x:u,y:v})
     }
     //陸地は速度が -9.9e+33になる->速度0にする
@@ -306,6 +250,18 @@ function interpolateVelocity(position)
     var u_01 = VortexRotation_matrix.u.data[array_y][array_x+1];
     var u_10 = VortexRotation_matrix.u.data[array_y+1][array_x];
     var u_11 = VortexRotation_matrix.u.data[array_y+1][array_x+1];
+    if(u_00 < -1.0e+10){
+        u_00 = 0;
+    }
+    if(u_01 < -1.0e+10){
+        u_01 = 0;
+    }
+    if(u_10 < -1.0e+10){
+        u_10 = 0;
+    }
+    if(u_11 < -1.0e+10){
+        u_11 = 0;
+    }
     var u0 = mix( u_00, u_10, t );
     var u1 = mix( u_01, u_11, t );
     var u = mix( u0, u1, s );
@@ -314,6 +270,18 @@ function interpolateVelocity(position)
     var v_01 = VortexRotation_matrix.v.data[array_y][array_x+1];
     var v_10 = VortexRotation_matrix.v.data[array_y+1][array_x];
     var v_11 = VortexRotation_matrix.v.data[array_y+1][array_x+1];
+    if(v_00 < -1.0e+10){
+        v_00 = 0;
+    }
+    if(v_01 < -1.0e+10){
+        v_01 = 0;
+    }
+    if(v_10 < -1.0e+10){
+        v_10 = 0;
+    }
+    if(v_11 < -1.0e+10){
+        v_11 = 0;
+    }
     var v0 = mix( v_00, v_10, t );
     var v1 = mix( v_01, v_11, t );
     var v = mix( v0, v1, s );
@@ -333,7 +301,9 @@ function LatLonToMapGrid_Vector3(lon,lat)
         console.log("line vertex has Longitude that is out of range.");
         return vector;
     }
-    vector = new THREE.Vector3(lon*10.0,lat*10.0, 50);
+    var map_lat = Latitude.min * 10.0;
+    map_lat += FromLatToMapGrid(lat) - FromLatToMapGrid(Latitude.min);
+    vector = new THREE.Vector3(lon*10.0, map_lat, 50);
     return vector;
 }
 
@@ -344,5 +314,82 @@ function postProcessing()
         for(var j=0;j<returnObject.data[0].length;j++){
             returnObject.data[i][j] = Math.abs(returnObject.data[i][j]);
         }
+    }
+}
+
+function InitObjects(arguments)
+{
+    if(CPUE_Position!=null){
+        lineNum = CPUE_Position.length;
+    }
+    InitPositionVelocity(arguments);
+    InitReturnObject();
+    if(CPUE_Position!=null){
+        setInitCPUEPositionToLineObject();
+    }
+}
+
+//ルンゲクッタ法を使うためには位置がn、速度がn+1必要
+function InitPositionVelocity(arguments)
+{
+    for(var t=0;t<3;t++) {
+        position[t] = new Array(VortexRotation_matrix.height);
+        for (var i = 0; i <  position[t].length; i++) {
+            position[t][i] = new Array(VortexRotation_matrix.width);
+        }
+        for (var i = 0; i < VortexRotation_matrix.height; i++) {
+            for (var j = 0; j < VortexRotation_matrix.width; j++) {
+                position[t][i][j] = new THREE.Vector3(500, 500, 0);  //CalcTurningAngle で(500,500)を使っているから、変えるときは気をつける
+            }
+        }
+    }
+    for(var t=0;t<4;t++) {
+        velocity[t] = new Array(VortexRotation_matrix.height);
+        for (var i = 0; i <  position[0].length; i++) {
+            velocity[t][i] = new Array(VortexRotation_matrix.width);
+        }
+        for (var i = 0; i < VortexRotation_matrix.height; i++) {
+            for (var j = 0; j < VortexRotation_matrix.width; j++) {
+                velocity[t][i][j] = new THREE.Vector3(VELOCITY_NAN, VELOCITY_NAN, 0);
+            }
+        }
+    }
+    for (var i = 0; i < VortexRotation_matrix.height; i++) {
+        for (var j = 0; j < VortexRotation_matrix.width; j++) {
+            var pos = {};
+            pos.x = LatLon.Longitude.data[j];
+            pos.y = LatLon.Latitude.data[i];
+            position[2][i][j] = new THREE.Vector3(pos.x, pos.y, 0);
+            velocity[3][i][j] = new THREE.Vector3(VortexRotation_matrix.u.data[i][j], VortexRotation_matrix.v.data[i][j], 0);
+            velocity[2][i][j] = new THREE.Vector3(arguments[3].data[i][j], arguments[4].data[i][j], 0);
+        }
+    }
+}
+
+function InitReturnObject()
+{
+    returnObject.data = new Array(VortexRotation_matrix.height);
+    for (var i = 0; i < returnObject.data.length; i++) {
+        returnObject.data[i] = new Array(VortexRotation_matrix.width);
+    }
+
+    for (var j = 0; j < returnObject.data.length; j++) {
+        for (var i = 0; i < returnObject.data[0].length; i++) {
+            returnObject.data[j][i] = 0;
+        }
+    }
+
+    //lineの配列を用意  配列の要素数は引きたい線の数（折れ線も一本で書ける）
+    returnObject.line = new Array(lineNum);
+    for (var i = 0; i < lineNum; i++) {
+        returnObject.line[i] = new THREE.Geometry();
+    }
+
+}
+
+function setInitCPUEPositionToLineObject()
+{
+    for (var i = 0; i < lineNum; i++) {
+        returnObject.line[i].vertices.push(LatLonToMapGrid_Vector3(CPUE_Position[i].x, CPUE_Position[i].y));
     }
 }
