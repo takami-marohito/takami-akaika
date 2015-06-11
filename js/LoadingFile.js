@@ -33,11 +33,11 @@ function LoadingCPUEFile(){
                 }
             }
             CPUE_Position = new Array();
-            for(var i=1;i<csvNumData.data.length;i++){
-            //var count = 0;
-            //for(var i=150;i<157;i++){
+            //for(var i=1;i<csvNumData.data.length;i++){ 0 7
+            var count = 0;
+            for(var i=155;i<156;i++){
                 CPUE_Position[count] = new THREE.Vector3(csvNumData.data[i][4], csvNumData.data[i][3], 0);
-                //count++;
+                count++;
             }
         });
 }

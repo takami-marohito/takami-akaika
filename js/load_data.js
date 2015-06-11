@@ -5,6 +5,7 @@
 //ユーザの入力は緯度、経度だけどopendapへのアクセスは0,1,2...で行う
 //この変換を行う関数を作る
 
+    //http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dasとddsにいろいろ書いてある。
 
 var TimeArray = new Array();
 

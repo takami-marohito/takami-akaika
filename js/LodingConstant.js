@@ -1,6 +1,10 @@
 /**
  * Created by vizlab on 2015/05/10.
  */
+
+//http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?LatuでLatの配列を取得できるが、ここではローカルに保存したデータを使っている
+//http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?Lattもある。違いはhttp://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.ddsに書いてある
+
 var LatLon = new setLatLon_func();
 
 loadLatandLonData();

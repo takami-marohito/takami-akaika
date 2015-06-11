@@ -62,7 +62,7 @@ function draw_map(Data)
     InitMap();
     map_scene.remove(variable_mesh);
 
-    draw_polygon(Data);
+    //draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
         draw_line(Data);
     }
