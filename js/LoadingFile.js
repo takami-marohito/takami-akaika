@@ -3,6 +3,7 @@
  */
 
 var CPUE_Position;
+var CPUE_Value;
 
 function LoadingCPUEFile(){
     fileurl = URL.createObjectURL(document.getElementById("CPUEFileName").files[0]);
@@ -33,10 +34,12 @@ function LoadingCPUEFile(){
                 }
             }
             CPUE_Position = new Array();
+            CPUE_Value = new Array();
             //for(var i=1;i<csvNumData.data.length;i++){ 0 7
             var count = 0;
-            for(var i=155;i<156;i++){
+            for(var i=154;i<156;i++){
                 CPUE_Position[count] = new THREE.Vector3(csvNumData.data[i][4], csvNumData.data[i][3], 0);
+                CPUE_Value[count] = csvNumData.data[i][5];
                 count++;
             }
         });

@@ -81,17 +81,6 @@ function DownloadButtonOnClickFunction() {
     }
 */
 
-    /*
-    var OutputString = new Array();
-    for(var x=0;x<VortexRotation_matrix[0].u.data.length;x++){
-        OutputString += String(VortexRotation_matrix[0].u.data[100][x]);
-        OutputString += ",";
-    }
 
-    var blob = new Blob([OutputString],{type:'text/plain'});
-    var link = document.createElement("a");
-    link.download = 'test';
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    */
+
 }

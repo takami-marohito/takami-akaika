@@ -10,13 +10,17 @@
 //1.ユーザの設定した緯度経度を配列番号にする関数をつくる
 //2.データをロード、計算
 //3.描画
+
+PointData = new Array();
+
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
         loadTimeArray(),
         button_loading_text(),
-        CalcVariable()
-    ).then(function (retvalue0,retvalue2,retvalue3, m_secondinvariant) {
+        CalcVariable(),
+        GetPointData()
+    ).then(function (retvalue0,retvalue2,retvalue3, m_secondinvariant, m_PointData) {
             if (DEBUG == 1) {
                 //console.log(m_secondinvariant);
             }
@@ -24,9 +28,11 @@ function OnClickFunction() {
             draw_land(m_secondinvariant);
             addColorLegend_Horizontal();
             button_calculating_finish();
+            PointData = m_PointData;
             return m_secondinvariant;
         });
 }
+
 
 function button_loading_text()
 {
