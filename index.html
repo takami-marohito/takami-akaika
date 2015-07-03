@@ -29,6 +29,8 @@
 
     <script src="js/LodingConstant.js"></script>
 
+    <script type="text/javascript" src="js/RungeKutta.js"></script>
+
 </head>
 <body>
 <ul class="nav nav-tabs">
@@ -109,6 +111,7 @@
                     </form>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-lg-12">
                     <form id="SecondInvariantDate" class="form-inline" role="form">
@@ -122,12 +125,13 @@
                                 format: 'yyyy-mm-dd',
                                 language: 'ja',
                                 autoclose: true,
-                                clearBtn: true
+                                clearBtn: false
                             });
                         });
                     </script>
                 </div>
             </div>
+
 
             <div class="row">
                 <div class="col col-lg-12">
@@ -194,8 +198,77 @@
             </div>
         </div>
     </div>
+
+    <!--
+    タブの切り替え
+    -->
+
     <div class="tab-pane fade" id="tab2">
-        <p>test</p>
+        <div class="container">
+
+            <div class="row">
+                <div class="col col-lg-12">
+                    <form id="INTEGRAL_PER_DAY" class="form-inline" role="form">
+                        <label>一日あたりのルンゲクッタ法の回数</label>
+                        <input type="number" name="name1" id="IntegralPerDay" class="form-control"  value="3" />
+                        回/日
+                    </form>
+                </div>
+            </div>
+
+            <Br><Br>
+
+            <div class="row">
+                <div class="col col-lg-12">
+                    <form id="CPUE_CALC_DAY" class="form-inline" role="form">
+                        <label>遡る日数</label>
+                        <input type="number" name="name1" id="CPUEDay" class="form-control"  value="7" />
+                        日
+                    </form>
+                </div>
+            </div>
+
+            <Br><Br>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <label>CPUE Data</label>
+                    <input type="file" id="CPUE_FOR_RUNGEKUTTA"/>
+                </div>
+            </div>
+
+            <Br><Br>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <form id="CPUEDate" class="form-inline" role="form">
+                        <label>日付</label>
+                        <input type="text" name="name1" id="CPUE_Date_input" class="form-control"  value="2006-02-01" />
+                    </form>
+
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#CPUE_Date_input').datepicker({
+                                format: 'yyyy-mm-dd',
+                                language: 'ja',
+                                autoclose: true,
+                                clearBtn: false
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <Br><Br>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <script src="js/OnClickFunction.js"></script>
+                    <button id=button_tab2_exec data-toggle="button"  value="OFF" class="btn btn-success btn-lg" data-loading-text="loading" onclick="OnClickFunction_RungeKutta();">Exec</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
