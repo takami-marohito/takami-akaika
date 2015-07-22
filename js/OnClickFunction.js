@@ -16,11 +16,10 @@ PointData = new Array();
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
-        loadTimeArray(),
         button_loading_text(),
         CalcVariable(),
         GetPointData()
-    ).then(function (retvalue0,retvalue2,retvalue3, m_secondinvariant, m_PointData) {
+    ).then(function (retvalue0,retvalue3, m_secondinvariant, m_PointData) {
             if (DEBUG == 1) {
                 //console.log(m_secondinvariant);
             }

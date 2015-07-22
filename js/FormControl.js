@@ -37,3 +37,9 @@ function CPUEDataEvent() {
         LoadingCPUEFile();
     });
 }
+
+function CPUEDataEventForRungeKutta() {
+    jQuery('#CPUE_FOR_RUNGEKUTTA').on('change', function () {
+        LoadingCPUEForRungeKutta();
+    });
+}

@@ -222,7 +222,7 @@
                 <div class="col col-lg-12">
                     <form id="CPUE_CALC_DAY" class="form-inline" role="form">
                         <label>遡る日数</label>
-                        <input type="number" name="name1" id="CPUEDay" class="form-control"  value="7" />
+                        <input type="number" name="name1" id="CPUEDay" class="form-control"  value="1" />
                         日
                     </form>
                 </div>
@@ -234,6 +234,9 @@
                 <div class="col-lg-12">
                     <label>CPUE Data</label>
                     <input type="file" id="CPUE_FOR_RUNGEKUTTA"/>
+                    <script type="text/javascript">
+                        CPUEDataEventForRungeKutta();
+                    </script>
                 </div>
             </div>
 

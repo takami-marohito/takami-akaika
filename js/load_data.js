@@ -8,6 +8,8 @@
     //http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dasとddsにいろいろ書いてある。
 
 var TimeArray = new Array();
+loadTimeArray();
+
 
 function loadTimeArray()
 {
