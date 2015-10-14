@@ -8,16 +8,55 @@ var DataForRungeKutta = new Array(2);
 DataForRungeKutta[0] = {u:[],v:[],w:[],s:[],t:[]};
 DataForRungeKutta[1] = {u:[],v:[],w:[],s:[],t:[]};
 
+var afrom = 0;
+var bto = 14;
+var cdate = 22;
+
 function OnClickFunction_RungeKutta() {
     var target = document.getElementById("button_tab2_exec");
     target.innerHTML = "loading&Calculating";
 
-    var dateNum = DateToArrayNum(document.getElementById("CPUE_Date_input").value);
-    if(dateNum == -1){
+    var dateNum = DateToArrayNum(document.getElementById("CPUE_Date_input").value)-cdate;
+    if (dateNum == -1) {
         console.log("cannot find date");
         target.innerHTML = "Exec";
         return;
     }
+
+    /*
+    var dap_line = "http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?";
+    dap_line+="U";
+    dap_line+="[1200]";
+    dap_line+="[23]";
+    dap_line+="[102:103]";
+    dap_line+="[121:122]";
+
+    return jqdap.loadData(dap_line,{withCredentials:true})
+        .then(function(tmp_T)
+        {
+            console.log(tmp_T);
+
+            console.log((tmp_T[0][0][0][0][0][0]+tmp_T[0][0][0][0][0][1]+tmp_T[0][0][0][0][1][0]+tmp_T[0][0][0][0][1][1])/4.0);
+
+            return(tmp_T);
+            var OutputString = new Array();
+            for(var i=0;i<tmp_T[0].length;i++){
+                OutputString += String(tmp_T[0][i]);
+                if(i!=tmp_T[0].length-1) {
+                    OutputString += "\n";
+                }
+            }
+            var blob = new Blob([OutputString], {type: 'text/plain'});
+            var link = document.createElement("a");
+            link.download = "depth_ascii";
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            return(tmp_T);
+        }
+    );
+
+    return 0;
+    */
 
     var cpue_filename = document.getElementById("CPUE_FOR_RUNGEKUTTA").files[0];
 
@@ -32,48 +71,77 @@ function OnClickFunction_RungeKutta() {
 
     var tmp_count = 0;
 
-
-    for(var i=0;i<CPUE.length;i++){
-        CPUE_same_day_from[tmp_count] = i;
-        CPUE_same_day_to[tmp_count] = i;
-        for(var j=1;i+j<CPUE.length;j++){
-            if(CPUE[i].day[0] == CPUE[i+j].day[0]){
-                CPUE_same_day_to[tmp_count]++;
-            }else{
-                break;
-            }
-        }
-        i = CPUE_same_day_to[tmp_count];
-        tmp_count++;
-    }
-
-    //console.log(CPUE[CPUE_same_day_from[20]].year[0] + "-" + CPUE[CPUE_same_day_from[20]].month[0] + "-" + CPUE[CPUE_same_day_from[20]].day[0]);
-
-    for(var i=0;i<CPUE_same_day_from.length;i++){
-        var dateStr = CPUE[CPUE_same_day_from[i]].year + "-" + CPUE[CPUE_same_day_from[i]].month + "-" + CPUE[CPUE_same_day_from[i]].day;
-        var dateNum = DateToArrayNum(dateStr);
-        for(var j=0;j<54;j++){
-            dfds.push(loadMOVEdata(dateNum , j, 0, 441, 0, 672, "U"));
-            dfds.push(loadMOVEdata(dateNum , j, 0, 441, 0, 672, "V"));
-            dfds.push(loadMOVEdata(dateNum , j, 0, 441, 0, 672, "W"));
-            dfds.push(loadMOVEdata(dateNum , j, 0, 441, 0, 672, "T"));
-            dfds.push(loadMOVEdata(dateNum , j, 0, 441, 0, 672, "S"));
+    for(var i=0;i<1;i++){
+        for(var j=afrom;j<bto;j++){
+            downloadData(i,j,1);
         }
     }
 
-    return jQuery.when.apply(
-        $,dfds
-    ).then(function(){
-            DataForRungeKutta[1].u = arguments[0];
-            DataForRungeKutta[1].v = arguments[1];
-            DataForRungeKutta[1].w = arguments[2];
-            DataForRungeKutta[1].t = arguments[3];
-            DataForRungeKutta[1].s = arguments[4];
-            Loop_RungeKutta(cpue_backward, CPUE_same_day_from[i], CPUE_same_day_to[i]);
-            console.log(CPUE);
-            target.innerHTML = "Exec";
-        });
 
+
+    function downloadData(argi,argj,count){
+        var fn = [];
+        fn.push(loadMOVEdata(dateNum - argi, argj, 0, 441, 0, 672, "U"));
+        fn.push(loadMOVEdata(dateNum - argi, argj, 0, 441, 0, 672, "V"));
+        fn.push(loadMOVEdata(dateNum - argi, argj, 0, 441, 0, 672, "W"));
+        fn.push(loadMOVEdata(dateNum - argi, argj, 0, 441, 0, 672, "T"));
+        fn.push(loadMOVEdata(dateNum - argi, argj, 0, 441, 0, 672, "S"));
+        return jQuery.when.apply(
+            $, fn
+        ).then(function () {
+                var OutputString;
+                var blob;
+                var link;
+                var filenameString;
+                for(var i=0;i<5;i++) {
+                    OutputString = new Array();
+                    for (var y = 0; y < arguments[0].data.length; y++) {
+                        for (var x = 0; x < arguments[0].data[0].length; x++) {
+                            OutputString += String(arguments[i].data[y][x]);
+                            if (x == arguments[0].data[0].length - 1) {
+
+                            } else {
+                                OutputString += ",";
+                            }
+                        }
+                        OutputString += "\n";
+                    }
+                    blob = new Blob([OutputString], {type: 'text/plain'});
+                    link = document.createElement("a");
+                    if(i==0){
+                        filenameString = "U";
+                    }
+                    if(i==1){
+                        filenameString = "V";
+                    }
+                    if(i==2){
+                        filenameString = "W";
+                    }
+                    if(i==3){
+                        filenameString = "T";
+                    }
+                    if(i==4){
+                        filenameString = "S";
+                    }
+                    filenameString += "-";
+                    filenameString += String(arguments[i].time);
+                    filenameString += "-";
+                    filenameString += String(argj);
+                    link.download = filenameString;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                }
+                arguments = new Array();
+                OutputString = new Array();
+                blob = new Blob();
+                link = 0;
+                filenameString = 0;
+                if(count <= 1){
+                    return;
+                }
+                downloadData(argi+1,argj,count-1);
+            });
+    }
 
     function Loop_RungeKutta(count, from, to){
         if(count==0){
@@ -114,12 +182,12 @@ function OnClickFunction_RungeKutta() {
         }
         var deltaT = 1.0 / integral_number_per_day;
         for(var i=0;i<integral_number_per_day;i++){
-            
+
         }
     }
 
     function GetDataForRungeKutta(time){
-        loadMOVEdata(time, Depth, 0, 441, 0, 672, "U")
+        loadMOVEdata(time, Depth, 0, 441, 0, 672, "U");
     }
 
 }

@@ -2,14 +2,102 @@
  * Created by vizlab on 15/03/25.
  */
 
+    //地形描画の関数はデータが全て東経かつ北緯前提なので西経や南緯だとおかしくなる→add2DPolygonで特殊処理している（北緯0度以下は描画しない、西経120度は東経240度として扱う）
+
 var GROUND_COLOR={h:0.3,s:0.5,l:0.0};
 var land_mesh;
+
+
+function AbsEastLongitude(lon)
+{
+    if(lon < 0){
+        return(360+lon);
+    }
+    return lon;
+}
+
+function add2DPolygon(coordinate,group,material)
+{
+    for(var i=0;i<coordinate.length;i++){
+        if(coordinate[i][1] < 0){
+            return;
+        }
+    }
+    for(var i=0;i<coordinate.length;i++){  //西経と東経の境目でおかしくなるからその部分は描画しない
+        if(Math.abs(coordinate[i][0])<10){
+            return;
+        }
+    }
+    var path = new THREE.Shape();
+    var coord_lon = AbsEastLongitude(coordinate[0][0]) * 10.0;
+    var coord_lat = FromLatToMapGrid(coordinate[0][1]);
+    path.moveTo(coord_lon,coord_lat);
+    for(var i=1;i<coordinate.length;i++){
+        coord_lon = AbsEastLongitude(coordinate[i][0]) * 10.0;
+        coord_lat = FromLatToMapGrid(coordinate[i][1]);
+        path.lineTo(coord_lon,coord_lat);
+    }
+    //console.log(path);
+    group.add(new THREE.Mesh(path.makeGeometry(),material));
+    //console.log(coordinate);
+    return;
+}
 
 function draw_land()
 {
     map_scene.remove(land_mesh);
+
+    d3.json("./geometry/world.json",function(error,world){
+        //console.log(world);
+        //console.log(world.objects.countries);
+        var feature = world.features;
+        var group = new THREE.Object3D();
+        var material = new THREE.MeshBasicMaterial({
+            color:0x000000,
+            side:THREE.DoubleSide
+        });
+        for(var i=0;i<feature.length;i++){
+            if(feature[i].geometry.type=='MultiPolygon'){
+                for(var j=0;j<feature[i].geometry.coordinates.length;j++){
+                    add2DPolygon(feature[i].geometry.coordinates[j][0],group,material);
+                }
+            }
+        }
+        map_scene.add(group);
+        /*
+        geo = topojson.feature(world,world.objects.countries);
+        //geo = topojson.feature(world,world.objects);
+        //console.log(geo.features);
+        feature = geo.features;
+        geo = world.objects.countries.geometries;
+        var group = new THREE.Object3D();
+        var material = new THREE.MeshBasicMaterial({
+            color:0x000000,
+            side:THREE.DoubleSide
+        });
+        for(var i=0;i<feature.length;i++){
+            if(geo[i].type == 'Polygon'){
+                //console.log(feature[i].geometry.coordinates);
+                add2DPolygon(feature[i].geometry.coordinates[0],group,material);
+            }
+            if(geo[i].type == 'MultiPolygon'){
+                for(var j=0;j<feature[i].geometry.coordinates.length;j++){
+                    //console.log(feature[i].geometry.coordinates[j])
+                    add2DPolygon(feature[i].geometry.coordinates[j][0],group,material);
+                }
+                //console.log(geo[i]);
+            }
+        }
+        map_scene.add(group);
+        */
+    });
+    console.log("draw land");
+    return;
+
+
     var dfds = [];
     dfds.push(loadMOVEdata(0, 0, 0, 441, 0, 672, "U"));
+
 
     return jQuery.when.apply(
         $,dfds

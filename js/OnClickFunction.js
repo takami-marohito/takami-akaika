@@ -13,6 +13,8 @@
 
 PointData = new Array();
 
+CalcData = new Array();
+
 function OnClickFunction() {
     jQuery.when(
         setVariable(),
@@ -23,6 +25,7 @@ function OnClickFunction() {
             if (DEBUG == 1) {
                 //console.log(m_secondinvariant);
             }
+            CalcData = m_secondinvariant;
             draw_map(m_secondinvariant);
             draw_land(m_secondinvariant);
             addColorLegend_Horizontal();
@@ -98,6 +101,19 @@ function CalcVariable()
     if(target.value == "LoadingCalculatedVariable"){
         exec_function.push(LoadingFile());
     }
+
+    if(target.value == "KonishiMethod"){
+        var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
+        if(dateNum == -1){
+            console.log("cannot find date");
+            return(function(){
+                var date = {miss:true};
+                return date;
+            });
+        }
+        exec_function.push(KonishiMethod(dateNum));
+    }
+
     //console.log(exec_function);
     return jQuery.when.apply(
         $,exec_function
@@ -113,7 +129,7 @@ function DateToArrayNum(date)
 {
     for(var i=0;i<TimeArray.length;i++){
         if(TimeArray[i] == date){
-            console.log("find date " + TimeArray[i] );
+            //console.log("find date " + TimeArray[i] );
             return i;
         }
     }

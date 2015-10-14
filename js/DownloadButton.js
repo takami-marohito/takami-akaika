@@ -2,6 +2,28 @@
  * Created by vizlab on 2015/04/10.
  */
 
+function DownloadDataButtonOnClickFunction() {
+    var OutputString = new Array();
+    console.log(CalcData);
+    for(var i=0;i<CalcData.data.length;i++){
+        for(var j=0;j<CalcData.data[0].length;j++){
+            OutputString += String(CalcData.data[i][j]);
+            if(j != CalcData.data[0].length-1) {
+                OutputString += ",";
+            }
+            if(j == CalcData.data[0].length-1){
+                OutputString += '\n';
+            }
+        }
+    }
+    var blob = new Blob([OutputString], {type: 'text/plain'});
+    var link = document.createElement("a");
+    filenameString = "input" ;
+    link.download = filenameString;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+}
+
 function DownloadButtonOnClickFunction() {
     var imgData = map_renderer.domElement.toDataURL();
     imgNode = document.createElement("img");

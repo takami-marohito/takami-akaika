@@ -24,7 +24,7 @@ function loadTimeArray()
     return 0;
 }
 
-
+//http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?time のデータを2006年3月までローカルに保存した
 
 //opendapURLに0,441と指定すると0から441まで合計442の数取ってくる
 //だからデータを入れるときはarg_x_end-arg_x_start+1にしないといけない

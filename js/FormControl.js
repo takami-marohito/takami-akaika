@@ -11,23 +11,38 @@ function SelectVariableEvent()
         if(target2.value == "SecondInvariant"){
             document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="none";
+            document.getElementById("LineFilename").style.display="none";
             document.getElementById("SecondInvariantDate").style.display="";
             document.getElementById("DownloadDateRange").style.display="none";
             document.getElementById("DrawLine").style.display="none";
+            document.getElementById("KonishiFilename").style.display="none";
         }
         if(target2.value == "VortexRotation"){
             document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="none";
+            document.getElementById("LineFilename").style.display="none";
             document.getElementById("SecondInvariantDate").style.display="";
             document.getElementById("DownloadDateRange").style.display="";
             document.getElementById("DrawLine").style.display="";
+            document.getElementById("KonishiFilename").style.display="none";
         }
         if(target2.value == "LoadingCalculatedVariable"){
             document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="";
+            document.getElementById("LineFilename").style.display="";
             document.getElementById("SecondInvariantDate").style.display="none";
             document.getElementById("DownloadDateRange").style.display="none";
             document.getElementById("DrawLine").style.display="none";
+            document.getElementById("KonishiFilename").style.display="none";
+        }
+        if(target2.value == "KonishiMethod"){
+            document.getElementById("ColorLegendRange").style.display="";
+            document.getElementById("Filename").style.display="none";
+            document.getElementById("LineFilename").style.display="none";
+            document.getElementById("SecondInvariantDate").style.display="";
+            document.getElementById("DownloadDateRange").style.display="none";
+            document.getElementById("DrawLine").style.display="none";
+            document.getElementById("KonishiFilename").style.display="";
         }
     });
 }

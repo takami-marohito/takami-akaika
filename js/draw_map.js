@@ -14,6 +14,25 @@
 //log(tand(Latitude.min)) = 0.1138
 //1319.28 * (0.6557-0.1138)が緯度方向の幅 714.92px
 
+//topojsonの地図データをthree jsで使いたい→path.makeGeometryでできた→これだとz座標を指定できない（多分z=0）→faceでつくる→faceは三角形しか作れない→海とか漁獲点のzを変える
+
+var ocean_z = -1.0;
+var land_z = 0.0;
+var point_z = -0.5;
+var line_z = -0.7;
+
+var SpecialColorValue = -1;
+
+function SpecialColorFunction(color,value){
+    if(value == SpecialColorValue){
+        color.h = 0.33;
+        color.s = 1.0;
+        color.l = 0.5;
+    }
+    return color;
+}
+
+
 var MAP_COE = 1800/ ( Math.LOG10E*Math.log(Math.tan(Math.PI/180.0*(85.051128/2.0+45.0))));
 //地図は完全固定サイズ. カメラ位置を変えることで見える部分を変える
 var camera_position = {x:0,y:0};
@@ -21,7 +40,9 @@ var camera_position = {x:0,y:0};
 var map_renderer = new THREE.WebGLRenderer({antialias: true, alpha:true});
 map_renderer.shadowMapEnabled = false;
 
-var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
+var map_camera = new THREE.OrthographicCamera(-500, -500, 500, -500, 0.01, 100);
+//var map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
+console.log("mapcamera");
 var map_scene = new THREE.Scene();
 
 var variable_mesh;
@@ -43,7 +64,7 @@ var MapGrid = {width:835, height:715};
 
     document.getElementById("mapArea").appendChild(map_renderer.domElement);
 
-    map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
+    //map_camera = new THREE.OrthographicCamera(0, 1000, 1000, 0, 0.01, 100);
     map_camera.position.set(0, 0, 50);
     map_camera.lookAt({x: 0, y: 0, z: 0});
     render();
@@ -62,11 +83,16 @@ function draw_map(Data)
     InitMap();
     map_scene.remove(variable_mesh);
 
-    //draw_polygon(Data);
+    draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
         draw_line(Data);
     }
+    if(CPUE_Position!=null){
+        console.log("draw points");
+        draw_points();
+    }
     setMapMouseEvent();
+    console.log("draw_ocean");
 }
 
 function draw_line(Data)
@@ -87,6 +113,64 @@ function draw_line(Data)
         map_scene.add(line[i]);
     }
 }
+
+function draw_points()
+{
+    if(document.getElementById("EveryPoints").checked) {
+        var min = 100;
+        var max = -100;
+        for (var i = 0; i < CPUE_Value.length; i++) {
+            if (CPUE_Value[i] < min) {
+                min = CPUE_Value[i];
+            }
+            if (CPUE_Value[i] > max) {
+                max = CPUE_Value[i];
+            }
+        }
+        var material = new THREE.PointCloudMaterial({size: 10, transparent: false, vertexColors: THREE.VertexColors});
+        //var material = new THREE.PointCloudMaterial({size:10,color:0xffffff});
+        var pointsgeometry = new THREE.Geometry();
+        for (var i = 0; i < CPUE_Value.length; i++) {
+            pointsgeometry.vertices.push(new THREE.Vector3(CPUE_Position[i].x * 10, FromLatToMapGrid(CPUE_Position[i].y), point_z));
+            var color = new THREE.Color();
+            var v = (CPUE_Value[i] - min) / (max - min);
+            color.setHSL(240 * v / 360, 1.0, 0.5);
+            pointsgeometry.colors.push(color);
+        }
+        var points = new THREE.PointCloud(pointsgeometry, material);
+        map_scene.add(points);
+    }else{
+        var min = 100;
+        var max = -100;
+        for (var i = 0; i < CPUE_Value.length; i++) {
+            //console.log(CPUE_Date.year[i] + "-" + ("0"+CPUE_Date.month[i]).slice(-2) + "-" + ("0"+CPUE_Date.day[i]).slice(-2));
+            if(DateToArrayNum(document.getElementById("SecondInvariantDate_input").value) == DateToArrayNum(CPUE_Date.year[i] + "-" + ("0"+CPUE_Date.month[i]).slice(-2) + "-" + ("0"+CPUE_Date.day[i]).slice(-2))) {
+                if (CPUE_Value[i] < min) {
+                    min = CPUE_Value[i];
+                }
+                if (CPUE_Value[i] > max) {
+                    max = CPUE_Value[i];
+                }
+            }
+        }
+        var material = new THREE.PointCloudMaterial({size: 10, transparent: false, vertexColors: THREE.VertexColors});
+        //var material = new THREE.PointCloudMaterial({size:10,color:0xffffff});
+        var pointsgeometry = new THREE.Geometry();
+        for (var i = 0; i < CPUE_Value.length; i++) {
+            if(DateToArrayNum(document.getElementById("SecondInvariantDate_input").value) == DateToArrayNum(CPUE_Date.year[i] + "-" + ("0"+CPUE_Date.month[i]).slice(-2) + "-" + ("0"+CPUE_Date.day[i]).slice(-2))) {
+                pointsgeometry.vertices.push(new THREE.Vector3(CPUE_Position[i].x * 10, FromLatToMapGrid(CPUE_Position[i].y), point_z));
+                var color = new THREE.Color();
+                var v = (CPUE_Value[i] - min) / (max - min);
+                color.setHSL(240 * v / 360, 1.0, 0.5);
+                pointsgeometry.colors.push(color);
+            }
+        }
+        console.log(document.getElementById("SecondInvariantDate_input").value);
+        var points = new THREE.PointCloud(pointsgeometry, material);
+        map_scene.add(points);
+    }
+}
+
 
 function draw_polygon(SecondInvariant)
 {
@@ -123,6 +207,7 @@ function CreateGeometry(SecondInvariant)
     var x_grid = x_grid_org;
     var y_grid = Latitude.min*10.0;
     var geometry = new THREE.Geometry();
+
     for(var y=0;y<SecondInvariant.data.length-1;y++){
         for(var x=0;x<SecondInvariant.data[0].length-1;x++){
             //var x_grid_step = MapGrid.width * (LatLon.Longitude.data[x+1]-LatLon.Longitude.data[x]) /(Longitude.max - Longitude.min);
@@ -134,10 +219,10 @@ function CreateGeometry(SecondInvariant)
             //var y_grid_step = (LatLon.Latitude.data[y+1]-LatLon.Latitude.data[y])*10.0;
             var y_grid_step = FromLatToMapGrid(LatLon.Latitude.data[y+1]) - FromLatToMapGrid(LatLon.Latitude.data[y]);
 
-            geometry.vertices.push(new THREE.Vector3(x_grid, y_grid, 0));
-            geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid, 0));
-            geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid+y_grid_step, 0));
-            geometry.vertices.push(new THREE.Vector3(x_grid, y_grid+y_grid_step, 0));
+            geometry.vertices.push(new THREE.Vector3(x_grid, y_grid, ocean_z));
+            geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid, ocean_z));
+            geometry.vertices.push(new THREE.Vector3(x_grid+x_grid_step, y_grid+y_grid_step, ocean_z));
+            geometry.vertices.push(new THREE.Vector3(x_grid, y_grid+y_grid_step, ocean_z));
             x_grid += x_grid_step;
 
             var color0 = new THREE.Color();
@@ -149,6 +234,12 @@ function CreateGeometry(SecondInvariant)
             var tmp_color1 = SecondInvariantToHSL_white(SecondInvariant.data[y][x+1]);
             var tmp_color2 = SecondInvariantToHSL_white(SecondInvariant.data[y+1][x+1]);
             var tmp_color3 = SecondInvariantToHSL_white(SecondInvariant.data[y+1][x]);
+
+            tmp_color0 = SpecialColorFunction(tmp_color0,SecondInvariant.data[y][x]);
+            tmp_color1 = SpecialColorFunction(tmp_color1,SecondInvariant.data[y][x+1]);
+            tmp_color2 = SpecialColorFunction(tmp_color2,SecondInvariant.data[y+1][x+1]);
+            tmp_color3 = SpecialColorFunction(tmp_color3,SecondInvariant.data[y+1][x]);
+
             color0.setHSL(tmp_color0.h,tmp_color0.s,tmp_color0.l);
             color1.setHSL(tmp_color1.h,tmp_color1.s,tmp_color1.l);
             color2.setHSL(tmp_color2.h,tmp_color2.s,tmp_color2.l);
@@ -189,7 +280,10 @@ function CreateGeometry(SecondInvariant)
 
 function FromLatToMapGrid(lat)
 {
-    return(MAP_COE*Math.LOG10E*Math.log((Math.tan(Math.PI/180.0*(lat/2.0+45.0)))));
+    if(lat>0) {
+        return (MAP_COE * Math.LOG10E * Math.log((Math.tan(Math.PI / 180.0 * (lat / 2.0 + 45.0)))));
+    }
+    return(lat);
 }
 
 
@@ -453,7 +547,7 @@ function SecondInvariantToHSL(value)
 var interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0,0.5,1]).clamp(true);  //hslでは0.66が青で0が赤
 function SecondInvariantToHSL_white(value)
 {
-    //陸地の処理
+    //へんな値の処理（陸地や計算ミスなど）
     if(value < -5000 || value == undefined){
         var color_land = {
             h:0,
@@ -543,6 +637,8 @@ function setMapRenderer()
 function setMapCamera()
 {
     map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,FromLatToMapGrid(Latitude.max),FromLatToMapGrid(Latitude.min), 0.01, 3000);
+    //map_camera = new THREE.OrthographicCamera(-500,500,500,-500, 0.01, 3000);
+    console.log("change setMapCameraFunction");
     map_camera.position.set(0, 0, 1);
     map_camera.lookAt({x: 0, y: 0, z: 0});
     map_camera.position.set(camera_position.x, camera_position.y, 100);

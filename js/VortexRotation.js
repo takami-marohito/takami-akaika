@@ -31,6 +31,10 @@ function GetPointData()
         return;
     }
 
+return;
+
+
+
     console.log(CPUE_Position);
 
     var t =  DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
@@ -459,7 +463,7 @@ function LatLonToMapGrid_Vector3(lon,lat)
     }
     var map_lat = Latitude.min * 10.0;
     map_lat += FromLatToMapGrid(lat) - FromLatToMapGrid(Latitude.min);
-    vector = new THREE.Vector3(lon*10.0, map_lat, 50);
+    vector = new THREE.Vector3(lon*10.0, map_lat, ocean_z);
     return vector;
 }
 
