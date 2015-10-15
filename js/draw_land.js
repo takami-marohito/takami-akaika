@@ -6,7 +6,7 @@
 
 var GROUND_COLOR={h:0.3,s:0.5,l:0.0};
 var land_mesh;
-
+var land_group;
 
 function AbsEastLongitude(lon)
 {
@@ -45,13 +45,13 @@ function add2DPolygon(coordinate,group,material)
 
 function draw_land()
 {
-    map_scene.remove(land_mesh);
+    map_scene.remove(land_group);
 
     d3.json("./geometry/world.json",function(error,world){
         //console.log(world);
         //console.log(world.objects.countries);
         var feature = world.features;
-        var group = new THREE.Object3D();
+        land_group = new THREE.Object3D();
         var material = new THREE.MeshBasicMaterial({
             color:0x000000,
             side:THREE.DoubleSide
@@ -59,11 +59,11 @@ function draw_land()
         for(var i=0;i<feature.length;i++){
             if(feature[i].geometry.type=='MultiPolygon'){
                 for(var j=0;j<feature[i].geometry.coordinates.length;j++){
-                    add2DPolygon(feature[i].geometry.coordinates[j][0],group,material);
+                    add2DPolygon(feature[i].geometry.coordinates[j][0],land_group,material);
                 }
             }
         }
-        map_scene.add(group);
+        map_scene.add(land_group);
         /*
         geo = topojson.feature(world,world.objects.countries);
         //geo = topojson.feature(world,world.objects);
