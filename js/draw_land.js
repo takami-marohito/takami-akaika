@@ -8,6 +8,9 @@ var GROUND_COLOR={h:0.3,s:0.5,l:0.0};
 var land_mesh;
 var land_group;
 
+var draw_land_flag = false;
+//陸地の描画を一回だけにしたい→変更が面倒→flagにした
+
 function AbsEastLongitude(lon)
 {
     if(lon < 0){
@@ -45,6 +48,10 @@ function add2DPolygon(coordinate,group,material)
 
 function draw_land()
 {
+    if(draw_land_flag==true){
+        console.log("land has been drawn");
+        return;
+    }
     map_scene.remove(land_group);
 
     d3.json("./geometry/world.json",function(error,world){
@@ -92,6 +99,7 @@ function draw_land()
         */
     });
     console.log("draw land");
+    draw_land_flag=true;
     return;
 
 

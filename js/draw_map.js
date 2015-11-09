@@ -21,16 +21,7 @@ var land_z = 0.0;
 var point_z = -0.5;
 var line_z = -0.7;
 
-var SpecialColorValue = -1;
 
-function SpecialColorFunction(color,value){
-    if(value == SpecialColorValue){
-        color.h = 0.1;
-        color.s = 0.0;
-        color.l = 0.5;
-    }
-    return color;
-}
 
 
 var MAP_COE = 1800/ ( Math.LOG10E*Math.log(Math.tan(Math.PI/180.0*(85.051128/2.0+45.0))));
@@ -81,9 +72,8 @@ function render()
 function draw_map(Data)
 {
     variable_data = Data;
-
-    updateSecondInvariantMinMax();
-    InitMap();
+    //updateColorLegendMinMax();
+    //InitMap();
     map_scene.remove(variable_mesh);
 
     draw_polygon(Data);
@@ -94,7 +84,7 @@ function draw_map(Data)
         console.log("draw points");
         draw_points();
     }
-    setMapMouseEvent();
+    //setMapMouseEvent();
     console.log("draw_ocean");
 }
 
@@ -192,7 +182,7 @@ function draw_polygon(SecondInvariant)
 
     //var light = new THREE.DirectionalLight("#AAAAAA");
     //light.position.set(0,0,100);
-    map_scene = new THREE.Scene();
+    //map_scene = new THREE.Scene();
     map_scene.add(variable_mesh);
     //map_scene.add(light);
 
@@ -287,13 +277,29 @@ function FromLatToMapGrid(lat)
     return(lat);
 }
 
-
-
-
-function updateSecondInvariantMinMax()
+function autodetectingMinMax(xmin,xmax,ymin,ymax)
 {
-    colorlegend_min = eval(document.forms.ColorLegendRange.Min.value);
-    colorlegend_max = eval(document.forms.ColorLegendRange.Max.value);
+    min = 5000;
+    max = -5000;
+    for(var i=xmin;i<xmax;i++){
+        for(var j=ymin;j<ymax;j++){
+            if(min>CalcData.data[j][i]){
+                min = CalcData.data[j][i];
+            }
+            if(max<CalcData.data[j][i]){
+                max=CalcData.data[j][i];
+            }
+        }
+    }
+    var leg={min:min,max:max};
+    return leg;
+}
+
+
+function changeColorRangeMinMax(min,max)
+{
+    colorlegend_min = min;
+    colorlegend_max = max;
     interpolate_white = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0,0.5,1]).clamp(true);
     interpolate_hsl = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range([0.66,0.33,0]).clamp(true);
     interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);

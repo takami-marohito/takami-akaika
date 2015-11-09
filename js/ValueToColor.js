@@ -1,6 +1,22 @@
 /**
  * Created by vizlab on 2015/10/15.
  */
+var SpecialColorValue = -1;
+
+function SpecialColorFunction(color,value){
+    if(value == SpecialColorValue){
+        color.h = 0.1;
+        color.s = 0.0;
+        color.l = 1.0;//0.5;
+    }
+    if(value == undefined){
+        color.h = 0.1;
+        color.s = 0.0;
+        color.l = 1.0;//0.5;
+    }
+    return color;
+}
+
 var interpolate_rgb = d3.scale.linear().domain([colorlegend_min,(colorlegend_min+colorlegend_max)/2.0,colorlegend_max]).range(["blue","green","red"]).clamp(true);
 //関数内で定義したら時間がかかった->何度もこれを実行するから
 function SecondInvariantToRGB(value)
@@ -39,7 +55,7 @@ function SecondInvariantToHSL(value)
         var color_land = {
             h:0.1,
             s:0,
-            l:0
+            l:0.5
         };
         return(color_land);
     }

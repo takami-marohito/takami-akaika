@@ -9,7 +9,6 @@ function SelectVariableEvent()
         var target2 = document.getElementById("VariableMode");
         console.log(target2.value + " selected");
         if(target2.value == "SecondInvariant"){
-            document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="none";
             document.getElementById("LineFilename").style.display="none";
             document.getElementById("SecondInvariantDate").style.display="";
@@ -18,7 +17,6 @@ function SelectVariableEvent()
             document.getElementById("KonishiFilename").style.display="none";
         }
         if(target2.value == "VortexRotation"){
-            document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="none";
             document.getElementById("LineFilename").style.display="none";
             document.getElementById("SecondInvariantDate").style.display="";
@@ -27,7 +25,6 @@ function SelectVariableEvent()
             document.getElementById("KonishiFilename").style.display="none";
         }
         if(target2.value == "LoadingCalculatedVariable"){
-            document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="";
             document.getElementById("LineFilename").style.display="";
             document.getElementById("SecondInvariantDate").style.display="none";
@@ -36,7 +33,6 @@ function SelectVariableEvent()
             document.getElementById("KonishiFilename").style.display="none";
         }
         if(target2.value == "KonishiMethod"){
-            document.getElementById("ColorLegendRange").style.display="";
             document.getElementById("Filename").style.display="none";
             document.getElementById("LineFilename").style.display="none";
             document.getElementById("SecondInvariantDate").style.display="";

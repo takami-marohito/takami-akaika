@@ -15,10 +15,42 @@ PointData = new Array();
 
 CalcData = new Array();
 
+function OnClickFunctionAutoRange(){
+    if(CalcData.length == 0){
+        console.log("This button can be used after drawing map");
+        return;
+    }
+    leg = {min:0,max:0};
+    leg = autodetectingMinMax(260,290,220,240);//だいたいこの範囲が目的の範囲
+    document.forms.ColorLegendRange.Min.value = leg.min;
+    document.forms.ColorLegendRange.Max.value = leg.max;
+    changeColorRangeMinMax(leg.min,leg.max);
+    draw_map(CalcData);
+    addColorLegend_Horizontal();
+    return CalcData;
+}
+
+function OnClickFunctionApply(){
+   if(CalcData.length == 0){
+       console.log("This button can be used after drawing map");
+       return;
+   }
+    min = eval(document.forms.ColorLegendRange.Min.value);
+    max = eval(document.forms.ColorLegendRange.Max.value);
+    changeButtonText("button_change_value","changing");
+    changeColorRangeMinMax(min,max);
+    draw_map(CalcData);
+    addColorLegend_Horizontal();
+    changeButtonText("button_change_value","ApplyNewRange");
+    return CalcData;
+}
+
 function OnClickFunction() {
+    min = eval(document.forms.ColorLegendRange.Min.value);
+    max = eval(document.forms.ColorLegendRange.Max.value);
     jQuery.when(
         setVariable(),
-        button_loading_text(),
+        changeButtonText("button_exec","Loading&Calculating"),
         CalcVariable(),
         GetPointData()
     ).then(function (retvalue0,retvalue3, m_secondinvariant, m_PointData) {
@@ -26,27 +58,19 @@ function OnClickFunction() {
                 //console.log(m_secondinvariant);
             }
             CalcData = m_secondinvariant;
+            changeColorRangeMinMax(min,max);
             draw_map(m_secondinvariant);
             draw_land(m_secondinvariant);
             addColorLegend_Horizontal();
-            button_calculating_finish();
+            changeButtonText("button_exec","Exec");
             PointData = m_PointData;
             return m_secondinvariant;
         });
 }
 
-
-function button_loading_text()
-{
-    var target = document.getElementById("button_exec");
-    target.innerHTML = "loading&Calculating";
-    return 0;
-}
-
-function button_calculating_finish()
-{
-    var target = document.getElementById("button_exec");
-    target.innerHTML = "Update";
+function changeButtonText(buttonID,text){
+    var target = document.getElementById(buttonID);
+    target.innerHTML = text;
     return 0;
 }
 
