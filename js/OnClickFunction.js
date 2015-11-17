@@ -49,7 +49,7 @@ function OnClickFunction() {
     min = eval(document.forms.ColorLegendRange.Min.value);
     max = eval(document.forms.ColorLegendRange.Max.value);
     jQuery.when(
-        setVariable(),
+        setLatLonRange(),
         changeButtonText("button_exec","Loading&Calculating"),
         CalcVariable(),
         GetPointData()
@@ -74,7 +74,7 @@ function changeButtonText(buttonID,text){
     return 0;
 }
 
-function setVariable()
+function setLatLonRange()
 {
     Latitude.min = eval(document.getElementById("LatitudeMinInt").value);
     Latitude.min += eval(document.getElementById("LatitudeMinDec").value/60.0);
@@ -99,8 +99,8 @@ function CalcVariable()
 {
     var target = document.getElementById("VariableMode");
     var exec_function = [];
+    var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
     if(target.value == "SecondInvariant") {
-        var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
         if(dateNum == -1){
             console.log("cannot find date");
             return(function(){
@@ -111,7 +111,6 @@ function CalcVariable()
         exec_function.push(SecondInvariant(dateNum, 0));
     }
     if(target.value == "VortexRotation"){
-        var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
         if(dateNum == -1){
             console.log("cannot find date");
             return(function(){
@@ -127,7 +126,6 @@ function CalcVariable()
     }
 
     if(target.value == "KonishiMethod"){
-        var dateNum = DateToArrayNum(document.getElementById("SecondInvariantDate_input").value);
         if(dateNum == -1){
             console.log("cannot find date");
             return(function(){
@@ -136,6 +134,17 @@ function CalcVariable()
             });
         }
         exec_function.push(KonishiMethod(dateNum));
+    }
+
+    if(target.value == "PreviousMethod"){
+        if(dateNum == -1){
+            console.log("cannot find date");
+            return(function(){
+                var date = {miss:true};
+                return date;
+            });
+        }
+        exec_function.push(PreviousMethod(dateNum));
     }
 
     //console.log(exec_function);

@@ -31,6 +31,9 @@
 
     <script type="text/javascript" src="js/RungeKutta.js"></script>
     <script type="text/javascript" src="js/KonishiMethod.js"></script>
+    <script type="text/javascript" src="js/PreviousMethod.js"></script>
+
+    <script type="text/javascript" src="js/InterpolateVariable.js"></script>
 
 </head>
 <body>
@@ -102,6 +105,7 @@
                             <option>VortexRotation</option>
                             <option>LoadingCalculatedVariable</option>
                             <option>KonishiMethod</option>
+                            <option>PreviousMethod</option>
                         </select>
                     </div>
                 </div>
@@ -165,10 +169,36 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col col-lg-12">
+                    <form id="CalcLonRange" class="form-inline" role="form">
+                        <label>Longitude Range</label>
+                        <input type="number" name="name1" id="CalcLonMin" class="form-control"  value="116.5" />
+                        <input type="number" name="name2" id="CalcLonMax" class="form-control"  value="200.15" />
+                    </form>
+                </div>
+                <div class="col col-lg-12">
+                    <form id="CalcLatRange" class="form-inline" role="form">
+                        <label>Latitude Range</label>
+                        <input type="number" name="name1" id="CalcLatMin" class="form-control"  value="14.5" />
+                        <input type="number" name="name2" id="CalcLatMax" class="form-control"  value="65.5" />
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="PreviousMethodFiletext">CPUEFile</div>
+                    <input type="file" id="PreviousMethodFile"/>
+                    <script type="text/javascript">
+                        LoadingCPUEfilePreviousMethod();
+                    </script>
+                </div>
+            </div>
+
             <!--  可視化変数の初期化-->
             <script type="text/javascript">
                 SelectVariableEvent();
-                jQuery('#VariableMode').val('KonishiMethod').trigger('change');
+                jQuery('#VariableMode').val('PreviousMethod').trigger('change');
                 jQuery('#LineOnOff').prop('checked',false);
             </script>
             <!--  ここまで-->
@@ -188,7 +218,7 @@
                     <script src="js/draw_color_legend.js"></script>
                     <script src="js/ValueToColor.js"></script>
                     <script type="text/javascript">
-                        setVariable();
+                        setLatLonRange();
                         InitMap();
                         draw_land();
                         setMapMouseEvent();
