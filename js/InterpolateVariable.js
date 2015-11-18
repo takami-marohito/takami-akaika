@@ -7,11 +7,21 @@
 
 function interpolateVariable(arg,position)
 {
-    if(LatLon.Latitude.data[LatLon.Latitude.data.length-1] < position.y || LatLon.Latitude.data[0] > position.y){
+    var SelectedLat;
+    var SelectedLon;
+    if(arg.type == "U" || arg.type == "V" || arg.type == "W"){
+        SelectedLat = LatLon.LatitudeU;
+        SelectedLon = LatLon.LongitudeU;
+    }
+    if(arg.type == "S" || arg.type == "T"){
+        SelectedLat = LatLon.LatitudeT;
+        SelectedLon = LatLon.LongitudeT;
+    }
+    if(SelectedLat.data[SelectedLat.data.length-1] < position.y || SelectedLat.data[0] > position.y){
         //console.log("this latitude is out of range.");
         return(0)
     }
-    if(LatLon.Longitude.data[LatLon.Longitude.data.length-1] < position.x || LatLon.Longitude.data[0] > position.x){
+    if(SelectedLon.data[SelectedLon.data.length-1] < position.x || SelectedLon.data[0] > position.x){
         //console.log("this longitude is out of MOVE data range.");
         return(0);
     }
@@ -19,29 +29,29 @@ function interpolateVariable(arg,position)
 
     //Gridは等間隔でないのでひとつずつ見ていく必要があるはず
     var array_x;
-    for(var x=0;x<LatLon.Longitude.data.length-1;x++){
-        if(LatLon.Longitude.data[x] <= position.x && LatLon.Longitude.data[x+1] > position.x ){
+    for(var x=0;x<SelectedLon.data.length-1;x++){
+        if(SelectedLon.data[x] <= position.x && SelectedLon.data[x+1] > position.x ){
             array_x = x;
             //console.log(x);
         }
     }
-    if(position.x == LatLon.Longitude.data[LatLon.Longitude.data.length-1]){
-        array_x = LatLon.Longitude.data.length-1;
+    if(position.x == SelectedLon.data[SelectedLon.data.length-1]){
+        array_x = SelectedLon.data.length-1;
     }
 
     var array_y;
-    for(var y=0;y<LatLon.Latitude.data.length-1;y++){
-        if(LatLon.Latitude.data[y] <= position.y && LatLon.Latitude.data[y+1] > position.y){
+    for(var y=0;y<SelectedLat.data.length-1;y++){
+        if(SelectedLat.data[y] <= position.y && SelectedLat.data[y+1] > position.y){
             array_y = y;
             //console.log(y);
         }
     }
-    if(position.y == LatLon.Latitude.data[LatLon.Latitude.data.length-1]){
-        array_y = LatLon.Latitude.data.length-1;
+    if(position.y == SelectedLat.data[SelectedLat.data.length-1]){
+        array_y = SelectedLat.data.length-1;
     }
 
     //格子点上の場合
-    if(LatLon.Longitude.data[array_x] == position.x && LatLon.Latitude.data[array_y] == position.y){
+    if(SelectedLon.data[array_x] == position.x && SelectedLat.data[array_y] == position.y){
         var u = arg.data[array_y][array_x];
 
         return(u);
@@ -52,8 +62,8 @@ function interpolateVariable(arg,position)
         return( (1-a)*x + a*y);
     }
 
-    var p0 = new THREE.Vector2(LatLon.Longitude.data[array_x], LatLon.Latitude.data[array_y]);
-    var p1 = new THREE.Vector2(LatLon.Longitude.data[array_x+1], LatLon.Latitude.data[array_y+1]);
+    var p0 = new THREE.Vector2(SelectedLon.data[array_x], SelectedLat.data[array_y]);
+    var p1 = new THREE.Vector2(SelectedLon.data[array_x+1], SelectedLat.data[array_y+1]);
 
     var x = position.x;
     var y = position.y;

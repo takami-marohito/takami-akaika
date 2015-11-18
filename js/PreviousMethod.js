@@ -94,7 +94,8 @@ function PreviousMethod(datenum)
     return jQuery.when.apply(
         $, fn
     ).then(function () {
-            //console.log(interpolateVariable(arguments[0],position));
+            console.log(interpolateVariable(arguments[0],position));
+            //SaveAnArray(arguments[0].data);
             console.log(arguments[0]);
         });
 

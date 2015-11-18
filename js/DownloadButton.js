@@ -24,6 +24,40 @@ function DownloadDataButtonOnClickFunction() {
     link.click();
 }
 
+function SaveAnArray(arr)
+{
+    var OutputString = new Array();
+    console.log(arr[0].length);
+    if(arr[0].length!==undefined) {
+        for (var i = 0; i < arr.length; i++) {
+            for (var j = 0; j < arr[0].length; j++) {
+                OutputString += String(arr[i][j]);
+                if (j != arr[0].length - 1) {
+                    OutputString += ",";
+                }
+                if (j == arr[0].length - 1) {
+                    OutputString += '\n';
+                }
+            }
+        }
+    }
+    if(arr[0].length===undefined){
+        for (var i = 0; i < arr.length; i++) {
+            OutputString += String(arr[i]);
+            if(i != arr.length-1){
+                OutputString += ",";
+            }
+        }
+    }
+    var blob = new Blob([OutputString], {type: 'text/plain'});
+    var link = document.createElement("a");
+    filenameString = "SavedArray" ;
+    link.download = filenameString;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+}
+
+
 function DownloadButtonOnClickFunction() {
     var imgData = map_renderer.domElement.toDataURL();
     imgNode = document.createElement("img");
