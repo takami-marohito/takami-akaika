@@ -381,8 +381,8 @@ function LatLonToMapGrid_Vector3(lon,lat)
         console.log("line vertex has Longitude that is out of range.");
         return vector;
     }
-    var map_lat = Latitude.min * 10.0;
-    map_lat += FromLatToMapGrid(lat) - FromLatToMapGrid(Latitude.min);
+    var map_lat = LatLon.Latitude.min * 10.0;
+    map_lat += FromLatToMapGrid(lat) - FromLatToMapGrid(LatLon.Latitude.min);
     vector = new THREE.Vector3(lon*10.0, map_lat, ocean_z);
     return vector;
 }

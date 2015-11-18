@@ -192,9 +192,9 @@ function draw_polygon(SecondInvariant)
 
 function CreateGeometry(SecondInvariant)
 {
-    var x_grid_org = Longitude.min*10.0;
+    var x_grid_org = LatLon.Longitude.min*10.0;
     var x_grid = x_grid_org;
-    var y_grid = FromLatToMapGrid(Latitude.min);
+    var y_grid = FromLatToMapGrid(LatLon.Latitude.min);
 
     var geometry = new THREE.Geometry();
 
@@ -329,7 +329,8 @@ function setMapRenderer()
 
 function setMapCamera()
 {
-    map_camera = new THREE.OrthographicCamera(Longitude.min*10.0,Longitude.max*10.0,FromLatToMapGrid(Latitude.max),FromLatToMapGrid(Latitude.min), 0.01, 3000);
+    map_camera = new THREE.OrthographicCamera(LatLon.Longitude.min*10.0,LatLon.Longitude.max*10.0,FromLatToMapGrid(LatLon.Latitude.max),FromLatToMapGrid(LatLon.Latitude.min), 0.01, 3000);
+
     //map_camera = new THREE.OrthographicCamera(-500,500,500,-500, 0.01, 3000);
     console.log("change setMapCameraFunction");
     map_camera.position.set(0, 0, 1);
@@ -378,7 +379,7 @@ function setMapMouseEvent()
         }
         var scaled_width = MapGrid.width/map_scale;
         var scaled_height = MapGrid.height/map_scale;
-        var center_Grid = {x:(Longitude.max*10.0+Longitude.min*10.0)/2.0, y:(FromLatToMapGrid(Latitude.max)+FromLatToMapGrid(Latitude.min))/2.0};
+        var center_Grid = {x:(LatLon.Longitude.max*10.0+LatLon.Longitude.min*10.0)/2.0, y:(FromLatToMapGrid(LatLon.Latitude.max)+FromLatToMapGrid(LatLon.Latitude.min))/2.0};
         map_camera = new THREE.OrthographicCamera(center_Grid.x-scaled_width/2.0,center_Grid.x+scaled_width/2.0,center_Grid.y+scaled_height/2.0,center_Grid.y-scaled_height/2.0, 0.01, 3000);
         //console.log(map_camera.top - map_camera.bottom);
         //console.log(map_camera.right-map_camera.left);

@@ -112,9 +112,9 @@ function draw_land()
     ).then(function () {
             var ground = arguments[0];
 
-            var x_grid_org = Longitude.min * 10.0;
+            var x_grid_org = LatLon.Longitude.min * 10.0;
             var x_grid = x_grid_org;
-            var y_grid = Latitude.min * 10.0;
+            var y_grid = LatLon.Latitude.min * 10.0;
             var geometry = new THREE.Geometry();
             for (var y = 0; y < ground.data.length - 1; y++) {
                 for (var x = 0; x < ground.data[0].length - 1; x++) {

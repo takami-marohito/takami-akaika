@@ -86,7 +86,17 @@ function PreviousMethod(datenum)
     SplineParam.push(makeBestSpline(learningData,"V"));
     SplineParam.push(makeBestSpline(learningData,"W"));
 
+    var fn = [];
+    fn.push(loadMOVEdata(datenum, 0, 0, 441, 0, 672, "S"));
 
+    var position = {x:143.5,y:38.28};
+
+    return jQuery.when.apply(
+        $, fn
+    ).then(function () {
+            //console.log(interpolateVariable(arguments[0],position));
+            console.log(arguments[0]);
+        });
 
 
     function splitData(input)

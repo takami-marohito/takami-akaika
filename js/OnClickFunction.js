@@ -76,20 +76,20 @@ function changeButtonText(buttonID,text){
 
 function setLatLonRange()
 {
-    Latitude.min = eval(document.getElementById("LatitudeMinInt").value);
-    Latitude.min += eval(document.getElementById("LatitudeMinDec").value/60.0);
-    Latitude.max = eval(document.getElementById("LatitudeMaxInt").value);
-    Latitude.max += eval(document.getElementById("LatitudeMaxDec").value/60.0);
+    LatLon.User.Latitude.min = eval(document.getElementById("LatitudeMinInt").value);
+    LatLon.User.Latitude.min += eval(document.getElementById("LatitudeMinDec").value/60.0);
+    LatLon.User.Latitude.max = eval(document.getElementById("LatitudeMaxInt").value);
+    LatLon.User.Latitude.max += eval(document.getElementById("LatitudeMaxDec").value/60.0);
 
-    Longitude.min = eval(document.getElementById("LongitudeMinInt").value);
-    Longitude.min += eval(document.getElementById("LongitudeMinDec").value/60.0);
-    Longitude.max = eval(document.getElementById("LongitudeMaxInt").value);
-    Longitude.max += eval(document.getElementById("LongitudeMaxDec").value/60.0);
+    LatLon.User.Longitude.min = eval(document.getElementById("LongitudeMinInt").value);
+    LatLon.User.Longitude.min += eval(document.getElementById("LongitudeMinDec").value/60.0);
+    LatLon.User.Longitude.max = eval(document.getElementById("LongitudeMaxInt").value);
+    LatLon.User.Longitude.max += eval(document.getElementById("LongitudeMaxDec").value/60.0);
 
-    if(Latitude.min > Latitude.max){
+    if(LatLon.User.Latitude.min > LatLon.User.Latitude.max){
         console.log("Latitude min max error");
     }
-    if(Longitude.min > Longitude.max){
+    if(LatLon.User.Longitude.min > LatLon.User.Longitude.max){
         console.log("Longitude min max error");
     }
     return 0;

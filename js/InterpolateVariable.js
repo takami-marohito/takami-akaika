@@ -1,6 +1,10 @@
 /**
  * Created by vizlab on 2015/11/18.
  */
+
+//引数のargはloadMOVEDataのreturnをそのまま入れる
+//positionは.xと.yに緯度経度を入れる
+
 function interpolateVariable(arg,position)
 {
     if(LatLon.Latitude.data[LatLon.Latitude.data.length-1] < position.y || LatLon.Latitude.data[0] > position.y){
@@ -18,6 +22,7 @@ function interpolateVariable(arg,position)
     for(var x=0;x<LatLon.Longitude.data.length-1;x++){
         if(LatLon.Longitude.data[x] <= position.x && LatLon.Longitude.data[x+1] > position.x ){
             array_x = x;
+            //console.log(x);
         }
     }
     if(position.x == LatLon.Longitude.data[LatLon.Longitude.data.length-1]){
@@ -28,6 +33,7 @@ function interpolateVariable(arg,position)
     for(var y=0;y<LatLon.Latitude.data.length-1;y++){
         if(LatLon.Latitude.data[y] <= position.y && LatLon.Latitude.data[y+1] > position.y){
             array_y = y;
+            //console.log(y);
         }
     }
     if(position.y == LatLon.Latitude.data[LatLon.Latitude.data.length-1]){

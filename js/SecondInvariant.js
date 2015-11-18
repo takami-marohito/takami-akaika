@@ -6,8 +6,6 @@
 
 
 var vortex_size = 1;
-var Latitude = {min:0,max:0};
-var Longitude = {min:0,max:0};
 
 function SecondInvariant(Time, Depth)
 {
@@ -55,8 +53,6 @@ function SecondInvariant(Time, Depth)
             return SecondInvariant;
         });
 }
-
-
 
 //m_object has three object u,v,w
 //m_object.u.time, m_object.u.depth, m_object.u.type, m_object.u.data[y][x]
