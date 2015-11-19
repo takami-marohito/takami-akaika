@@ -51,7 +51,7 @@ var Konishi_CreateArray_ReturnObject = {};
 var Konishi_PartObject = new Array();
 
 function Konishi_CreateArray(input_array,dateNum){
-    console.log(input_array.length);
+    //console.log(input_array.length);
     var exec_function = [];
     var namelengtharray = new Array(1);
     namelengtharray[0] = 0;
@@ -74,7 +74,7 @@ function Konishi_CreateArray(input_array,dateNum){
             namelengtharray[counter]++;
         }
     }
-    console.log(namelengtharray);
+    //console.log(namelengtharray);
 
     for(var i=0;i<input_array.length;i++) {
         var name = input_array[i][0];

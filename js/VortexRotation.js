@@ -153,22 +153,22 @@ function VortexRotation(Time, Depth, Range)
 
             for (var i = 0; i < inputlonlat.length; i++) {
                 //Gridは等間隔でないのでひとつずつ見ていく必要があるはず
-                for (var x = 0; x < LatLon.Longitude.data.length - 1; x++) {
-                    if (LatLon.Longitude.data[x] <= inputlonlat[i].x && LatLon.Longitude.data[x + 1] > inputlonlat[i].x) {
+                for (var x = 0; x < LatLon.LongitudeU.data.length - 1; x++) {
+                    if (LatLon.LongitudeU.data[x] <= inputlonlat[i].x && LatLon.LongitudeU.data[x + 1] > inputlonlat[i].x) {
                         array_x = x;
                     }
                 }
-                if (inputlonlat[i].x == LatLon.Longitude.data[LatLon.Longitude.data.length - 1]) {
-                    array_x = LatLon.Longitude.data.length - 1;
+                if (inputlonlat[i].x == LatLon.LongitudeU.data[LatLon.LongitudeU.data.length - 1]) {
+                    array_x = LatLon.LongitudeU.data.length - 1;
                 }
 
-                for (var y = 0; y < LatLon.Latitude.data.length - 1; y++) {
-                    if (LatLon.Latitude.data[y] <= inputlonlat[i].y && LatLon.Latitude.data[y + 1] > inputlonlat[i].y) {
+                for (var y = 0; y < LatLon.LatitudeU.data.length - 1; y++) {
+                    if (LatLon.LatitudeU.data[y] <= inputlonlat[i].y && LatLon.LatitudeU.data[y + 1] > inputlonlat[i].y) {
                         array_y = y;
                     }
                 }
-                if (inputlonlat[i].y == LatLon.Latitude.data[LatLon.Latitude.data.length - 1]) {
-                    array_y = LatLon.Latitude.data.length - 1;
+                if (inputlonlat[i].y == LatLon.LatitudeU.data[LatLon.LatitudeU.data.length - 1]) {
+                    array_y = LatLon.LatitudeU.data.length - 1;
                 }
                 //console.log("("+inputlonlat[i].x+","+inputlonlat[i].y+") = "+returnObject.data[array_y][array_x]);
             }
@@ -267,13 +267,13 @@ function beforePosition(position, velocity)
 
 function interpolateVelocity(position)
 {
-    if(LatLon.Latitude.data[LatLon.Latitude.data.length-1] < position.y || LatLon.Latitude.data[0] > position.y){
+    if(LatLon.LatitudeU.data[LatLon.LatitudeU.data.length-1] < position.y || LatLon.LatitudeU.data[0] > position.y){
         //console.log("this latitude is out of range.");
         var u = 0;
         var v = 0;
         return({x:u,y:v})
     }
-    if(LatLon.Longitude.data[LatLon.Longitude.data.length-1] < position.x || LatLon.Longitude.data[0] > position.x){
+    if(LatLon.LongitudeU.data[LatLon.LongitudeU.data.length-1] < position.x || LatLon.LongitudeU.data[0] > position.x){
         //console.log("this longitude is out of MOVE data range.");
         var u = 0;
         var v = 0;
@@ -283,27 +283,27 @@ function interpolateVelocity(position)
 
     //Gridは等間隔でないのでひとつずつ見ていく必要があるはず
     var array_x;
-    for(var x=0;x<LatLon.Longitude.data.length-1;x++){
-        if(LatLon.Longitude.data[x] <= position.x && LatLon.Longitude.data[x+1] > position.x ){
+    for(var x=0;x<LatLon.LongitudeU.data.length-1;x++){
+        if(LatLon.LongitudeU.data[x] <= position.x && LatLon.LongitudeU.data[x+1] > position.x ){
             array_x = x;
         }
     }
-    if(position.x == LatLon.Longitude.data[LatLon.Longitude.data.length-1]){
-        array_x = LatLon.Longitude.data.length-1;
+    if(position.x == LatLon.LongitudeU.data[LatLon.LongitudeU.data.length-1]){
+        array_x = LatLon.LongitudeU.data.length-1;
     }
 
     var array_y;
-    for(var y=0;y<LatLon.Latitude.data.length-1;y++){
-        if(LatLon.Latitude.data[y] <= position.y && LatLon.Latitude.data[y+1] > position.y){
+    for(var y=0;y<LatLon.LatitudeU.data.length-1;y++){
+        if(LatLon.LatitudeU.data[y] <= position.y && LatLon.LatitudeU.data[y+1] > position.y){
             array_y = y;
         }
     }
-    if(position.y == LatLon.Latitude.data[LatLon.Latitude.data.length-1]){
-        array_y = LatLon.Latitude.data.length-1;
+    if(position.y == LatLon.LatitudeU.data[LatLon.LatitudeU.data.length-1]){
+        array_y = LatLon.LatitudeU.data.length-1;
     }
 
     //格子点上の場合
-    if(LatLon.Longitude.data[array_x] == position.x && LatLon.Latitude.data[array_y] == position.y){
+    if(LatLon.LongitudeU.data[array_x] == position.x && LatLon.LatitudeU.data[array_y] == position.y){
         var u = VortexRotation_matrix.u.data[array_y][array_x];
         var v = VortexRotation_matrix.v.data[array_y][array_x];
         return({x:u,y:v});
@@ -314,8 +314,8 @@ function interpolateVelocity(position)
         return( (1-a)*x + a*y);
     }
 
-    var p0 = new THREE.Vector2(LatLon.Longitude.data[array_x], LatLon.Latitude.data[array_y]);
-    var p1 = new THREE.Vector2(LatLon.Longitude.data[array_x+1], LatLon.Latitude.data[array_y+1]);
+    var p0 = new THREE.Vector2(LatLon.LongitudeU.data[array_x], LatLon.LatitudeU.data[array_y]);
+    var p1 = new THREE.Vector2(LatLon.LongitudeU.data[array_x+1], LatLon.LatitudeU.data[array_y+1]);
 
     var x = position.x;
     var y = position.y;
@@ -373,16 +373,16 @@ function interpolateVelocity(position)
 function LatLonToMapGrid_Vector3(lon,lat)
 {
     var vector = new THREE.Vector3();
-    if(LatLon.Latitude.data[LatLon.Latitude.data.length-1] < lat || LatLon.Latitude.data[0] > lat){
+    if(LatLon.LatitudeU.data[LatLon.LatitudeU.data.length-1] < lat || LatLon.LatitudeU.data[0] > lat){
         console.log("line vertex has latitude that is out of range.");
         return vector;
     }
-    if(LatLon.Longitude.data[LatLon.Longitude.data.length-1] < lon || LatLon.Longitude.data[0] > lon){
+    if(LatLon.LongitudeU.data[LatLon.LongitudeU.data.length-1] < lon || LatLon.LongitudeU.data[0] > lon){
         console.log("line vertex has Longitude that is out of range.");
         return vector;
     }
-    var map_lat = LatLon.Latitude.min * 10.0;
-    map_lat += FromLatToMapGrid(lat) - FromLatToMapGrid(LatLon.Latitude.min);
+    var map_lat = LatLon.LatitudeU.min * 10.0;
+    map_lat += FromLatToMapGrid(lat) - FromLatToMapGrid(LatLon.LatitudeU.min);
     vector = new THREE.Vector3(lon*10.0, map_lat, ocean_z);
     return vector;
 }
@@ -437,8 +437,8 @@ function InitPositionVelocity(arguments)
     for (var i = 0; i < VortexRotation_matrix.height; i++) {
         for (var j = 0; j < VortexRotation_matrix.width; j++) {
             var pos = {};
-            pos.x = LatLon.Longitude.data[j];
-            pos.y = LatLon.Latitude.data[i];
+            pos.x = LatLon.LongitudeU.data[j];
+            pos.y = LatLon.LatitudeU.data[i];
             position[2][i][j] = new THREE.Vector3(pos.x, pos.y, 0);
             velocity[3][i][j] = new THREE.Vector3(VortexRotation_matrix.u.data[i][j], VortexRotation_matrix.v.data[i][j], 0);
             velocity[2][i][j] = new THREE.Vector3(arguments[3].data[i][j], arguments[4].data[i][j], 0);
