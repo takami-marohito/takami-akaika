@@ -87,18 +87,75 @@ function PreviousMethod(datenum)
     SplineParam.push(makeBestSpline(learningData,"W"));
 
     var fn = [];
-    fn.push(loadMOVEdata(datenum, 0, 0, 441, 0, 672, "S"));
-
-    var position = {x:143.5,y:38.28};
+    fn.push(loadMOVEdata(datenum, SplineParam[0].depth, 0, 441, 0, 672, "S"));
+    fn.push(loadMOVEdata(datenum, SplineParam[1].depth, 0, 441, 0, 672, "T"));
+    fn.push(loadMOVEdata(datenum, SplineParam[2].depth, 0, 441, 0, 672, "U"));
+    fn.push(loadMOVEdata(datenum, SplineParam[3].depth, 0, 441, 0, 672, "V"));
+    fn.push(loadMOVEdata(datenum, SplineParam[4].depth, 0, 441, 0, 672, "W"));
 
     return jQuery.when.apply(
         $, fn
     ).then(function () {
-            console.log(interpolateVariable(arguments[0],position));
+            //var position = {x:143.5,y:38.28};
+            //console.log(interpolateVariable(arguments[0],position));
             //SaveAnArray(arguments[0].data);
-            console.log(arguments[0]);
+            return(makeHSIfromSplineParam(arguments,SplineParam));
         });
 
+    function makeHSIfromSplineParam(MOVEdata,SplineParam)
+    {
+        //SaveAnArray(SplineParam[0].params);
+        var valS = MOVEdata[0];
+        var valT = MOVEdata[1];
+        var valU = MOVEdata[2];
+        var valV = MOVEdata[3];
+        var valW = MOVEdata[4];
+
+        var mapS = {data:valS.data};
+        var mapT = {data:valT.data};
+        var mapU = {data:valU.data};
+        var mapV = {data:valV.data};
+        var mapW = {data:valW.data};
+
+        var map = {data:new Array(mapS.data.length)};
+        for(var i=0;i<mapS.data.length;i++){
+            map.data[i] = new Array(mapS.data[0].length);
+            for(var j=0;j<mapS.data[0].length;j++){
+                map.data[i][j] = 1;
+            }
+        }
+
+        for(var i=0;i<mapS.data.length;i++){
+            for(var j=0;j<mapS.data[0].length;j++){
+                var s = calcCPUEFromSplineParams(SplineParam[0],mapS.data[i][j]);
+                var t = calcCPUEFromSplineParams(SplineParam[1],mapT.data[i][j]);
+                var u = calcCPUEFromSplineParams(SplineParam[2],mapU.data[i][j]);
+                var v = calcCPUEFromSplineParams(SplineParam[3],mapV.data[i][j]);
+                var w = calcCPUEFromSplineParams(SplineParam[4],mapW.data[i][j]);
+                if(s>0){
+                    map.data[i][j]*=s;
+                }
+                if(t>0){
+                    map.data[i][j]*=t;
+                }
+                if(u>0){
+                    map.data[i][j]*=u;
+                }
+                if(v>0){
+                    map.data[i][j]*=v;
+                }
+                if(w>0){
+                    map.data[i][j]*=w;
+                }
+            }
+        }
+        for(var i=0;i<mapS.data.length;i++) {
+            for (var j = 0; j < mapS.data[0].length; j++) {
+                map.data[i][j] = Math.sqrt(map.data[i][j]);
+            }
+        }
+        return map;
+    }
 
     function splitData(input)
     {

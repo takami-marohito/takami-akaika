@@ -1,7 +1,10 @@
 /**
+ * Created by vizlab on 2015/11/19.
+ */
+/**
  * Created by vizlab on 2015/09/25.
  */
-function KonishiMethod(dateNum) {
+function KonishiMethodTime(dateNum) {
     fileurl = URL.createObjectURL(document.getElementById("KonishiFilename").files[0]);
     //console.log(fileurl);
 
@@ -74,12 +77,13 @@ function KonishiMethod(dateNum) {
                 namelengtharray[counter]++;
             }
         }
-        //console.log(namelengtharray);
+        console.log(namelengtharray);
 
         for (var i = 0; i < input_array.length; i++) {
             var name = input_array[i][0];
             var depth = Number(input_array[i][1]);
-            exec_function.push(loadMOVEdata(dateNum, depth, 0, 441, 0, 672, name));
+            var date = dateNum - Number(input_array[i][3]);
+            exec_function.push(loadMOVEdata(date, depth, 0, 441, 0, 672, name));
         }
 
         return jQuery.when.apply(
@@ -123,8 +127,8 @@ function KonishiMethod(dateNum) {
                 }
                 avg = avg / (j * k);
                 console.log("avg=" + avg);
-                //console.log(Konishi_CreateArray_ReturnObject.data[80][159]);
-                //console.log(Konishi_CreateArray_ReturnObject.data[80]);
+                console.log(Konishi_CreateArray_ReturnObject.data[80][159]);
+                console.log(Konishi_CreateArray_ReturnObject.data[80]);
                 return Konishi_CreateArray_ReturnObject;
             });
     }
@@ -163,6 +167,10 @@ function KonishiMethod(dateNum) {
                     object.data[i][j] += coef * Math.log(Math.abs(array[i][j]));
                 } else {
                     object.data[i][j] += coef * (-5);
+                }
+                if (i == 80 && j == 159) {
+                    console.log(array[i][j]);
+                    console.log(coef * Math.log(Math.abs(array[i][j])));
                 }
             }
         }

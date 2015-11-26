@@ -110,17 +110,17 @@ function draw_line(Data)
 
 function draw_points()
 {
-    if(document.getElementById("EveryPoints").checked) {
-        var min = 100;
-        var max = -100;
-        for (var i = 0; i < CPUE_Value.length; i++) {
-            if (CPUE_Value[i] < min) {
-                min = CPUE_Value[i];
-            }
-            if (CPUE_Value[i] > max) {
-                max = CPUE_Value[i];
-            }
+    var min = 100;
+    var max = -100;
+    for (var i = 0; i < CPUE_Value.length; i++) {
+        if (CPUE_Value[i] < min) {
+            min = CPUE_Value[i];
         }
+        if (CPUE_Value[i] > max) {
+            max = CPUE_Value[i];
+        }
+    }
+    if(document.getElementById("EveryPoints").checked) {
         var material = new THREE.PointCloudMaterial({size: 10, transparent: false, vertexColors: THREE.VertexColors});
         //var material = new THREE.PointCloudMaterial({size:10,color:0xffffff});
         var pointsgeometry = new THREE.Geometry();
@@ -134,19 +134,6 @@ function draw_points()
         var points = new THREE.PointCloud(pointsgeometry, material);
         map_scene.add(points);
     }else{
-        var min = 100;
-        var max = -100;
-        for (var i = 0; i < CPUE_Value.length; i++) {
-            //console.log(CPUE_Date.year[i] + "-" + ("0"+CPUE_Date.month[i]).slice(-2) + "-" + ("0"+CPUE_Date.day[i]).slice(-2));
-            if(DateToArrayNum(document.getElementById("SecondInvariantDate_input").value) == DateToArrayNum(CPUE_Date.year[i] + "-" + ("0"+CPUE_Date.month[i]).slice(-2) + "-" + ("0"+CPUE_Date.day[i]).slice(-2))) {
-                if (CPUE_Value[i] < min) {
-                    min = CPUE_Value[i];
-                }
-                if (CPUE_Value[i] > max) {
-                    max = CPUE_Value[i];
-                }
-            }
-        }
         var material = new THREE.PointCloudMaterial({size: 10, transparent: false, vertexColors: THREE.VertexColors});
         //var material = new THREE.PointCloudMaterial({size:10,color:0xffffff});
         var pointsgeometry = new THREE.Geometry();
