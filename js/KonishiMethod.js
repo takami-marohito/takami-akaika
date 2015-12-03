@@ -86,6 +86,14 @@ function KonishiMethod(dateNum) {
             $, exec_function
         ).then(function () {
                 InitKonishi_ReturnObject(arguments[0].data.length, arguments[0].data[0].length, namelengtharray.length);
+                var PowNumber = new Array(Konishi_PartObject[0].data.length);
+                for(var i=0;i<Konishi_PartObject[0].data.length;i++){
+                    PowNumber[i] = new Array(Konishi_PartObject[0].data[0].length);
+                    for(var j=0;j<Konishi_PartObject[0].data[0].length;j++){
+                        PowNumber[i][j] = 0;
+                    }
+                }
+
 
                 var nth = 0;
                 for (var i = 0; i < namelengtharray.length; i++) {
@@ -100,6 +108,7 @@ function KonishiMethod(dateNum) {
                             if (Konishi_PartObject[i].data[j][k] < 0) {
                                 //0以下なら相乗平均に加えない
                             } else {
+                                PowNumber[j][k] = PowNumber[j][k] + 1;
                                 Konishi_CreateArray_ReturnObject.data[j][k] = Konishi_CreateArray_ReturnObject.data[j][k] * Konishi_PartObject[i].data[j][k];
                             }
                         }
@@ -109,7 +118,7 @@ function KonishiMethod(dateNum) {
                 for (var j = 0; j < Konishi_PartObject[0].data.length; j++) {
                     for (var k = 0; k < Konishi_PartObject[0].data[0].length; k++) {
                         if (Konishi_CreateArray_ReturnObject.data[j][k] > 0) {
-                            Konishi_CreateArray_ReturnObject.data[j][k] = Math.sqrt(Konishi_CreateArray_ReturnObject.data[j][k]);
+                            Konishi_CreateArray_ReturnObject.data[j][k] = Math.pow(Konishi_CreateArray_ReturnObject.data[j][k],1.0/PowNumber[j][k]);
                         } else {
                             Konishi_CreateArray_ReturnObject.data[j][k] = -1;
                         }

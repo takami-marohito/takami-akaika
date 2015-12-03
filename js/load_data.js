@@ -35,7 +35,9 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
     if(DEBUG==1) {
         //console.log("load_data start\n");
     }
-    var dap_line = "http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?";
+    //var dap_line = "http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/dods/secret/MOVE-RA2014.dods?";
+    //var dap_line = "http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?";
+    var dap_line = "http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/thredds/dodsC/DIAS/MOVE-RA2014.dods?";
     dap_line+=arg_string;
     dap_line+="[" + arg_time + "]";
     dap_line+="[" + arg_depth + "]";

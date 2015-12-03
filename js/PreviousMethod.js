@@ -2,6 +2,9 @@
  * Created by vizlab on 2015/11/09.
  */
 
+//従来手法ではS,T,U,V,Wそれぞれを使って、CPUEをスプライン曲線で近似する
+    //そのとき、パラメータは深さとスプライン係数がある
+    //それを全パターン試して最適化する
 
 //year month day lat lon cpue hm hg s00-s53 t00-t53 ... のファイルを読み込む
 
@@ -73,8 +76,8 @@ function PreviousMethod(datenum)
             break;
         }
     }
-    for(var i=0;i<PreCPUE.data.length;i++){
-        AvgLearningDataCPUE += PreCPUE.data[i][cpuenum] / PreCPUE.data.length;
+    for(var i=0;i<learningData.data.length;i++){
+        AvgLearningDataCPUE += learningData.data[i][cpuenum] / learningData.data.length;
     }
 
     //console.log(AvgLearningDataCPUE);
@@ -99,10 +102,10 @@ function PreviousMethod(datenum)
             //var position = {x:143.5,y:38.28};
             //console.log(interpolateVariable(arguments[0],position));
             //SaveAnArray(arguments[0].data);
-            return(makeHSIfromSplineParam(arguments,SplineParam));
+            return(makeHSIfromSplineParam(arguments,SplineParam,testData));
         });
 
-    function makeHSIfromSplineParam(MOVEdata,SplineParam)
+    function makeHSIfromSplineParam(MOVEdata,SplineParam,testData)
     {
         //SaveAnArray(SplineParam[0].params);
         var valS = MOVEdata[0];
@@ -125,6 +128,8 @@ function PreviousMethod(datenum)
             }
         }
 
+        checkCorrectRateHSI(SplineParam,testData);
+
         for(var i=0;i<mapS.data.length;i++){
             for(var j=0;j<mapS.data[0].length;j++){
                 var s = calcCPUEFromSplineParams(SplineParam[0],mapS.data[i][j]);
@@ -132,40 +137,77 @@ function PreviousMethod(datenum)
                 var u = calcCPUEFromSplineParams(SplineParam[2],mapU.data[i][j]);
                 var v = calcCPUEFromSplineParams(SplineParam[3],mapV.data[i][j]);
                 var w = calcCPUEFromSplineParams(SplineParam[4],mapW.data[i][j]);
-                if(s>0){
-                    map.data[i][j]*=s;
-                }
-                if(t>0){
-                    map.data[i][j]*=t;
-                }
-                if(u>0){
-                    map.data[i][j]*=u;
-                }
-                if(v>0){
-                    map.data[i][j]*=v;
-                }
-                if(w>0){
-                    map.data[i][j]*=w;
+                if(s != SpecialColorValue && t!=SpecialColorValue && u!=SpecialColorValue && v!= SpecialColorValue && w!= SpecialColorValue){
+                    map.data[i][j] = s*t*u*v*w;
+                }else{
+                    map.data[i][j] = SpecialColorValue;
                 }
             }
         }
         for(var i=0;i<mapS.data.length;i++) {
             for (var j = 0; j < mapS.data[0].length; j++) {
-                map.data[i][j] = Math.sqrt(map.data[i][j]);
+                if(map.data[i][j] != SpecialColorValue){
+                    map.data[i][j] = Math.pow(map.data[i][j],0.2);
+                }
             }
         }
         return map;
+    }
+
+    function checkCorrectRateHSI(SplineParam,testData)
+    {
+        var count = 0;
+        var count2 = 0;
+        console.log("Avg " + AvgLearningDataCPUE);
+        for(var i=0;i<testData.data.length;i++){
+            var depth = SplineParam[0].valnum;
+            var s = calcCPUEFromSplineParams(SplineParam[0],testData.data[i][depth]);
+            depth = SplineParam[1].valnum;
+            var t = calcCPUEFromSplineParams(SplineParam[1],testData.data[i][depth]);
+            depth = SplineParam[2].valnum;
+            var u = calcCPUEFromSplineParams(SplineParam[2],testData.data[i][depth]);
+            depth = SplineParam[3].valnum;
+            var v = calcCPUEFromSplineParams(SplineParam[3],testData.data[i][depth]);
+            depth = SplineParam[4].valnum;
+            var w = calcCPUEFromSplineParams(SplineParam[4],testData.data[i][depth]);
+            //console.log("s " + s);
+            //console.log("t " + t);
+            var PredictCPUE = Math.pow(s*t*u*v*w,0.2);
+            //console.log("PredictHSI " + PredictCPUE);
+            //console.log("testdata " + testData.data[i][cpuenum]);
+            if(PredictCPUE > AvgLearningDataCPUE){
+                if(testData.data[i][cpuenum] > AvgLearningDataCPUE){
+                    count++;
+                }else{
+                    count2++;
+                }
+            }
+            if(PredictCPUE < AvgLearningDataCPUE){
+                if(testData.data[i][cpuenum] < AvgLearningDataCPUE){
+                    count++;
+                }else{
+                    count2++;
+                }
+            }
+        }
+        console.log("Correct Rate of HSI : " + count / testData.data.length);
+        //console.log(count2);
     }
 
     function splitData(input)
     {
         testData.name = input.name;
         learningData.name = input.name;
+        var count = 0;
+        var count2 = 0;
+        console.log("データの奇数番目をテストデータにした");
         for(var i=0;i<input.data.length;i++){
-            if(i%2==0){
-                learningData.data[i/2] = input.data[i];
+            if(i%2==1){
+                learningData.data[count] = input.data[i];
+                count++;
             }else{
-                testData.data[(i-1)/2] = input.data[i];
+                testData.data[count2] = input.data[i];
+                count2++;
             }
         }
     }
@@ -180,7 +222,7 @@ function PreviousMethod(datenum)
     {
         var bestparam;
         var correctrate = 0;
-        for(var i=0.1;i<0.9;i=i+0.1){
+        for(var i=0.01;i<0.95;i=i+0.01){
             for(var depth=0;depth<30;depth++){
                 var param = makeSpline(data, name, i, depth);
                 //console.log(param);
@@ -226,6 +268,11 @@ function PreviousMethod(datenum)
 
     function calcCPUEFromSplineParams(params,v)
     {
+        //特定の値の処理
+        if(v<-1000.0){
+            return SpecialColorValue;
+        }
+
         var i = d3.bisectRight(params.x, v) - 1;
         if (i < 0) {
             return params.params[0][3];
