@@ -48,16 +48,21 @@ function SelectVariableEvent()
             DisplayParameter(input);
         }
         if(target2.value == "KonishiMethod"){
-            document.getElementById("CalculatedMapData").innerHTML="";
-            document.getElementById("Filename").style.display="none";
-            document.getElementById("CalculatedLineData").innerHTML="";
-            document.getElementById("LineFilename").style.display="none";
-            document.getElementById("SecondInvariantDate").style.display="";
-            document.getElementById("DownloadDateRange").style.display="none";
-            document.getElementById("DrawLine").style.display="none";
-            document.getElementById("KonishiFilename").style.display="";
-            document.getElementById("KonishiFilenametext").innerHTML="ResultFile";
-            document.getElementById("CalcLonRange").style.display="";
+            input = new Array(13);
+            input[0] = "";
+            input[1] = "none";
+            input[2] = "";
+            input[3] = "none";
+            input[4] = "";
+            input[5] = "none";
+            input[6] = "none";
+            input[7] = "";
+            input[8] = "ResultFile";
+            input[9] = "none";
+            input[10] = "none";
+            input[11] = "";
+            input[12] = "none";
+            DisplayParameter(input);
         }
         if(target2.value == "PreviousMethod"){
             input = new Array(13);
@@ -74,6 +79,23 @@ function SelectVariableEvent()
             input[10] = "";
             input[11] = "CPUEFile";
             input[12] = "";
+            DisplayParameter(input);
+        }
+        if(target2.value == "CalcData"){
+            input = new Array(13);
+            input[0] = "CPUEFile";
+            input[1] = "";
+            input[2] = "";
+            input[3] = "none";
+            input[4] = "none";
+            input[5] = "none";
+            input[6] = "none";
+            input[7] = "none";
+            input[8] = "";
+            input[9] = "none";
+            input[10] = "none";
+            input[11] = "";
+            input[12] = "none";
             DisplayParameter(input);
         }
     });

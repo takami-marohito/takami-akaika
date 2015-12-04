@@ -32,7 +32,8 @@ function interpolateVariable(arg,position)
     for(var x=0;x<SelectedLon.data.length-1;x++){
         if(SelectedLon.data[x] <= position.x && SelectedLon.data[x+1] > position.x ){
             array_x = x;
-            //console.log(x);
+            //console.log(SelectedLon.data[x] + "<" + " x : " + position.x + " < " + SelectedLon.data[x+1]);
+            //console.log("x:" + x);
         }
     }
     if(position.x == SelectedLon.data[SelectedLon.data.length-1]){
@@ -43,7 +44,8 @@ function interpolateVariable(arg,position)
     for(var y=0;y<SelectedLat.data.length-1;y++){
         if(SelectedLat.data[y] <= position.y && SelectedLat.data[y+1] > position.y){
             array_y = y;
-            //console.log(y);
+            //console.log(SelectedLat.data[y] + "<" + " y : " + position.y + " < " + SelectedLat.data[y+1]);
+            //console.log("y:" + y);
         }
     }
     if(position.y == SelectedLat.data[SelectedLat.data.length-1]){
@@ -73,11 +75,12 @@ function interpolateVariable(arg,position)
     var y1 = p1.y;
     var s = ( x - x0 ) / ( x1 - x0 );
     var t = ( y - y0 ) / ( y1 - y0 );
-
+console.log(array_y + " " + array_x);
     var u_00 = arg.data[array_y][array_x];
     var u_01 = arg.data[array_y][array_x+1];
     var u_10 = arg.data[array_y+1][array_x];
     var u_11 = arg.data[array_y+1][array_x+1];
+    console.log(u_00 + " , " + u_01 + " , " + u_10 + " , " + u_11 + "  この4点で補間");
     if(u_00 < -1.0e+10){
         u_00 = 0;
     }

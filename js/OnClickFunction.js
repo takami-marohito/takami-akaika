@@ -15,19 +15,65 @@ PointData = new Array();
 
 CalcData = new Array();
 
+PreviousMethodAvgLearningDataCPUE = 0;
+
 function OnClickFunctionAutoRange(){
     if(CalcData.length == 0){
         console.log("This button can be used after drawing map");
         return;
     }
+    var target = document.getElementById("VariableMode");
+    if(target.value == "PreviousMethod") {
+        console.log("SetAvgLearningDataColorToGreen");
+        setCenterColorToGreen();
+        return CalcData;
+    }
+    if(target.value == "KonishiMethod") {
+        console.log("SetCenterTo1.5");
+        setCenterKonishi();
+        return CalcData;
+    }
+
     leg = {min:0,max:0};
     leg = autodetectingMinMax(260,290,220,240);//だいたいこの範囲が目的の範囲
-    document.forms.ColorLegendRange.Min.value = leg.min;
-    document.forms.ColorLegendRange.Max.value = leg.max;
-    changeColorRangeMinMax(leg.min,leg.max);
+    document.forms.ColorLegendRange.Min.value = leg.min.toFixed(3);
+    document.forms.ColorLegendRange.Max.value = leg.max.toFixed(3);
+    changeColorRangeMinMax(Number(leg.min.toFixed(3)),Number(leg.max.toFixed(3)));
     draw_map(CalcData);
     addColorLegend_Horizontal();
     return CalcData;
+
+    function setCenterKonishi()
+    {
+        leg = {min:0,max:0};
+        leg = autodetectingMinMax(260,290,220,240);
+        document.forms.ColorLegendRange.Min.value = leg.min.toFixed(3);
+        var avg = 1.5;
+        var min = Number(leg.min.toFixed(3));
+        var max = Number(avg) + Number(avg-min);
+        document.forms.ColorLegendRange.Max.value = max;
+        changeColorRangeMinMax(min,max);
+        draw_map(CalcData);
+        addColorLegend_Horizontal();
+        return CalcData;
+    }
+
+
+    function setCenterColorToGreen()
+    {
+        leg = {min:0,max:0};
+        leg = autodetectingMinMax(260,290,220,240);
+        document.forms.ColorLegendRange.Max.value = leg.max.toFixed(3);
+
+        var avg = Number(PreviousMethodAvgLearningDataCPUE.toFixed(3));
+        var max = Number(leg.max.toFixed(3));
+        var min = Number(avg) - Number(max-avg);
+        document.forms.ColorLegendRange.Min.value = min;
+        changeColorRangeMinMax(min,max);
+        draw_map(CalcData);
+        addColorLegend_Horizontal();
+        return CalcData;
+    }
 }
 
 function OnClickFunctionApply(){
@@ -35,8 +81,8 @@ function OnClickFunctionApply(){
        console.log("This button can be used after drawing map");
        return;
    }
-    min = eval(document.forms.ColorLegendRange.Min.value);
-    max = eval(document.forms.ColorLegendRange.Max.value);
+    var min = eval(document.forms.ColorLegendRange.Min.value);
+    var max = eval(document.forms.ColorLegendRange.Max.value);
     changeButtonText("button_change_value","changing");
     changeColorRangeMinMax(min,max);
     draw_map(CalcData);
@@ -145,6 +191,10 @@ function CalcVariable()
             });
         }
         exec_function.push(PreviousMethod(dateNum));
+    }
+
+    if(target.value == "CalcData"){
+        CalculatingData();
     }
 
     //console.log(exec_function);

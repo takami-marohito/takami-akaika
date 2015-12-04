@@ -1,6 +1,8 @@
 /**
  * Created by vizlab on 2015/09/25.
  */
+
+
 function KonishiMethod(dateNum) {
     fileurl = URL.createObjectURL(document.getElementById("KonishiFilename").files[0]);
     //console.log(fileurl);
@@ -15,6 +17,9 @@ function KonishiMethod(dateNum) {
             async: false
         })
     );
+
+    var Konishi_CreateArray_ReturnObject = {};
+    var Konishi_PartObject = new Array();
 
     return jQuery.when.apply(
         $, testfunction
@@ -32,8 +37,8 @@ function KonishiMethod(dateNum) {
             }
 
             var exec_function = [];
-
             exec_function.push(Konishi_CreateArray(csvData, dateNum));
+
 
             return jQuery.when.apply(
                 $, exec_function
@@ -47,8 +52,7 @@ function KonishiMethod(dateNum) {
         });
 
 
-    var Konishi_CreateArray_ReturnObject = {};
-    var Konishi_PartObject = new Array();
+    var ValidMap;
 
     function Konishi_CreateArray(input_array, dateNum) {
         //console.log(input_array.length);
@@ -85,6 +89,8 @@ function KonishiMethod(dateNum) {
         return jQuery.when.apply(
             $, exec_function
         ).then(function () {
+                //var loc = {x:142.02,y:38.35};
+                //console.log(interpolateVariable(arguments[4],loc));
                 InitKonishi_ReturnObject(arguments[0].data.length, arguments[0].data[0].length, namelengtharray.length);
                 var PowNumber = new Array(Konishi_PartObject[0].data.length);
                 for(var i=0;i<Konishi_PartObject[0].data.length;i++){
@@ -93,12 +99,20 @@ function KonishiMethod(dateNum) {
                         PowNumber[i][j] = 0;
                     }
                 }
+                ValidMap = new Array(Konishi_PartObject[0].data.length);
+                for(var i=0;i<Konishi_PartObject[0].data.length;i++){
+                    ValidMap[i] = new Array(Konishi_PartObject[0].data[0].length);
+                    for(var j=0;j<Konishi_PartObject[0].data[0].length;j++){
+                        ValidMap[i][j] = 0;
+                    }
+                }
 
 
                 var nth = 0;
                 for (var i = 0; i < namelengtharray.length; i++) {
                     for (var j = 0; j < namelengtharray[i]; j++) {
-                        Konishi_OneVariableOneStepFunction(Konishi_PartObject[i], arguments[nth].data, input_array[i][2]);
+                        //console.log("namelengtharray " + i + " , " + "input_array " + input_array[nth][2]);
+                        Konishi_OneVariableOneStepFunction(Konishi_PartObject[i], arguments[nth].data, input_array[nth][2]);
                         nth++;
                     }
                 }
@@ -127,6 +141,9 @@ function KonishiMethod(dateNum) {
                         }
                         if (Konishi_CreateArray_ReturnObject.data[j][k] > 0) {
                             avg += Konishi_CreateArray_ReturnObject.data[j][k];
+                        }
+                        if(ValidMap[j][k] == 1){
+                            Konishi_CreateArray_ReturnObject.data[j][k] = -1;
                         }
                     }
                 }
@@ -166,7 +183,8 @@ function KonishiMethod(dateNum) {
     function Konishi_OneVariableOneStepFunction(object, array, coef) {
         for (var i = 0; i < array.length; i++) {
             for (var j = 0; j < array[0].length; j++) {
-                if (Math.abs(array[i][j]) > 1.0e+10) {
+                if (Math.abs(array[i][j]) > 10000) {
+                    ValidMap[i][j] = 1;
                     //データが取得できない場合は +0する
                 } else if (Math.abs(array[i][j]) > 0.00001) {
                     object.data[i][j] += coef * Math.log(Math.abs(array[i][j]));

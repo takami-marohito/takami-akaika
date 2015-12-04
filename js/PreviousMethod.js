@@ -79,6 +79,8 @@ function PreviousMethod(datenum)
     for(var i=0;i<learningData.data.length;i++){
         AvgLearningDataCPUE += learningData.data[i][cpuenum] / learningData.data.length;
     }
+    PreviousMethodAvgLearningDataCPUE = AvgLearningDataCPUE;
+
 
     //console.log(AvgLearningDataCPUE);
 
@@ -200,9 +202,9 @@ function PreviousMethod(datenum)
         learningData.name = input.name;
         var count = 0;
         var count2 = 0;
-        console.log("データの奇数番目をテストデータにした");
+        console.log("データの奇数番目を学習データにした");
         for(var i=0;i<input.data.length;i++){
-            if(i%2==1){
+            if(i%2==0){
                 learningData.data[count] = input.data[i];
                 count++;
             }else{
@@ -370,6 +372,7 @@ function PreviousMethod(datenum)
         var returnParam = {params:params,x:pickupval,y:pickupcpue,valnum:valnum,lambda:lambda,depth:depth};
         return returnParam;
     }
+
 
     function smoothingSpline(x,y,sigma,lambda)
     {

@@ -35,6 +35,7 @@
 
     <script type="text/javascript" src="js/InterpolateVariable.js"></script>
     <script type="text/javascript" src="js/KonishiMethodTime.js"></script>
+    <script type="text/javascript" src="js/CalculatingData.js"></script>
 
 </head>
 <body>
@@ -107,6 +108,7 @@
                             <option>LoadingCalculatedVariable</option>
                             <option>KonishiMethod</option>
                             <option>PreviousMethod</option>
+                            <option>CalcData</option>
                         </select>
                     </div>
                 </div>
@@ -199,7 +201,7 @@
             <!--  可視化変数の初期化-->
             <script type="text/javascript">
                 SelectVariableEvent();
-                jQuery('#VariableMode').val('PreviousMethod').trigger('change');
+                jQuery('#VariableMode').val('KonishiMethod').trigger('change');
                 jQuery('#LineOnOff').prop('checked',false);
             </script>
             <!--  ここまで-->
