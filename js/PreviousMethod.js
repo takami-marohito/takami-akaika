@@ -103,13 +103,13 @@ function PreviousMethod(datenum)
     ).then(function () {
             //var position = {x:143.5,y:38.28};
             //console.log(interpolateVariable(arguments[0],position));
-            //SaveAnArray(arguments[0].data);
+            //SaveAnArray(arguments[0].data,"PreviousMethod");
             return(makeHSIfromSplineParam(arguments,SplineParam,testData));
         });
 
     function makeHSIfromSplineParam(MOVEdata,SplineParam,testData)
     {
-        //SaveAnArray(SplineParam[0].params);
+        //SaveAnArray(SplineParam[0].params,"SplineParam");
         var valS = MOVEdata[0];
         var valT = MOVEdata[1];
         var valU = MOVEdata[2];

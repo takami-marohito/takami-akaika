@@ -23,9 +23,44 @@ function CalculatingData() {
             datenum:date,lat:orgCPUEData.data[i][3],lon:orgCPUEData.data[i][4]};
     }
     var result = new Array();
+    var retArray = new Array();
 
+    var loopnum = orgCPUEData.data.length-30;
+    // var loopnum = orgCPUEData.data.length-1;
+
+    var ValString = "T";
+
+    var ReturnArray = new Array();
+
+    return loopfunction(loopnum);
+
+
+    function loopfunction(number){
+        if(number==-1){
+            console.log(retArray);
+            SaveAnArray(retArray,ValString + number);
+            return CalcData;
+        }
+        if(number<loopnum-1) {
+            //console.log(retArray);
+            SaveAnArray(retArray, ValString + number);
+        }
+        var afn = [];
+        //console.log(CPUEData[number]);
+        afn.push(loadData(ValString,CPUEData[number]));
+        return jQuery.when.apply(
+            $, afn
+        ).then(function (){
+                retArray[loopnum-number] = arguments[0];
+                //console.log(retArray);
+                loopfunction(number-1);
+            });
+    }
+
+
+/*
     var afn = [];
-    for(var i=0;i<CPUEData.length-180;i++){
+    for(var i=0;i<CPUEData.length-170;i++){
         afn.push(loadData("S",CPUEData[i]));
         //afn.push(loadData("T",CPUEData[i]));
         //afn.push(loadData("U",CPUEData[i]));
@@ -37,16 +72,17 @@ function CalculatingData() {
     ).then(function () {
             //console.log(arguments);
             console.log("save");
-            SaveAnArray(arguments);
+            SaveAnArray(arguments,"arg");
             return CalcData;
         });
-
+*/
     function loadData(valname,DateLocation){
         var returnValue = new Array();
         var xy = {x:DateLocation.lon,y:DateLocation.lat};
         var fn = [];
-        for(var i=0;i<30;i++) {
-            fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, valname));
+        fn.push(loadDataLoop(valname,DateLocation,0));
+        for(var i=0;i<21;i++) {
+            //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, valname));
             //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "T"));
             //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "U"));
             //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "V"));
@@ -64,10 +100,35 @@ function CalculatingData() {
                 returnValue[4] = DateLocation.lon;
                 returnValue[5] = DateLocation.cpue;
 
-                for(var i=0;i<30;i++){
-                    returnValue[i+6] = interpolateVariable(arguments[i],xy);
+                for(var i=0;i<21;i++){
+                    //returnValue[i+6] = interpolateVariable(arguments[i],xy);
+                    returnValue[i+6] = arguments[0][i];
                 }
                 return returnValue;
+            });
+    }
+
+
+    function loadDataLoop(valname,DateLocation,nth){
+        if(nth == 0){
+            ReturnArray = new Array();
+        }
+        if(nth == 21){
+            return(ReturnArray);
+        }
+        var fn = [];
+        var xy = {x:DateLocation.lon,y:DateLocation.lat};
+        fn.push(loadMOVEdata(DateLocation.datenum, nth, 0, 441, 0, 672, valname));
+        //console.log(DateLocation.datenum + "   " + nth + "   " + valname);
+        return jQuery.when.apply(
+            $, fn
+        ).then(function () {
+                ReturnArray.push(interpolateVariable(arguments[0],xy));
+                //console.log(arguments[0]);
+                if(nth%2==0){
+                    console.log(nth);
+                }
+                return(loadDataLoop(valname,DateLocation,nth+1));
             });
     }
 

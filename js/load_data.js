@@ -44,7 +44,7 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
     dap_line+="[" + arg_y_start + ":" + arg_y_end + "]";
     dap_line+="[" + arg_x_start + ":" + arg_x_end + "]";
     if(DEBUG == 1) {
-        console.log(dap_line);
+        //console.log(dap_line);
     }
     return jqdap.loadData(dap_line,{withCredentials:true})
         .then(function(tmp_T)

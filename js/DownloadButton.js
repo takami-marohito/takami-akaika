@@ -24,10 +24,10 @@ function DownloadDataButtonOnClickFunction() {
     link.click();
 }
 
-function SaveAnArray(arr)
+function SaveAnArray(arr,name)
 {
     var OutputString = new Array();
-    console.log(arr[0].length);
+    //console.log(arr[0].length);
     if(arr[0].length!==undefined) {
         for (var i = 0; i < arr.length; i++) {
             for (var j = 0; j < arr[0].length; j++) {
@@ -51,7 +51,7 @@ function SaveAnArray(arr)
     }
     var blob = new Blob([OutputString], {type: 'text/plain'});
     var link = document.createElement("a");
-    filenameString = "SavedArray" ;
+    filenameString = name ;
     link.download = filenameString;
     link.href = URL.createObjectURL(blob);
     link.click();

@@ -75,12 +75,12 @@ function interpolateVariable(arg,position)
     var y1 = p1.y;
     var s = ( x - x0 ) / ( x1 - x0 );
     var t = ( y - y0 ) / ( y1 - y0 );
-console.log(array_y + " " + array_x);
+    //console.log(array_y + " " + array_x);
     var u_00 = arg.data[array_y][array_x];
     var u_01 = arg.data[array_y][array_x+1];
     var u_10 = arg.data[array_y+1][array_x];
     var u_11 = arg.data[array_y+1][array_x+1];
-    console.log(u_00 + " , " + u_01 + " , " + u_10 + " , " + u_11 + "  この4点で補間");
+    //console.log(u_00 + " , " + u_01 + " , " + u_10 + " , " + u_11 + "  この4点で補間");
     if(u_00 < -1.0e+10){
         u_00 = 0;
     }

@@ -90,7 +90,7 @@ function KonishiMethod(dateNum) {
             $, exec_function
         ).then(function () {
                 //var loc = {x:142.02,y:38.35};
-                //console.log(interpolateVariable(arguments[4],loc));
+                //console.log(interpolateVariable(arguments[0],loc));
                 InitKonishi_ReturnObject(arguments[0].data.length, arguments[0].data[0].length, namelengtharray.length);
                 var PowNumber = new Array(Konishi_PartObject[0].data.length);
                 for(var i=0;i<Konishi_PartObject[0].data.length;i++){
