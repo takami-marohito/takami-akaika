@@ -5,8 +5,15 @@
 //引数のargはloadMOVEDataのreturnをそのまま入れる
 //positionは.xと.yに緯度経度を入れる
 
-function interpolateVariable(arg,position)
+function interpolateVariable(arg,pos)
 {
+    var position = {x:0,y:0};
+    if(pos.x == undefined){
+        position.x = pos.lon;
+        position.y = pos.lat;
+    }else{
+        position = pos;
+    }
     var SelectedLat;
     var SelectedLon;
     if(arg.type == "U" || arg.type == "V" || arg.type == "W"){

@@ -39,11 +39,58 @@
     if (arg == null) {
       arg = {};
     }
+    var callee = arguments.callee;
     options = parseArg(arg);
     options.dataType = 'binary';
+    options.timeout = 5000;
     options.beforeSend = function(xhr) {
       return xhr.overrideMimeType('text/plain; charset=x-user-defined');
     };
+      options.retryCount = 0;
+      options.retryLimit = 2;
+      options.retryTimeout = 5000;
+      options.error = function(xhr,textStatus,errorThrown){
+          //console.log("error");
+          return -1;
+      };
+      /*
+    options.error = (function(){
+        console.log("error");
+        return (function(){
+            var options;
+            if (arg == null) {
+                arg = {};
+            }
+            console.log(arg);
+            console.log(url);
+            console.log("error function start");
+            options = parseArg(arg);
+            options.dataType = 'binary';
+            options.timeout = 5000;
+            options.beforeSend = function(xhr) {
+                return xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            };
+            options.converters = {
+                '* binary': function(response) {
+                    return response;
+                }
+            };
+            options.error = (function(){
+               console.log("error2");
+                return new xdr.dapUnpacker(0,0).getValue();
+            });
+            console.log("error3");
+            return $.ajax(url, options).then(function(dods) {
+                var dapvar, dds, pos;
+                pos = dods.indexOf('\nData:\n');
+                dds = dods.substr(0, pos);
+                dods = getBuffer(dods.substr(pos + 7));
+                dapvar = new parser.ddsParser(dds).parse();
+                return new xdr.dapUnpacker(dods, dapvar).getValue();
+            });
+        });
+    });
+    */
     options.converters = {
       '* binary': function(response) {
         return response;
@@ -56,7 +103,11 @@
       dods = getBuffer(dods.substr(pos + 7));
       dapvar = new parser.ddsParser(dds).parse();
       return new xdr.dapUnpacker(dods, dapvar).getValue();
-    });
+    },
+    function(){
+        return -1;
+    }
+    );
   };
 
   loadDataset = function(url, arg) {

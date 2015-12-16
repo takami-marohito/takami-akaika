@@ -10,7 +10,50 @@
 
 var LatLon = new setLatLon_func();
 
+var DepthArray = new Array();
+
 loadLatandLonData();
+loadDepthArray();
+
+function loadDepthArray()
+{
+    var csvData = new Array();
+    var data = new XMLHttpRequest();
+    data.open("GET","./js/data/depth_ascii", false);  //true:非同期, false:同期
+    data.send(null);
+    var LF = String.fromCharCode(10); //改行ｺｰﾄﾞ
+    var lines = data.responseText.split(LF);
+    for(var i=0;i<lines.length;i++){
+        var cells = lines[i].split(",");
+        if(cells.length!=1){
+            csvData.push(cells);
+        }
+    }
+    DepthArray = new Array(csvData[0].length);
+    for(var i=0;i<csvData[0].length;i++){
+        DepthArray[i] = Number(csvData[0][i]);
+    }
+}
+
+function returnNumberOfDepthFromDepthIntNumber(number){
+    return DepthArray[number];
+}
+
+function returnNumberOfDepthFromDepth(depth)
+{
+    if(depth < DepthArray[0]){
+        return 0;
+    }
+    if(depth >= DepthArray[DepthArray.length-1]){
+        return DepthArray.length-1;
+    }
+    for(var i=0;i<DepthArray.length;i++){
+        if(DepthArray[i] <= depth && depth < DepthArray[i+1]){
+            return i;
+        }
+    }
+    return -1;
+}
 
 function loadLatandLonData()
 {

@@ -36,8 +36,8 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
         //console.log("load_data start\n");
     }
     //var dap_line = "http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/dods/secret/MOVE-RA2014.dods?";
-    //var dap_line = "http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?";
-    var dap_line = "http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/thredds/dodsC/DIAS/MOVE-RA2014.dods?";
+    var dap_line = "http://hyperinfo.viz.media.kyoto-u.ac.jp/~futami/dias/MOVE-RA2014.dods?";
+    //var dap_line = "http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/thredds/dodsC/DIAS/MOVE-RA2014.dods?";
     dap_line+=arg_string;
     dap_line+="[" + arg_time + "]";
     dap_line+="[" + arg_depth + "]";
@@ -66,6 +66,24 @@ function loadMOVEdata(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, 
             for(y=0;y<arg_y_end-arg_y_start+1;y++){
                 for(x=0;x<arg_x_end-arg_x_start+1;x++){
                     MOVEdata.data[y][x] = tmp_T[0][0][0][0][y][x];
+                }
+            }
+            return(MOVEdata);
+        },
+        function(er){
+            //console.log("ee : " + er);
+            MOVEdata.time = arg_time;
+            MOVEdata.time_string = "error";
+            MOVEdata.depth = arg_depth;
+            MOVEdata.type = arg_string;
+            MOVEdata.data = new Array(arg_y_end-arg_y_start+1);
+            for(var i=0;i<arg_y_end-arg_y_start+1;i++){
+                MOVEdata.data[i] = new Array(arg_x_end-arg_x_start+1);
+            }
+
+            for(y=0;y<arg_y_end-arg_y_start+1;y++){
+                for(x=0;x<arg_x_end-arg_x_start+1;x++){
+                    MOVEdata.data[y][x] = -1;
                 }
             }
             return(MOVEdata);

@@ -26,6 +26,8 @@ function DownloadDataButtonOnClickFunction() {
 
 function SaveAnArray(arr,name)
 {
+    //console.log(arr.length);
+    //console.log(arr[0].length);
     var OutputString = new Array();
     //console.log(arr[0].length);
     if(arr[0].length!==undefined) {
@@ -49,6 +51,7 @@ function SaveAnArray(arr,name)
             }
         }
     }
+    //console.log(OutputString);
     var blob = new Blob([OutputString], {type: 'text/plain'});
     var link = document.createElement("a");
     filenameString = name ;

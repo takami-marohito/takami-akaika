@@ -194,7 +194,7 @@ function CalcVariable()
     }
 
     if(target.value == "CalcData"){
-        CalculatingData();
+        exec_function.push(CalculatingPathLine());
     }
 
     //console.log(exec_function);

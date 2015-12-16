@@ -7,6 +7,16 @@
     //それを全パターン試して最適化する
 
 //year month day lat lon cpue hm hg s00-s53 t00-t53 ... のファイルを読み込む
+//year month day lat lon cpue s00-s20 t00-t20... でも読める
+//スプライン計算する時にS10みたいな、スプラインを作りたい変数名を探すから大丈夫
+
+//スプライン曲線の作り方
+//array.name[j] = j番目の変数名
+//array.data[i][j] = i番目のCPUE点, j番目の変数
+//この配列を用意して
+//var param = makeSpline(array,name,SplineCoef, depth);
+//でできる
+//値を求めるときはcalcCPUEFromSplineParams(param, value)
 
 var PreCPUE = {};
 
@@ -224,6 +234,45 @@ function PreviousMethod(datenum)
     {
         var bestparam;
         var correctrate = 0;
+
+        var bestcorr = 0;
+        var bestdepth = 0;
+
+        //相関係数はひとつのスプライン曲線につきひとつ求まる
+        //depthと係数を変えて最大値をさがす
+        for (var depth = 0; depth < 20; depth++) {
+            var cpue_array = new Array();
+            for(var i=0;i<PreCPUE.data.length;i++) {
+                cpue_array.push(PreCPUE.data[i][5]);
+            }
+            var learningdata_depth_array = new Array();
+            var valnum;
+            var valname = name + String(("0"+depth).slice(-2));
+            for(var i=0;i<PreCPUE.name.length;i++){
+                if(PreCPUE.name[i] == valname){
+                    valnum = i;
+                    break;
+                }
+            }
+            for (var i = 0; i < PreCPUE.data.length; i++) {
+                learningdata_depth_array.push(PreCPUE.data[i][valnum]);
+            }
+            var param = makeSpline(PreCPUE, name, 0.5, depth);
+            var Predict = new Array();
+            for(var i=0;i<PreCPUE.data.length;i++){
+                Predict.push(calcCPUEFromSplineParams(param,learningdata_depth_array[i]));
+            }
+            //console.log(learningdata_depth_array);
+            //console.log(Predict);
+            //console.log(cpue_array);
+            console.log("Correlation at " + depth + " = " + correlation( cpue_array, Predict));
+            if(bestcorr < correlation(cpue_array,Predict)){
+                bestcorr = correlation(cpue_array,Predict);
+                bestdepth = depth;
+            }
+        }
+
+        //ここからの方法で、正答率最大を探せる
         for(var i=0.01;i<0.95;i=i+0.01){
             for(var depth=0;depth<30;depth++){
                 var param = makeSpline(data, name, i, depth);
@@ -373,6 +422,26 @@ function PreviousMethod(datenum)
         return returnParam;
     }
 
+    function correlation(x, y) {
+        var xBar = 0,
+            yBar = 0,
+            sigmaXX = 0,
+            sigmaYY = 0,
+            sigmaXY = 0;
+        var i, n = x.length;
+        for (i = 0; i < n; ++i) {
+            xBar += x[i];
+            yBar += y[i];
+        }
+        xBar /= n;
+        yBar /= n;
+        for (i = 0; i < n; ++i) {
+            sigmaXX += (x[i] - xBar) * (x[i] - xBar);
+            sigmaYY += (y[i] - yBar) * (y[i] - yBar);
+            sigmaXY += (x[i] - xBar) * (y[i] - yBar);
+        }
+        return sigmaXY / Math.sqrt(sigmaXX * sigmaYY);
+    }
 
     function smoothingSpline(x,y,sigma,lambda)
     {

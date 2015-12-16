@@ -4,6 +4,10 @@
 /**
  * Created by vizlab on 2015/12/03.
  */
+
+
+//遡らない一日のデータを計算
+
 function CalculatingData() {
 
     var loopcounter=0;
@@ -25,23 +29,68 @@ function CalculatingData() {
     var result = new Array();
     var retArray = new Array();
 
-    var loopnum = orgCPUEData.data.length-30;
+    var loopnum = orgCPUEData.data.length-1;
     // var loopnum = orgCPUEData.data.length-1;
 
-    var ValString = "T";
+    var ValString = "";
 
     var ReturnArray = new Array();
 
-    return loopfunction(loopnum);
+    var fn = [];
+    fn.push(loopfunction_valname(2));
 
+    return jQuery.when.apply(
+        $, fn
+    ).then(function () {
+            return arguments[0];
+        },
+        function () {
+            return arguments[0];
+        }
+    );
+
+
+    function loopfunction_valname(number){
+        if(number == 5){
+            return CalcData;
+        }
+        if(number == 0){
+            ValString = "S";
+        }
+        if(number == 1){
+            ValString = "T";
+        }
+        if(number == 2){
+            ValString = "U";
+        }
+        if(number == 3){
+            ValString = "V";
+        }
+        if(number == 4){
+            ValString = "W";
+        }
+        var afn = [];
+        afn.push(loopfunction(loopnum));
+        return jQuery.when.apply(
+            $, afn
+        ).then(function (){
+                return loopfunction_valname(number+1);
+            },
+            function(){
+                console.log("error at loopfunction_valname : " + number);
+                return loopfunction_valname(number+1);
+            }
+        );
+    }
 
     function loopfunction(number){
         if(number==-1){
-            console.log(retArray);
+            //console.log(retArray);
             SaveAnArray(retArray,ValString + number);
-            return CalcData;
+            return retArray;
         }
-        if(number<loopnum-1) {
+        if(number<loopnum-1 && number%10==0) {
+            //console.log(retArray);
             //console.log(retArray);
             SaveAnArray(retArray, ValString + number);
         }
@@ -53,45 +102,39 @@ function CalculatingData() {
         ).then(function (){
                 retArray[loopnum-number] = arguments[0];
                 //console.log(retArray);
-                loopfunction(number-1);
-            });
+                return loopfunction(number-1);
+            },
+            function(){
+                retArray[loopnum-number] = arguments[0];
+                console.log("error at loopfunction : " + number);
+                return loopfunction(number-1);
+            }
+        );
     }
 
-
-/*
-    var afn = [];
-    for(var i=0;i<CPUEData.length-170;i++){
-        afn.push(loadData("S",CPUEData[i]));
-        //afn.push(loadData("T",CPUEData[i]));
-        //afn.push(loadData("U",CPUEData[i]));
-        //afn.push(loadData("V",CPUEData[i]));
-        //afn.push(loadData("W",CPUEData[i]));
-    }
-    return jQuery.when.apply(
-        $, afn
-    ).then(function () {
-            //console.log(arguments);
-            console.log("save");
-            SaveAnArray(arguments,"arg");
-            return CalcData;
-        });
-*/
     function loadData(valname,DateLocation){
         var returnValue = new Array();
         var xy = {x:DateLocation.lon,y:DateLocation.lat};
         var fn = [];
         fn.push(loadDataLoop(valname,DateLocation,0));
-        for(var i=0;i<21;i++) {
-            //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, valname));
-            //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "T"));
-            //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "U"));
-            //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "V"));
-            //fn.push(loadMOVEdata(DateLocation.datenum, i, 0, 441, 0, 672, "W"));
-        }
         return jQuery.when.apply(
             $, fn
         ).then(function () {
-                console.log("get Data "+loopcounter + "  " + DateLocation.lon + "  " + DateLocation.lat + "  " + DateLocation.datenum);
+                //console.log("get Data "+loopcounter + "  " + DateLocation.lon + "  " + DateLocation.lat + "  " + DateLocation.datenum);
+                loopcounter++;
+                returnValue[0] = DateLocation.year;
+                returnValue[1] = DateLocation.month;
+                returnValue[2] = DateLocation.day;
+                returnValue[3] = DateLocation.lat;
+                returnValue[4] = DateLocation.lon;
+                returnValue[5] = DateLocation.cpue;
+
+                for(var i=0;i<21;i++){
+                    returnValue[i+6] = arguments[0][i];
+                }
+                return returnValue;
+            },
+            function(){
                 loopcounter++;
                 returnValue[0] = DateLocation.year;
                 returnValue[1] = DateLocation.month;
@@ -102,10 +145,12 @@ function CalculatingData() {
 
                 for(var i=0;i<21;i++){
                     //returnValue[i+6] = interpolateVariable(arguments[i],xy);
-                    returnValue[i+6] = arguments[0][i];
+                returnValue[i+6] = arguments[0][i];
                 }
+                console.log("loadData error");
                 return returnValue;
-            });
+            }
+        );
     }
 
 
@@ -125,11 +170,14 @@ function CalculatingData() {
         ).then(function () {
                 ReturnArray.push(interpolateVariable(arguments[0],xy));
                 //console.log(arguments[0]);
-                if(nth%2==0){
-                    console.log(nth);
-                }
                 return(loadDataLoop(valname,DateLocation,nth+1));
-            });
+            },
+            function() {
+                //ReturnArray.push(-10000);
+                console.log("error at : " + valname + " " + DateLocation.lon + " " + DateLocation.lat + " : depth=" + nth);
+                return (loadDataLoop(valname, DateLocation, nth));
+            }
+        );
     }
 
     function LoadingFile() {
