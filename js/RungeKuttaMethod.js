@@ -36,10 +36,28 @@
 var rungekutta_counter = 0;
 
 function RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber){
+    console.log("rungekutta " + rungekutta_counter);
+    var fn = [];
+    fn.push(loopRungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber));
+    return jQuery.when.apply(
+        $, fn
+    ).then(function () {
+            rungekutta_counter++;
+            if(rungekutta_counter == RungeKuttaNumber){
+                rungekutta_counter = 0;
+                return arguments[0];
+            }
+            var newInputPoint = RungeKuttaPointData[pointnumber][depthnumber][RungeKuttaPointData[pointnumber][depthnumber].length-1];
+            return RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,newInputPoint,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber);
+        },
+        function(){
+            return RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber);
+        }
+    );
+}
+
+function loopRungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber){
     //console.log("runge");
-    if(rungekutta_counter == RungeKuttaNumber){
-        return {s:10,t:11,u:12,v:13,w:14};
-    }
 
     var k1u = returnNumberOfData("U",depthnumber,datenumber);
     var k1v = returnNumberOfData("V",depthnumber,datenumber);
@@ -48,7 +66,7 @@ function RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_da
     var k1 = {u:CPUEDataArray[pointnumber][k1u],v:CPUEDataArray[pointnumber][k1v],w:CPUEDataArray[pointnumber][k1w]};
 
     var k1_location = input_point;
-    var k2_location = calck2locationFromk1velocity(k1_location,k1);
+    var k2_location = calck2locationFromk1velocity(k1_location,k1,1.0/RungeKuttaNumber);
 
     //console.log(k1_location);
     var d = returnNumberOfDepthFromDepth(k1_location.depth);
@@ -75,18 +93,18 @@ function RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_da
             //console.log(interpolateVariable(arguments[0],input_point));
             //console.log(interpolateVariable(arguments[4],input_point));
             var k2 = calck2(arguments,k2_location,d);
-            var k3_location = calck2locationFromk1velocity(k1_location,k2);
+            var k3_location = calck2locationFromk1velocity(k1_location,k2,1.0/RungeKuttaNumber);
             var k3 = calck2(arguments,k3_location,d);
-            var k4_location = calck2locationFromk1velocity(k1_location,k3);
-            k4_location = calck2locationFromk1velocity(k4_location,k3);  //二回やるとf(t+1)がつくれる
+            var k4_location = calck2locationFromk1velocity(k1_location,k3,1.0/RungeKuttaNumber);
+            k4_location = calck2locationFromk1velocity(k4_location,k3,1.0/RungeKuttaNumber);  //二回やるとf(t+1)がつくれる
             var k4 = calck4(arguments,k4_location,d);
             var sum_k = {
                 u:k1.u/6.0+k2.u/3.0+k3.u/3.0+k4.u/6.0,
                 v:k1.v/6.0+k2.v/3.0+k3.v/3.0+k4.v/6.0,
                 w:k1.w/6.0+k2.w/3.0+k3.w/3.0+k4.w/6.0
             };
-            var return_location = calck2locationFromk1velocity(input_point,sum_k);
-            return_location = calck2locationFromk1velocity(return_location,sum_k);
+            var return_location = calck2locationFromk1velocity(input_point,sum_k,1.0/RungeKuttaNumber);
+            return_location = calck2locationFromk1velocity(return_location,sum_k,1.0/RungeKuttaNumber);
             //console.log(return_location);
             RungeKuttaPointData[pointnumber][depthnumber].push(return_location);
             var retobject = {s:0,t:0,u:0,v:0,w:0};
@@ -128,14 +146,14 @@ function RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_da
                 function(){
                     rungekutta_counter = 0;
                     console.log("timeout miss");
-                    return RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber);
+                    return loopRungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber);
                 }
             );
         },
         function(){
             rungekutta_counter = 0;
             console.log("timeout miss");
-            return RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber);
+            return loopRungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_datenum, datenumber, depthnumber, pointnumber,RungeKuttaNumber);
             //失敗したら同じ関数をもう一度回す
         }
     );
@@ -187,7 +205,7 @@ function RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_da
     }
 
     //遡るので流速はマイナスになおして計算している
-    function calck2locationFromk1velocity(location,velocity){
+    function calck2locationFromk1velocity(location,velocity,steplength){
         var umeterperday = velocity.u * 60.0*60.0*24.0 /100.0;
         var vmeterperday = velocity.v * 60.0*60.0*24.0 /100.0;
         var wmeterperday = velocity.w * 60.0*60.0*24.0 /100.0;
@@ -201,9 +219,9 @@ function RungeKuttaMethod(CPUEDataArray,RungeKuttaPointData,input_point,input_da
         var vdegperday = vmeterperday / MeterPerDegLat;
 
         var ret = {lat:0,lon:0,depth:0};
-        ret.lat = location.lat - 0.5*vdegperday;
-        ret.lon = location.lon - 0.5*udegperday;
-        ret.depth = location.depth - 0.5*wmeterperday ;
+        ret.lat = location.lat - 0.5*vdegperday*steplength;
+        ret.lon = location.lon - 0.5*udegperday*steplength;
+        ret.depth = location.depth - 0.5*wmeterperday*steplength ;
         return ret;
     }
 

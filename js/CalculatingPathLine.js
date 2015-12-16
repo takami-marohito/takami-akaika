@@ -33,8 +33,8 @@ NUMBER_U = 2;
 NUMBER_V = 3;
 NUMBER_W = 4;
 
-var backward_day = 3;
-var maxdepth = 5;
+var backward_day = 7;
+var maxdepth = 1;
 
 function CalculatingPathLine(){
 
@@ -58,7 +58,7 @@ function CalculatingPathLine(){
     }
 
     var calculatingStartPoint = 0;
-    var calculatingEndPoint =   3;    //CPUEData.length;
+    var calculatingEndPoint =   1;    //CPUEData.length;
 
     var BackwardCPUEData = new Array();
     var BackwardCPUEPoint = new Array();
@@ -100,11 +100,29 @@ function CalculatingPathLine(){
     ).then(function () {
             console.log(BackwardCPUEData);
             console.log(BackwardCPUEPoint);
-            //var saveArray = InitSaveArray();
-            //saveArray = setBackwardCPUEDataToSaveArray(saveArray);
-            //SaveAnArray(BackwardCPUEPoint,"BackwardPointData");
+            var saveArray = InitSaveArray();
+            saveArray = setBackwardCPUEDataToSaveArray(saveArray);
+            var pointarray = new Array(BackwardCPUEPoint.length);
+            for(var i=0;i<BackwardCPUEPoint[0][0].length;i++) {
+                pointarray[i] = new Array();
+                pointarray[i].push(BackwardCPUEPoint[0][0][i].lat);
+                pointarray[i].push(BackwardCPUEPoint[0][0][i].lon);
+            }
+            console.log(pointarray);
+            SaveAnArray(pointarray,"BackwardPointData");
             //SaveAnArray(saveArray,"BackwardData");
-            return CalcData;
+            var retobject = {data:new Array(442),line:new Array()};
+            for(var i=0;i<442;i++){
+                retobject.data[i] = new Array(673);
+                for(var j=0;j<673;j++){
+                retobject.data[i][j] = SpecialColorValue;
+                }
+            }
+            retobject.line[0] = new THREE.Geometry();
+            for(var i=0;i<BackwardCPUEPoint[0][0].length;i++){
+                retobject.line[0].vertices.push(LatLonToMapGrid_Vector3(BackwardCPUEPoint[0][0][i].lon, BackwardCPUEPoint[0][0][i].lat));
+            }
+            return retobject;
         }
     );
 

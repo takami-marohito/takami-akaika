@@ -79,6 +79,7 @@ function draw_map(Data)
 
     draw_polygon(Data);
     if(document.getElementById("LineOnOff").checked){
+        console.log("draw line");
         draw_line(Data);
     }
     if(CPUE_Position!=null){
