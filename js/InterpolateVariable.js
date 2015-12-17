@@ -5,6 +5,42 @@
 //引数のargはloadMOVEDataのreturnをそのまま入れる
 //positionは.xと.yに緯度経度を入れる
 
+function returnNumberOfLonUsingLonU(lon)
+{
+    var SelectedLon = LatLon.LongitudeU;
+    if(SelectedLon.data[SelectedLon.data.length-1] < lon || SelectedLon.data[0] > lon){
+        //console.log("this longitude is out of MOVE data range.");
+        return(-1);
+    }
+    var array_x = -1;
+    for(var x=0;x<SelectedLon.data.length-1;x++){
+        if(SelectedLon.data[x] <= lon && SelectedLon.data[x+1] > lon ){
+            array_x = x;
+            //console.log(SelectedLon.data[x] + "<" + " x : " + lon + " < " + SelectedLon.data[x+1]);
+            //console.log("x:" + x);
+        }
+    }
+    return array_x;
+}
+
+function returnNumberOfLatUsingLatU(lat)
+{
+    var SelectedLat = LatLon.LatitudeU;
+    if(SelectedLat.data[SelectedLat.data.length-1] < lat || SelectedLat.data[0] > lat){
+        //console.log("this longitude is out of MOVE data range.");
+        return(-1);
+    }
+    var array_x = -1;
+    for(var x=0;x<SelectedLat.data.length-1;x++){
+        if(SelectedLat.data[x] <= lat && SelectedLat.data[x+1] > lat ){
+            array_x = x;
+            //console.log(SelectedLon.data[x] + "<" + " x : " + lon + " < " + SelectedLon.data[x+1]);
+            //console.log("x:" + x);
+        }
+    }
+    return array_x;
+}
+
 function interpolateVariable(arg,pos)
 {
     var position = {x:0,y:0};

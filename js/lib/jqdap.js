@@ -42,13 +42,13 @@
     var callee = arguments.callee;
     options = parseArg(arg);
     options.dataType = 'binary';
-    options.timeout = 5000;
+    options.timeout = 10000;
     options.beforeSend = function(xhr) {
       return xhr.overrideMimeType('text/plain; charset=x-user-defined');
     };
       options.retryCount = 0;
       options.retryLimit = 2;
-      options.retryTimeout = 5000;
+      options.retryTimeout = 10000;
       options.error = function(xhr,textStatus,errorThrown){
           //console.log("error");
           return -1;

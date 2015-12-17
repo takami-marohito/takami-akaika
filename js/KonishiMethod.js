@@ -152,7 +152,12 @@ function KonishiMethod(dateNum) {
                 //console.log(Konishi_CreateArray_ReturnObject.data[80][159]);
                 //console.log(Konishi_CreateArray_ReturnObject.data[80]);
                 return Konishi_CreateArray_ReturnObject;
-            });
+            },
+            function(){
+                console.log("time out retry");
+                return Konishi_CreateArray(input_array, dateNum);
+            }
+        );
     }
 
 //再帰的にCreateArray関数を回すかもしれない→無駄な関数を入れると消費メモリが増える→Init関数やoneStep関数をCreateArray関数の外に出した

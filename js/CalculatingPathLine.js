@@ -22,7 +22,7 @@
 
 
 //BackwardCPUEDataには、双見君の計算と同じ形で入っている
-//BackwardCPUEPoint[i][j][k]はi番目の点のdepth - jから遡り始めて、k日遡った点がはいっている。
+//BackwardCPUEPoint[i][j][k]はi番目の点のdepth = jから遡り始めて、k日遡った点がはいっている。
 //点はlat,lon,depthで表している。
 
 //RungeKuttaCPUEPointはルンゲクッタの途中で出てくる点を全て記録する。RungeKuttaCPUEPoint[i][j][k]はi番目の点depth j を計算中に出てくるk個目の座標
@@ -33,8 +33,8 @@ NUMBER_U = 2;
 NUMBER_V = 3;
 NUMBER_W = 4;
 
-var backward_day = 7;
-var maxdepth = 1;
+var backward_day = 10;
+var maxdepth = 20;
 
 function CalculatingPathLine(){
 
@@ -57,8 +57,8 @@ function CalculatingPathLine(){
             datenum:date,lat:orgCPUEData.data[i][3],lon:orgCPUEData.data[i][4]};
     }
 
-    var calculatingStartPoint = 0;
-    var calculatingEndPoint =   1;    //CPUEData.length;
+    var calculatingStartPoint = 170;
+    var calculatingEndPoint =   CPUEData.length;    //CPUEData.length;
 
     var BackwardCPUEData = new Array();
     var BackwardCPUEPoint = new Array();
@@ -110,7 +110,7 @@ function CalculatingPathLine(){
             }
             console.log(pointarray);
             SaveAnArray(pointarray,"BackwardPointData");
-            //SaveAnArray(saveArray,"BackwardData");
+            SaveAnArray(saveArray,"BackwardData");
             var retobject = {data:new Array(442),line:new Array()};
             for(var i=0;i<442;i++){
                 retobject.data[i] = new Array(673);
@@ -118,10 +118,12 @@ function CalculatingPathLine(){
                 retobject.data[i][j] = SpecialColorValue;
                 }
             }
+            /*
             retobject.line[0] = new THREE.Geometry();
             for(var i=0;i<BackwardCPUEPoint[0][0].length;i++){
                 retobject.line[0].vertices.push(LatLonToMapGrid_Vector3(BackwardCPUEPoint[0][0][i].lon, BackwardCPUEPoint[0][0][i].lat));
             }
+            */
             return retobject;
         }
     );
@@ -142,6 +144,24 @@ function CalculatingPathLine(){
                 return jQuery.when.apply(
                     $, fn2
                 ).then(function () {
+                        if(pointnumber > 0) {
+                            var saveArray = InitSaveArray();
+                            saveArray = setBackwardCPUEDataToSaveArray(saveArray);
+                            var pointarray = new Array(pointnumber+1);
+                            for (var i = 0; i < pointnumber+1; i++) {
+                                pointarray[i] = new Array();
+                                for(var j=0;j<backward_day;j++) {
+                                    for(var k=0;k<maxdepth;k++) {
+                                        pointarray[i].push(BackwardCPUEPoint[i][k][j].lat);
+                                        pointarray[i].push(BackwardCPUEPoint[i][k][j].lon);
+                                        pointarray[i].push(BackwardCPUEPoint[i][k][j].depth);
+                                    }
+                                }
+                            }
+                            //console.log(pointarray);
+                            SaveAnArray(pointarray, "BackwardPointData");
+                            SaveAnArray(saveArray, "BackwardData");
+                        }
                         return loopfunction_point(pointnumber + 1);
                     }
                 );
@@ -297,17 +317,20 @@ function CalculatingPathLine(){
         var day = ("0"+orgCPUEData.data[pointnumber][2]).slice(-2);
         var dateText = year + "-" + month + "-" + day;
         var date = DateToArrayNum(dateText);
-
+/*
         if(depth%5==0){
-            console.log("calc 0 day depth " + depth);
+            console.log("calc first day depth " + depth);
         }
+        */
+        var lon_number = returnNumberOfLonUsingLonU(BackwardCPUEPoint[pointnumber][depth][0].lon);
+        var lat_number = returnNumberOfLatUsingLatU(BackwardCPUEPoint[pointnumber][depth][0].lat);
 
         var fn = [];
-        fn.push(loadMOVEdata(date,depth,0,441,0,672,"S"));
-        fn.push(loadMOVEdata(date,depth,0,441,0,672,"T"));
-        fn.push(loadMOVEdata(date,depth,0,441,0,672,"U"));
-        fn.push(loadMOVEdata(date,depth,0,441,0,672,"V"));
-        fn.push(loadMOVEdata(date,depth,0,441,0,672,"W"));
+        fn.push(loadMOVEdataReduced(date,depth,lat_number-2,lat_number+2,lon_number-2,lon_number+2,"S"));
+        fn.push(loadMOVEdataReduced(date,depth,lat_number-2,lat_number+2,lon_number-2,lon_number+2,"T"));
+        fn.push(loadMOVEdataReduced(date,depth,lat_number-2,lat_number+2,lon_number-2,lon_number+2,"U"));
+        fn.push(loadMOVEdataReduced(date,depth,lat_number-2,lat_number+2,lon_number-2,lon_number+2,"V"));
+        fn.push(loadMOVEdataReduced(date,depth,lat_number-2,lat_number+2,lon_number-2,lon_number+2,"W"));
         return jQuery.when.apply(
             $, fn
         ).then(function(){
