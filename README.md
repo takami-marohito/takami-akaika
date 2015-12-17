@@ -7,5 +7,6 @@ python2ならpython -m SimpleHTTPServer 8000
 
 計算済みのデータを読み込むことができる
 データは単にfloatをカンマ区切りと改行で並べるだけ
+サイズは縦442 横673
 
 地形データの入ったjsonファイルを読み込んで、地形を描画している(function draw_land)
