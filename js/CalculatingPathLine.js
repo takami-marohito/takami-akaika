@@ -33,7 +33,7 @@ NUMBER_U = 2;
 NUMBER_V = 3;
 NUMBER_W = 4;
 
-var backward_day = 10;
+var backward_day = 10;   //0日目からn日目まで計算する(n+1のデータを作る
 var maxdepth = 20;
 
 function CalculatingPathLine(){
@@ -57,7 +57,7 @@ function CalculatingPathLine(){
             datenum:date,lat:orgCPUEData.data[i][3],lon:orgCPUEData.data[i][4]};
     }
 
-    var calculatingStartPoint = 170;
+    var calculatingStartPoint = 0;
     var calculatingEndPoint =   CPUEData.length;    //CPUEData.length;
 
     var BackwardCPUEData = new Array();
@@ -150,7 +150,7 @@ function CalculatingPathLine(){
                             var pointarray = new Array(pointnumber+1);
                             for (var i = 0; i < pointnumber+1; i++) {
                                 pointarray[i] = new Array();
-                                for(var j=0;j<backward_day;j++) {
+                                for(var j=0;j<backward_day+1;j++) {
                                     for(var k=0;k<maxdepth;k++) {
                                         pointarray[i].push(BackwardCPUEPoint[i][k][j].lat);
                                         pointarray[i].push(BackwardCPUEPoint[i][k][j].lon);
@@ -159,8 +159,8 @@ function CalculatingPathLine(){
                                 }
                             }
                             //console.log(pointarray);
-                            SaveAnArray(pointarray, "BackwardPointData");
-                            SaveAnArray(saveArray, "BackwardData");
+                            SaveAnArray(pointarray, "BackwardPointData" + pointnumber);
+                            SaveAnArray(saveArray, "BackwardData" + pointnumber);
                         }
                         return loopfunction_point(pointnumber + 1);
                     }
