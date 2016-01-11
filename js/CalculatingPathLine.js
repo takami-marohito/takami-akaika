@@ -33,7 +33,7 @@ NUMBER_U = 2;
 NUMBER_V = 3;
 NUMBER_W = 4;
 
-var backward_day = 10;   //0日目からn日目まで計算する(n+1のデータを作る
+var backward_day = 60;   //0日目からn日目まで計算する(n+1のデータを作る
 var maxdepth = 20;
 
 function CalculatingPathLine(){
@@ -98,8 +98,8 @@ function CalculatingPathLine(){
     return jQuery.when.apply(
         $, fn
     ).then(function () {
-            console.log(BackwardCPUEData);
-            console.log(BackwardCPUEPoint);
+            //console.log(BackwardCPUEData);
+            //console.log(BackwardCPUEPoint);
             var saveArray = InitSaveArray();
             saveArray = setBackwardCPUEDataToSaveArray(saveArray);
             var pointarray = new Array(BackwardCPUEPoint.length);
@@ -108,7 +108,7 @@ function CalculatingPathLine(){
                 pointarray[i].push(BackwardCPUEPoint[0][0][i].lat);
                 pointarray[i].push(BackwardCPUEPoint[0][0][i].lon);
             }
-            console.log(pointarray);
+            //console.log(pointarray);
             SaveAnArray(pointarray,"BackwardPointData");
             SaveAnArray(saveArray,"BackwardData");
             var retobject = {data:new Array(442),line:new Array()};
