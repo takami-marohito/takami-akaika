@@ -94,7 +94,8 @@ function CalculatingPathLine(){
     //console.log(BackwardCPUEData);
 
     var fn = [];
-    fn.push(loopfunction_point(calculatingStartPoint));
+    //fn.push(loopfunction_point(calculatingStartPoint));
+    fn.push(loopfunction_parallel(calculatingStartPoint,3));
     return jQuery.when.apply(
         $, fn
     ).then(function () {
@@ -109,8 +110,8 @@ function CalculatingPathLine(){
                 pointarray[i].push(BackwardCPUEPoint[0][0][i].lon);
             }
             //console.log(pointarray);
-            SaveAnArray(pointarray,"BackwardPointData");
-            SaveAnArray(saveArray,"BackwardData");
+            SaveAnArray(pointarray,"BackwardPointData.txt");
+            SaveAnArray(saveArray,"BackwardData.txt");
             var retobject = {data:new Array(442),line:new Array()};
             for(var i=0;i<442;i++){
                 retobject.data[i] = new Array(673);
@@ -128,12 +129,36 @@ function CalculatingPathLine(){
         }
     );
 
+    function loopfunction_parallel(startnum,n) {
+        if(startnum >=calculatingEndPoint){
+            return CalcData;
+        }
+        var fn = [];
+        for (var i = 0; i < n; i++) {
+            if (startnum + i < calculatingEndPoint) {
+                fn.push(loopfunction_point(startnum + i));
+            }
+        }
+        return jQuery.when.apply(
+            $, fn
+        ).then(function () {
+                return loopfunction_parallel(startnum+n,n);
+            },
+            function(){
+                return loopfunction_parallel(startnum,n);
+            }
+        );
+
+    }
+
     function loopfunction_point(pointnumber){
         console.log("point" + pointnumber);
+        /*
         if(pointnumber == calculatingEndPoint){
             //console.log("finish");
             return CalcData;
         }
+        */
         var fn = [];
         fn.push(set0dayData(pointnumber,0));
         return jQuery.when.apply(
@@ -159,10 +184,11 @@ function CalculatingPathLine(){
                                 }
                             }
                             //console.log(pointarray);
-                            SaveAnArray(pointarray, "BackwardPointData" + pointnumber);
-                            SaveAnArray(saveArray, "BackwardData" + pointnumber);
+                            SaveAnArray(pointarray, "BackwardPointData" + pointnumber + ".txt");
+                            SaveAnArray(saveArray, "BackwardData" + pointnumber + ".txt");
                         }
-                        return loopfunction_point(pointnumber + 1);
+                        return CalcData;
+                        //return loopfunction_point(pointnumber + 1);
                     }
                 );
             },
@@ -173,7 +199,7 @@ function CalculatingPathLine(){
     }
 
     function loopfunction_depth(depthnumber,pointnumber){
-        //console.log("depth" + depthnumber);
+        console.log("depth" + depthnumber);
         if(depthnumber == maxdepth){
             //console.log("depth = " + maxdepth + " end");
             return CalcData;
@@ -192,7 +218,7 @@ function CalculatingPathLine(){
     }
 
     function loopfunction_date(datenumber,depthnumber,pointnumber){
-        //console.log("date" + datenumber);
+        console.log("point" + pointnumber + " depth " + depthnumber + " , date" + datenumber);
         //console.log(" day = " + datenumber + "start " + backward_day);
         if(datenumber == backward_day){
             //console.log("day = " + datenumber + " end ");
