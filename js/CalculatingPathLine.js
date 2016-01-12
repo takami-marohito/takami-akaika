@@ -27,6 +27,9 @@
 
 //RungeKuttaCPUEPointはルンゲクッタの途中で出てくる点を全て記録する。RungeKuttaCPUEPoint[i][j][k]はi番目の点depth j を計算中に出てくるk個目の座標
 
+//SaveArray関数は1次元配列だとエラーになる
+//そうならないようにloopfunction_pointでセーブを行う関数は最初の一回は動かない
+
 NUMBER_S = 0;
 NUMBER_T = 1;
 NUMBER_U = 2;
@@ -57,8 +60,9 @@ function CalculatingPathLine(){
             datenum:date,lat:orgCPUEData.data[i][3],lon:orgCPUEData.data[i][4]};
     }
 
-    var calculatingStartPoint = document.getElementById("PathLineNumber").value;
+    var calculatingStartPoint = parseInt(document.getElementById("PathLineNumber").value);
     console.log(calculatingStartPoint);
+    console.log(calculatingStartPoint+3);
     var calculatingEndPoint =   CPUEData.length;    //CPUEData.length;
 
     var BackwardCPUEData = new Array();
