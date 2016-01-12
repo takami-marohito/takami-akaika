@@ -199,6 +199,7 @@ function CalculatingPathLine(){
     function loopfunction_date(datenumber,depthnumber,pointnumber){
         //console.log("date" + datenumber);
         //console.log(" day = " + datenumber + "start " + backward_day);
+        document.getElementById("Progress").innerText = pointnumber + " - " + depthnumber + " - " + datenumber;
         if(datenumber == backward_day){
             //console.log("day = " + datenumber + " end ");
             return 0;
