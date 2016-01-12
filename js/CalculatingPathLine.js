@@ -145,7 +145,7 @@ function CalculatingPathLine(){
                 return jQuery.when.apply(
                     $, fn2
                 ).then(function () {
-                        if(pointnumber > 0) {
+                        if(pointnumber > calculatingStartPoint) {
                             var saveArray = InitSaveArray();
                             saveArray = setBackwardCPUEDataToSaveArray(saveArray);
                             var pointarray = new Array(pointnumber+1);
