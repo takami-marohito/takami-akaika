@@ -45,6 +45,7 @@ function SelectVariableEvent()
             input[10] = "none";
             input[11] = "";
             input[12] = "none";
+            input[13] = "none";
             DisplayParameter(input);
         }
         if(target2.value == "KonishiMethod"){
@@ -62,6 +63,7 @@ function SelectVariableEvent()
             input[10] = "none";
             input[11] = "";
             input[12] = "none";
+            input[13] = "none";
             DisplayParameter(input);
         }
         if(target2.value == "PreviousMethod"){
@@ -79,6 +81,7 @@ function SelectVariableEvent()
             input[10] = "";
             input[11] = "CPUEFile";
             input[12] = "";
+            input[13] = "none";
             DisplayParameter(input);
         }
         if(target2.value == "CalcData"){
@@ -96,6 +99,7 @@ function SelectVariableEvent()
             input[10] = "none";
             input[11] = "";
             input[12] = "none";
+            input[13] = "";
             DisplayParameter(input);
         }
     });
@@ -128,4 +132,5 @@ function DisplayParameter(box)
     document.getElementById("CalcLatRange").style.display=box[10];
     document.getElementById("PreviousMethodFiletext").innerHTML=box[11];
     document.getElementById("PreviousMethodFile").style.display=box[12];
+    document.getElementById("PathLineNumber").style.display=box[13];
 }

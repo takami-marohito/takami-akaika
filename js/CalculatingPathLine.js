@@ -57,7 +57,8 @@ function CalculatingPathLine(){
             datenum:date,lat:orgCPUEData.data[i][3],lon:orgCPUEData.data[i][4]};
     }
 
-    var calculatingStartPoint = 0;
+    var calculatingStartPoint = document.getElementById("PathLineNumber").value;
+    console.log(calculatingStartPoint);
     var calculatingEndPoint =   CPUEData.length;    //CPUEData.length;
 
     var BackwardCPUEData = new Array();
