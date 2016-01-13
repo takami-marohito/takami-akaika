@@ -30,6 +30,11 @@
 //SaveArray関数は1次元配列だとエラーになる
 //そうならないようにloopfunction_pointでセーブを行う関数は最初の一回は動かない
 
+//出力のtxtは x-y-z.txtのファイル名で出力される
+//xはロードした点の数で1月と2月の判断ができる
+//yは計算開始点でy番目の点の流跡線を最初に計算する
+//zは現在の計算終了点でz番目の点の結果が保存されている
+
 NUMBER_S = 0;
 NUMBER_T = 1;
 NUMBER_U = 2;
@@ -114,8 +119,8 @@ function CalculatingPathLine(){
                 pointarray[i].push(BackwardCPUEPoint[0][0][i].lon);
             }
             //console.log(pointarray);
-            SaveAnArray(pointarray,"BackwardPointData");
-            SaveAnArray(saveArray,"BackwardData");
+            //SaveAnArray(pointarray,"BackwardPointData");
+            //SaveAnArray(saveArray,"BackwardData");
             var retobject = {data:new Array(442),line:new Array()};
             for(var i=0;i<442;i++){
                 retobject.data[i] = new Array(673);
@@ -164,8 +169,8 @@ function CalculatingPathLine(){
                                 }
                             }
                             //console.log(pointarray);
-                            SaveAnArray(pointarray, "BackwardPointData" + pointnumber);
-                            SaveAnArray(saveArray, "BackwardData" + pointnumber);
+                            SaveAnArray(pointarray, "BackwardPointData" + calculatingEndPoint + "-" + calculatingStartPoint + "-" + pointnumber +".txt");
+                            SaveAnArray(saveArray, "BackwardData" + calculatingEndPoint + "-" + calculatingStartPoint + "-" + pointnumber +".txt");
                         }
                         return loopfunction_point(pointnumber + 1);
                     }
