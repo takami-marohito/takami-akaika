@@ -12,8 +12,13 @@
 //opendapURLに0,441と指定すると0から441まで合計442の数取ってくる
 //だからデータを入れるときはarg_x_end-arg_x_start+1にしないといけない
 
+//MOVEデータを取得する時に値が0になる時がある
+//エラーが返ってきてるか確認してないから、とりあえず動かすために
+//返ってきた配列がある程度以上0で埋まってる場合はエラーとみなした
+
 function loadMOVEdataReduced(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, arg_x_end, arg_string)
 {
+    var checkMiss = 0;
     var MOVEdata={};
     if(DEBUG==1) {
         //console.log("load_data start\n");
@@ -52,27 +57,19 @@ function loadMOVEdataReduced(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_
             for(y=arg_y_start;y<arg_y_end+1;y++){
                 for(x=arg_x_start;x<arg_x_end+1;x++){
                     MOVEdata.data[y][x] = tmp_T[0][0][0][0][y-arg_y_start][x-arg_x_start];
+                    if(MOVEdata.data[y][x] == 0) {
+                        checkMiss++;
+                    }
                 }
+            }
+            if(checkMiss > (arg_y_end-arg_y_start)*(arg_x_end-arg_x_start)){
+                console.log("0 error");
+                return(loadMOVEdataReduced(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, arg_x_end, arg_string));
             }
             return(MOVEdata);
         },
         function(er){
-            //console.log("ee : " + er);
-            MOVEdata.time = arg_time;
-            MOVEdata.time_string = "error";
-            MOVEdata.depth = arg_depth;
-            MOVEdata.type = arg_string;
-            MOVEdata.data = new Array(arg_y_end-arg_y_start+1);
-            for(var i=0;i<arg_y_end-arg_y_start+1;i++){
-                MOVEdata.data[i] = new Array(arg_x_end-arg_x_start+1);
-            }
-
-            for(y=0;y<arg_y_end-arg_y_start+1;y++){
-                for(x=0;x<arg_x_end-arg_x_start+1;x++){
-                    MOVEdata.data[y][x] = -1;
-                }
-            }
-            return(MOVEdata);
+            return(loadMOVEdataReduced(arg_time, arg_depth, arg_y_start, arg_y_end, arg_x_start, arg_x_end, arg_string));
         }
     );
 }
