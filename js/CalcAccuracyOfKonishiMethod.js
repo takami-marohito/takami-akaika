@@ -1,6 +1,11 @@
 /**
- * Created by vizlab on 2015/09/25.
+ * Created by vizlab on 2016/01/31.
  */
+
+//matlabで計算したSIモデルをHSIモデルにして正答率を計算する
+//または直接HSIモデルを求める手法の正答率を計算する
+//1/31の時点で地図は出さない
+//追加予定
 
 function KonishiMethod(dateNum) {
     fileurl = URL.createObjectURL(document.getElementById("KonishiFilename").files[0]);
