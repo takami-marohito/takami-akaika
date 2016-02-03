@@ -197,6 +197,10 @@ function CalcVariable()
         exec_function.push(CalculatingPathLine());
     }
 
+    if(target.value == "CalcAccuracy"){
+        exec_function.push(KonishiMethodAccuracy(dateNum));
+    }
+
     //console.log(exec_function);
     return jQuery.when.apply(
         $,exec_function

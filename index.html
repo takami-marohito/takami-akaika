@@ -39,6 +39,7 @@
     <script type="text/javascript" src="js/CalculatingPathLine.js"></script>
     <script type="text/javascript" src="js/RungeKuttaMethod.js"></script>
     <script type="text/javascript" src="js/load_data_reduced.js"></script>
+    <script type="text/javascript" src="js/CalcAccuracyOfKonishiMethod.js"></script>
 
 </head>
 <body>
@@ -112,6 +113,7 @@
                             <option>KonishiMethod</option>
                             <option>PreviousMethod</option>
                             <option>CalcData</option>
+                            <option>CalcAccuracy</option>
                         </select>
                     </div>
                 </div>
@@ -121,6 +123,42 @@
                 <div class="col col-lg-12">
                     <div id="KonishiFilenametext">ResultFile</div>
                     <input type="file" id="KonishiFilename"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="SFilenametext">SFile</div>
+                    <input type="file" id="SFilename"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="TFilenametext">TFile</div>
+                    <input type="file" id="TFilename"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="UFilenametext">UFile</div>
+                    <input type="file" id="UFilename"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="VFilenametext">VFile</div>
+                    <input type="file" id="VFilename"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="WFilenametext">WFile</div>
+                    <input type="file" id="WFilename"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-lg-12">
+                    <div id="CheckCorrectCPUEFilenametext">CPUEFile</div>
+                    <input type="file" id="CheckCorrectCPUEFilename"/>
                 </div>
             </div>
 
@@ -214,7 +252,7 @@
             <!--  可視化変数の初期化-->
             <script type="text/javascript">
                 SelectVariableEvent();
-                jQuery('#VariableMode').val('CalcData').trigger('change');
+                jQuery('#VariableMode').val('CalcAccuracy').trigger('change');
                 jQuery('#LineOnOff').prop('checked',false);
             </script>
             <!--  ここまで-->

@@ -4,6 +4,7 @@
 
 function KonishiMethod(dateNum) {
     fileurl = URL.createObjectURL(document.getElementById("KonishiFilename").files[0]);
+
     //console.log(fileurl);
 
     var csvNumData = {};
@@ -11,7 +12,7 @@ function KonishiMethod(dateNum) {
     var testfunction = [];
     testfunction.push(
         jQuery.ajax({
-            url: fileurl,
+            url: fileurlS,
             dataType: "text",
             async: false
         })
